@@ -1,6 +1,6 @@
 <dl class="dl-horizontal">
     {% if attribute(order, type~'Site') is not empty and attribute(order, type~'Ts') %}
-        <div class="{% if order.rdrId is empty %} well well-sm {% else %} alert alert-success well-sm {% endif %}">
+        <div class="{% if order.rdrId is empty %} alert alert-secondary well well-sm {% else %} alert alert-success well-sm {% endif %}">
             <i class="fa fa-info-circle" aria-hidden="true"></i>
             <strong {% if attribute(order, 'biobankFinalized') and attribute(order, type~'User') is empty %} class="text-danger" {% endif %}>{{ type|capitalize }} by {{ attribute(order, type~'User') is not empty ? attribute(order, type~'User').email|default('Unknown') : 'Biobank user' }} at {{ siteInfo.siteDisplayName(attribute(order, type~'Site')) }}</strong>
             {# TODO: Replace with class constants #}
@@ -26,18 +26,12 @@
 </dl>
 {% if is_granted('ROLE_BIOBANK') and type == 'finalized' and attribute(order, 'finalizedTs') is empty and not order.disabled and order.origin is empty %}
     {% import 'biobank/partials/order-samples.html.twig' as samples %}
-    {% if order.type != 'saliva' %}
-        {% form_theme finalizeForm 'form/simple_checkbox.html.twig' %}
-    {% endif %}
     <div class="row col-sm-12">
-        {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit finalize-form' } }) }}
+        {{ form_start(finalizeForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit finalize-form aou-order-form' } }) }}
         {{ form_errors(finalizeForm) }}
 
         <div class="form-group{% if not finalizeForm.finalizedSamples.vars.valid %} has-error{% endif %}">
             {{ form_label(finalizeForm.finalizedSamples) }}
-            <span class="toggle-help-image" data-caption="Finalized samples help text placeholder.">
-                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
-            </span>
             {% if order.type == 'saliva' %}
                 {{ form_widget(finalizeForm.finalizedSamples) }}
             {% else %}
@@ -76,55 +70,58 @@
         {{ form_end(finalizeForm) }}
     </div>
 {% else %}
-    <div class="row col-sm-6">
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col" colspan="2">Samples</th>
-                <th scope="col">
-                    {{ type|capitalize }}
-                    {% if type != 'processed' and attribute(order, type~'Ts') is not empty %}
-                        {% set timezone = attribute(order, type~'Timezone') ?? app.user.timezone  %}
-                        <br> {{ attribute(order, type~'Ts')|date('n/j/Y g:ia T', timezone) }}
-                    {% endif %}
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for sample in samplesInfoText %}
-                {% if (type == 'processed' and sample.process is defined) or (type != 'processed') %}
-                    <tr>
-                        {% if order.type != constant('ORDER_TYPE_SALIVA', order) %}
-                            <td>({{ sample.number }}) {{ sample.label }} [{{ sample.sampleId }}]</td>
-                            <td>{{ sample.color }}</td>
-                        {% else %}
-                            <td>{{ sample.label }}</td>
+    <div class="row mt-2 mb-5">
+        <div class="col-md-12">
+            <table class="table table-auto-width table-samples">
+                <thead>
+                <tr>
+                    <th scope="col" colspan="2">Samples</th>
+                    <th scope="col">
+                        {{ type|capitalize }}
+                        {% if type != 'processed' and attribute(order, type~'Ts') is not empty %}
+                            {% set timezone = attribute(order, type~'Timezone') ?? app.user.timezone  %}
+                            <br> {{ attribute(order, type~'Ts')|date('n/j/Y g:ia T', timezone) }}
                         {% endif %}
-                        <td>
-                            {% if attribute(order, type~'Ts') %}
-                                {% if attribute(sample, type~'_checked') is defined and attribute(sample, type~'_ts') is defined and attribute(sample, type~'_ts') is not empty %}
-                                    <i class="fa fa-check text-success" aria-hidden="true"></i>
-                                    {% set timezone = attribute(order, type~'Timezone') ?? app.user.timezone  %}
-                                    {{ type == 'processed' ? attribute(sample, type~'_ts')|date('n/j/Y g:ia T', timezone) }}
-                                {% else %}
-                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                                {% endif %}
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for sample in samplesInfoText %}
+                    {% if (type == 'processed' and sample.process is defined) or (type != 'processed') %}
+                        <tr>
+                            {% if order.type != constant('ORDER_TYPE_SALIVA', order) %}
+                                <td>({{ sample.number }}) {{ sample.label }} [{{ sample.sampleId }}]</td>
+                                <td>{{ sample.color }}</td>
                             {% else %}
-                                {% if attribute(sample, type~'_checked') is defined %}
-                                    <i class="fa fa-check text-default" aria-hidden="true"></i>
-                                {% else %}
-                                    <i class="fa fa-times text-danger" aria-hidden="true"></i>
-                                {% endif %}
+                                <td>{{ sample.label }}</td>
+                                <td></td>
                             {% endif %}
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="row col-sm-12">
-        <b>Notes</b>
-        <br>{{ attribute(order, type~'Notes')|default('--') }}
+                            <td>
+                                {% if attribute(order, type~'Ts') %}
+                                    {% if attribute(sample, type~'_checked') is defined and attribute(sample, type~'_ts') is defined and attribute(sample, type~'_ts') is not empty %}
+                                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                        {% set timezone = attribute(order, type~'Timezone') ?? app.user.timezone  %}
+                                        {{ type == 'processed' ? attribute(sample, type~'_ts')|date('n/j/Y g:ia T', timezone) }}
+                                    {% else %}
+                                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                    {% endif %}
+                                {% else %}
+                                    {% if attribute(sample, type~'_checked') is defined %}
+                                        <i class="fa fa-check text-default" aria-hidden="true"></i>
+                                    {% else %}
+                                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="mt-2">
+                <span class="fw-bold">Notes</span>
+                <span class="d-block"> {{ attribute(order, type~'Notes')|default('--') }}</span>
+            </div>
+        </div>
     </div>
 {% endif %}

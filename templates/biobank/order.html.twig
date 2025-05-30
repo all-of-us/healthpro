@@ -1,30 +1,32 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'biobank/base.html.twig' %}
 {% block title %}Participant {{ participant.biobankId }} - {% endblock %}
 {% block body %}
-    <div class="page-header">
+    {% form_theme finalizeForm 'custom_bootstrap_5_layout.html.twig' %}
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Details</h2>
     </div>
-    <div class="row">
+    <div class="row mt-4">
         <div class="display-none" id="currentStep" data-current-step="{{ currentStep }}"></div>
         <div class="display-none" id="collectedSamples" data-collected-samples="{{ collectedSamples|json_encode }}"></div>
         <div class="col-sm-6">
-            <dl class="dl-horizontal">
+            <dl class="row">
                 {% if is_granted('ROLE_SCRIPPS') or is_granted('ROLE_AWARDEE') %}
-                    <dt>Participant ID</dt>
-                    <dd>{{ participant.id }}</dd>
+                    <dt class="col-sm-4">Participant ID</dt>
+                    <dd class="col-sm-8">{{ participant.id }}</dd>
                 {% endif %}
-                <dt>Biobank ID</dt>
-                <dd>
+                <dt class="col-sm-4">Biobank ID</dt>
+                <dd class="col-sm-8">
                     {% if is_granted('ROLE_SCRIPPS') or is_granted('ROLE_BIOBANK') %}
                         <a href="{{ path('biobank_participant', { biobankId: participant.biobankId }) }}">{{ participant.biobankId }}</a>
                     {% else %}
                         {{ participant.biobankId }}
                     {% endif %}
                 </dd>
-                <dt>Paired Organization</dt>
-                <dd>{{ participant.organization ? siteInfo.getOrganizationDisplayName(participant.organization) : '(not paired)' }}</dd>
-                <dt>AI/AN</dt>
-                <dd>
+                <dt class="col-sm-4">Paired Organization</dt>
+                <dd class="col-sm-8">{{ participant.organization ? siteInfo.getOrganizationDisplayName(participant.organization) : '(not paired)' }}</dd>
+                <dt class="col-sm-4">AI/AN</dt>
+                <dd class="col-sm-8">
                     {% if participant.isAIAN %}
                         Yes
                     {% else %}
@@ -35,7 +37,7 @@
         </div>
         <div class="col-sm-6">
             <p class="lead">
-                Order ID: <strong>{{ order.orderId }}</strong>
+                Order ID: <span class="fw-bold">{{ order.orderId }}</span>
             </p>
             <h3>
                 <i class="fa fa-medkit" aria-hidden="true"></i>
@@ -65,31 +67,31 @@
 
     <div role="tabpanel">
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active">
-                <a href="#collect" aria-controls="collect" role="tab" data-toggle="tab">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" aria-controls="collect" role="tab" data-bs-toggle="tab" data-bs-target="#collect">
                     {% if order.collectedTs is not empty %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                     {% endif %}
                     Collect
-                </a>
+                </button>
             </li>
             {% if order.type != 'saliva' %}
-                <li role="presentation">
-                    <a href="#process" aria-controls="process" role="tab" data-toggle="tab">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" aria-controls="process" role="tab" data-bs-toggle="tab" data-bs-target="#process">
                         {% if order.collectedTs is not empty and order.processedTs is not empty %}
                             <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                         {% endif %}
                         Process
-                    </a>
+                    </button>
                 </li>
             {% endif %}
-            <li role="presentation">
-                <a href="#finalize" aria-controls="finalize" role="tab" data-toggle="tab">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" aria-controls="finalize" role="tab" data-bs-toggle="tab" data-bs-target="#finalize">
                     {% if order.finalizedTs is not empty %}
                         <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
                     {% endif %}
                     Finalize
-                </a>
+                </button>
             </li>
         </ul>
         <br />
@@ -115,8 +117,9 @@
             </div>
         </div>
     </div>
+    {% include 'order/partials/finalize-notes-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
-    {{ encore_entry_script_tags('order-sub') }}
+    {{ encore_entry_script_tags('order-sub-bs5') }}
     {{ encore_entry_script_tags('biobank-order') }}
 {% endblock %}

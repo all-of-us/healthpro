@@ -1,60 +1,64 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'admin/base.html.twig' %}
 {% block title %}Sites - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
     {% import 'macros/display-text.html.twig' as macros %}
-    <ol class="breadcrumb">
-        <li><a href="{{ path('home') }}">Home</a></li>
-        <li><a href="{{ path('admin_home') }}">Admin</a></li>
-        <li class="active">Site Management</li>
-    </ol>
-    <div class="pull-right">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item" aria-current="page"><a href="{{ path('home') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('admin_home') }}">Admin</a></li>
+            <li class="breadcrumb-item active">Site Management</li>
+        </ol>
+    </nav>
+    <div class="float-end">
         {% if not sync %}
             <a href="{{ path('admin_site') }}" class="btn btn-primary"><i class="fa fa-plus" aria-hidden="true"></i> Add Site</a>
         {% endif %}
-        <a href="{{ path('admin_siteSync') }}" class="btn btn-default"><i class="fa fa-exchange" aria-hidden="true"></i> Preview Site Sync</a>
+        <a href="{{ path('admin_siteSync') }}" class="btn btn-secondary"><i class="fa fa-exchange" aria-hidden="true"></i> Preview Site Sync</a>
     </div>
-    <div class="page-header">
+    <div class="page-header border-bottom">
         <h2><i class="fa fa-hospital-o" aria-hidden="true"></i> Site Management</h2>
     </div>
-    <br/>
     {% if sites|length > 0 %}
-        <table class="table table-striped table-small table-hover datatable" data-table-scroll-x="true" data-table-order-column="1" data-table-order="asc">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Site ID</th>
-                <th>Awardee</th>
-                <th>Organization</th>
-                <th>MayoLINK Account</th>
-                <th>Type</th>
-                <th>Site Type</th>
-                <th>DV Module Configuration</th>
-                <th>Centrifuge type</th>
-                <th>EHR modification protocol</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for site in sites %}
+        <div class="my-4">
+            <table class="table table-striped table-small table-hover datatable" data-table-scroll-x="true" data-table-order-column="1" data-table-order="asc">
+                <thead>
                 <tr>
-                    <td>{{ site.id }}</td>
-                    <td><a href="{{ path('admin_site', { id: site.id }) }}">{{ site.name }}</a></td>
-                    <td>{{ macros.displayChoiceText(site.status, siteChoices['status']) }}</td>
-                    <td>{{ site.googleGroup }}</td>
-                    <td>{{ site.organization }}</td>
-                    <td>{{ site.organizationId }}</td>
-                    <td>{{ site.mayolinkAccount }}</td>
-                    <td>{{ site.type }}</td>
-                    <td>{{ site.siteType }}</td>
-                    <td>{{ site.type == 'DV' ? macros.displayChoiceText(site.dvModule, siteChoices['dv_module']) : 'N/A' }}</td>
-                    <td>{{ site.centrifugeType ? macros.displayChoiceText(site.centrifugeType, siteChoices['centrifuge_type']) }}</td>
-                    <td>{{ macros.displayChoiceText(site.ehrModificationProtocol, siteChoices['ehr_modification_protocol']) }}</td>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Site ID</th>
+                    <th>Awardee</th>
+                    <th>Organization</th>
+                    <th>MayoLINK Account</th>
+                    <th>Type</th>
+                    <th>Site Type</th>
+                    <th>DV Module Configuration</th>
+                    <th>Centrifuge type</th>
+                    <th>EHR modification protocol</th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {% for site in sites %}
+                    <tr>
+                        <td>{{ site.id }}</td>
+                        <td><a href="{{ path('admin_site', { id: site.id }) }}">{{ site.name }}</a></td>
+                        <td>{{ macros.displayChoiceText(site.status, siteChoices['status']) }}</td>
+                        <td>{{ site.googleGroup }}</td>
+                        <td>{{ site.organization }}</td>
+                        <td>{{ site.organizationId }}</td>
+                        <td>{{ site.mayolinkAccount }}</td>
+                        <td>{{ site.type }}</td>
+                        <td>{{ site.siteType }}</td>
+                        <td>{{ site.type == 'DV' ? macros.displayChoiceText(site.dvModule, siteChoices['dv_module']) : 'N/A' }}</td>
+                        <td>{{ site.centrifugeType ? macros.displayChoiceText(site.centrifugeType, siteChoices['centrifuge_type']) }}</td>
+                        <td>{{ macros.displayChoiceText(site.ehrModificationProtocol, siteChoices['ehr_modification_protocol']) }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     {% endif %}
 {% endblock %}
 
