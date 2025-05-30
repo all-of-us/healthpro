@@ -154,7 +154,15 @@ class NphParticipantSummaryService
                                     status
                                     current
                                 }
-                            }
+                            },
+                            aouDeactivationStatus {
+                                time
+                                value
+                            },
+                            aouWithdrawalStatus {
+                                time
+                                value
+                            },
                         }
                     }
                 }

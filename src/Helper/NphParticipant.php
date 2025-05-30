@@ -24,6 +24,7 @@ class NphParticipant
     public const DIET_DISCONTINUED = 'discontinued';
     public const DIET_CONTINUED = 'continued';
     public const DIET_INCOMPLETE = 'incomplete';
+    public const DEFAULT_AOU_CONSENT_STATUS = 'active';
     public $id;
     public $cacheTime;
     public $rdrData;
@@ -40,6 +41,10 @@ class NphParticipant
     public array $module3DietPeriod;
     public string $biobankId = '';
     public array $moduleConsents = [];
+    public string $aouConsentStatus;
+    public ?string $aouConsentStatusTime;
+    public bool $isAouWithdrawn = false;
+    public bool $isAouDeactivated = false;
 
     public function __construct(?\stdClass $rdrParticipant = null)
     {
@@ -124,6 +129,11 @@ class NphParticipant
         $this->module2DietPeriod = $this->getModuleDietPeriod(2);
         $this->module3DietPeriod = $this->getModuleDietPeriod(3);
         $this->moduleConsents = $this->getModuleConsents();
+        $aouConsentStatus = $this->getAouConsentStatus();
+        $this->aouConsentStatus = $aouConsentStatus['value'];
+        $this->aouConsentStatusTime = $aouConsentStatus['time'];
+        $this->isAouWithdrawn = $this->isAouWithdrawn();
+        $this->isAouDeactivated = $this->isAouDeactivated();
     }
 
     private function getSiteSuffix(string $site): string
@@ -301,4 +311,31 @@ class NphParticipant
             });
         }
     }
+
+    private function getAouConsentStatus(): array
+    {
+        $consentStatus = [];
+        if (isset($this->rdrData->aouDeactivationStatus)) {
+            $consentStatus['time'] = $this->rdrData->aouDeactivationStatus->time;
+            $consentStatus['value'] = $this->rdrData->aouDeactivationStatus->value;
+        }
+        if (isset($this->rdrData->aouWithdrawalStatus)) {
+            $consentStatus['time'] = $this->rdrData->aouWithdrawalStatus->time;
+            $consentStatus['value'] = $this->rdrData->aouWithdrawalStatus->value;
+        }
+        $consentStatus['value'] = $consentStatus['value'] ?? self::DEFAULT_AOU_CONSENT_STATUS;
+        $consentStatus['time'] = $consentStatus['time'] ?? null;
+        return $consentStatus;
+    }
+
+    private function isAouWithdrawn(): bool
+    {
+        return $this->aouConsentStatus === 'NO_USE' || $this->aouConsentStatus === 'EARLY_OUT';
+    }
+
+    private function isAouDeactivated(): bool
+    {
+        return $this->aouConsentStatus === 'NO_CONTACT';
+    }
+
 }
