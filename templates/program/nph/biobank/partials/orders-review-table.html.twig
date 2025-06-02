@@ -41,7 +41,10 @@
                 <td>{{ sample.biobankId }}</td>
                 <td>{{ sample.module }}</td>
                 <td>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[sample.visitPeriod] }}</td>
-                <td>{{ sample.timepoint }}</td>
+                <td>
+                    {% set timepointMapper = constant('App\\Entity\\NphOrder::TIMEPOINT_DISPLAY_NAME_MAPPER') %}
+                    {{ timepointMapper[sample.timepoint] is defined  ? timepointMapper[sample.timepoint] : sample.timepoint }}
+                </td>
                 <td data-row="{{ sample.orderId }}">
                     <a href="{{ path('nph_biobank_order_collect', {biobankId: sample.biobankId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a>
                 </td>

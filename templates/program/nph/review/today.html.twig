@@ -97,7 +97,10 @@
                 </td>
                 <td {{ moduleRowSpan }}>{{ constant('App\\Entity\\NphOrder::VISIT_DISPLAY_NAME_MAPPER')[sample.visitPeriod] }}</td>
             {% endif %}
-            <td {{ rowSpan }}>{{ sample.timepoint }}</td>
+            <td {{ rowSpan }}>
+                {% set timepointMapper = constant('App\\Entity\\NphOrder::TIMEPOINT_DISPLAY_NAME_MAPPER') %}
+                {{ timepointMapper[sample.timepoint] is defined  ? timepointMapper[sample.timepoint] : sample.timepoint }}
+            </td>
             <td {{ rowSpan }}><a href="{{ path('nph_order_collect', {participantId: sample.participantId, orderId: sample.hpoOrderId}) }}">{{ sample.orderId }}</a></td>
             {% for i in 0..sampleLength - 1 %}
                 <tr>
