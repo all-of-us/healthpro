@@ -1,0 +1,9 @@
+<div class="card mb-2">
+    <div class="card-header bg-danger font-bold text-white">
+        <i class="fa fa-times-circle"></i> Deactivated from module
+    </div>
+    <div class="card-body">
+        <p>The participant has been deactivated from this module. No new data can be collected or sent for this module. If applicable, other modules may still be active.</p>
+        <span class="font-bold">Deactivation Time:</span> {{ time ? time|date('n/j/Y g:ia', app.user.timezone) : '--' }}
+    </div>
+</div>
