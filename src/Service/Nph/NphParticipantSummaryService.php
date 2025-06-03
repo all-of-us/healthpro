@@ -163,6 +163,14 @@ class NphParticipantSummaryService
                                 time
                                 value
                             },
+                            nphDeactivationStatus {
+                                time
+                                value
+                            },
+                            nphWithdrawalStatus {
+                                time
+                                value
+                            }
                         }
                     }
                 }

@@ -24,7 +24,7 @@ class NphParticipant
     public const DIET_DISCONTINUED = 'discontinued';
     public const DIET_CONTINUED = 'continued';
     public const DIET_INCOMPLETE = 'incomplete';
-    public const DEFAULT_AOU_CONSENT_STATUS = 'active';
+    public const DEFAULT_CONSENT_STATUS = 'active';
     public $id;
     public $cacheTime;
     public $rdrData;
@@ -45,6 +45,18 @@ class NphParticipant
     public ?string $aouConsentStatusTime;
     public bool $isAouWithdrawn = false;
     public bool $isAouDeactivated = false;
+    public string $module1NphConsentStatus;
+    public ?string $module1NphConsentStatusTime;
+    public string $module2NphConsentStatus;
+    public ?string $module2NphConsentStatusTime;
+    public string $module3NphConsentStatus;
+    public ?string $module3NphConsentStatusTime;
+    public bool $isNphModule1Withdrawn = false;
+    public bool $isNphModule1Deactivated = false;
+    public bool $isNphModule2Withdrawn = false;
+    public bool $isNphModule2Deactivated = false;
+    public bool $isNphModule3Withdrawn = false;
+    public bool $isNphModule3Deactivated = false;
 
     public function __construct(?\stdClass $rdrParticipant = null)
     {
@@ -134,6 +146,22 @@ class NphParticipant
         $this->aouConsentStatusTime = $aouConsentStatus['time'];
         $this->isAouWithdrawn = $this->isAouWithdrawn();
         $this->isAouDeactivated = $this->isAouDeactivated();
+
+        $module1NphConsentStatus = $this->getNphConsentStatusByModule('module1');
+        $this->module1NphConsentStatus = $module1NphConsentStatus['value'];
+        $this->module1NphConsentStatusTime = $module1NphConsentStatus['time'];
+        $module2NphConsentStatus = $this->getNphConsentStatusByModule('module2');
+        $this->module2NphConsentStatus = $module2NphConsentStatus['value'];
+        $this->module2NphConsentStatusTime = $module2NphConsentStatus['time'];
+        $module3NphConsentStatus = $this->getNphConsentStatusByModule('module3');
+        $this->module3NphConsentStatus = $module3NphConsentStatus['value'];
+        $this->module3NphConsentStatusTime = $module3NphConsentStatus['time'];
+        $this->isNphModule1Withdrawn = $this->isNphModuleWithdrawn('module1');
+        $this->isNphModule1Deactivated = $this->isNphModuleDeactivated('module1');
+        $this->isNphModule2Withdrawn = $this->isNphModuleWithdrawn('module2');
+        $this->isNphModule2Deactivated = $this->isNphModuleDeactivated('module2');
+        $this->isNphModule3Withdrawn = $this->isNphModuleWithdrawn('module3');
+        $this->isNphModule3Deactivated = $this->isNphModuleDeactivated('module3');
     }
 
     private function getSiteSuffix(string $site): string
@@ -314,28 +342,81 @@ class NphParticipant
 
     private function getAouConsentStatus(): array
     {
+        $statusMap = [
+            'aouDeactivationStatus' => [
+                'triggerValues' => ['NO_CONTACT'],
+                'mappedValue' => 'DEACTIVATED',
+            ],
+            'aouWithdrawalStatus' => [
+                'triggerValues' => ['NO_USE', 'EARLY_OUT'],
+                'mappedValue' => 'WITHDRAWN',
+            ],
+        ];
         $consentStatus = [];
-        if (isset($this->rdrData->aouDeactivationStatus)) {
-            $consentStatus['time'] = $this->rdrData->aouDeactivationStatus->time;
-            $consentStatus['value'] = $this->rdrData->aouDeactivationStatus->value;
+        foreach ($statusMap as $key => $config) {
+            if (!isset($this->rdrData->$key)) {
+                continue;
+            }
+            $status = $this->rdrData->$key;
+            $consentStatus['time'] = $status->time;
+            if (in_array($status->value, $config['triggerValues'])) {
+                $consentStatus['value'] = $config['mappedValue'];
+            }
         }
-        if (isset($this->rdrData->aouWithdrawalStatus)) {
-            $consentStatus['time'] = $this->rdrData->aouWithdrawalStatus->time;
-            $consentStatus['value'] = $this->rdrData->aouWithdrawalStatus->value;
+        $consentStatus['value'] = $consentStatus['value'] ?? self::DEFAULT_CONSENT_STATUS;
+        $consentStatus['time'] = $consentStatus['time'] ?? null;
+        return $consentStatus;
+    }
+
+    private function getNphConsentStatusByModule(string $module): array
+    {
+        $statusMap = [
+            'nphDeactivationStatus' => [
+                'triggerValues' => [null, 'DEACTIVATED'],
+                'mappedValue' => 'DEACTIVATED',
+            ],
+            'nphWithdrawalStatus' => [
+                'triggerValues' => [null, 'WITHDRAWN'],
+                'mappedValue' => 'WITHDRAWN',
+            ],
+        ];
+        $consentStatus = [];
+        foreach ($statusMap as $key => $config) {
+            if (!isset($this->rdrData->$key)) {
+                continue;
+            }
+            $status = $this->rdrData->$key;
+            if (isset($status->module) && $status->module === $module) {
+                $consentStatus['time'] = $status->time ?? null;
+                if (in_array($status->value, $config['triggerValues'])) {
+                    $consentStatus['value'] = $config['mappedValue'];
+                }
+            }
         }
-        $consentStatus['value'] = $consentStatus['value'] ?? self::DEFAULT_AOU_CONSENT_STATUS;
+        $consentStatus['value'] = $consentStatus['value'] ?? self::DEFAULT_CONSENT_STATUS;
         $consentStatus['time'] = $consentStatus['time'] ?? null;
         return $consentStatus;
     }
 
     private function isAouWithdrawn(): bool
     {
-        return $this->aouConsentStatus === 'NO_USE' || $this->aouConsentStatus === 'EARLY_OUT';
+        return $this->aouConsentStatus === 'WITHDRAWN';
     }
 
     private function isAouDeactivated(): bool
     {
-        return $this->aouConsentStatus === 'NO_CONTACT';
+        return $this->aouConsentStatus === 'DEACTIVATED';
     }
 
+    private function isNphModuleWithdrawn(string $module): bool
+    {
+        $property = "{$module}NphConsentStatus";
+        return $this->$property === 'WITHDRAWN';
+    }
+
+    private function isNphModuleDeactivated(string $module): bool
+    {
+        $property = "{$module}NphConsentStatus";
+        return $this->$property === 'DEACTIVATED';
+    }
 }
