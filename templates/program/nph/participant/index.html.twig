@@ -316,12 +316,14 @@
                                                                                             {% endif %}
                                                                                         {% endif %}
                                                                                     {% else %}
-                                                                                        <div class="{{ textDivSize }}">
-                                                                                            <span class="alert alert-danger no-dob-banner">
-                                                                                                <i class="text-danger fa fa-exclamation-circle"></i>
-                                                                                                DOB has not been provided. Please enter the DOB via the consent checklist to unlock order generation.
-                                                                                            </span>
-                                                                                        </div>
+                                                                                        {% if not participant.isAouDeactivated and not nphModuleDeactivatedFlag %}
+                                                                                            <div class="{{ textDivSize }}">
+                                                                                                <span class="alert alert-danger no-dob-banner">
+                                                                                                    <i class="text-danger fa fa-exclamation-circle"></i>
+                                                                                                    DOB has not been provided. Please enter the DOB via the consent checklist to unlock order generation.
+                                                                                                </span>
+                                                                                            </div>
+                                                                                        {% endif %}
                                                                                     {% endif %}
                                                                                 </div>
                                                                                 {% set displayedOrderIDS = [] %}

@@ -382,14 +382,17 @@ class NphParticipant
         ];
         $consentStatus = [];
         foreach ($statusMap as $key => $config) {
-            if (!isset($this->rdrData->$key)) {
+            if (!isset($this->rdrData->$key) || !is_array($this->rdrData->$key)) {
                 continue;
             }
-            $status = $this->rdrData->$key;
-            if (isset($status->module) && $status->module === $module) {
-                $consentStatus['time'] = $status->time ?? null;
-                if (in_array($status->value, $config['triggerValues'])) {
-                    $consentStatus['value'] = $config['mappedValue'];
+            foreach ($this->rdrData->$key as $status) {
+                if (isset($status->module) && $status->module === $module) {
+                    if (!isset($consentStatus['time']) || strtotime($status->time) > strtotime($consentStatus['time'])) {
+                        $consentStatus['time'] = $status->time ?? null;
+                        if (in_array($status->value, $config['triggerValues'])) {
+                            $consentStatus['value'] = $config['mappedValue'];
+                        }
+                    }
                 }
             }
         }
