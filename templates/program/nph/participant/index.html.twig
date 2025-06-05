@@ -159,13 +159,15 @@
                                                         {% set consentStatusTime = attribute(participant, 'module' ~ moduleNumber ~ 'NphConsentStatusTime') %}
                                                         {% include 'program/nph/participant/partials/nph-module-deactivated-banner.html.twig' with { time: consentStatusTime } %}
                                                     {% endif %}
-                                                    <a class="float-end badge btn rounded-1 border-1 border-secondary border fw-semibold text-black text-decoration-none {% if sampleStatusCounts[moduleNumber]['active'] is defined and  sampleStatusCounts[moduleNumber]['active'] == 0%} disabled {% endif%}"  href="{{ path('nph_samples_modify_all', {participantId: participant.id, module: moduleNumber, type: 'cancel'}) }}">Cancel All</a>
+                                                    {% if not participant.isAouDeactivated and not nphModuleDeactivatedFlag %}
+                                                        <a class="float-end badge btn rounded-1 border-1 border-secondary border fw-semibold text-black text-decoration-none {% if sampleStatusCounts[moduleNumber]['active'] is defined and  sampleStatusCounts[moduleNumber]['active'] == 0%} disabled {% endif%}"  href="{{ path('nph_samples_modify_all', {participantId: participant.id, module: moduleNumber, type: 'cancel'}) }}">Cancel All</a>
+                                                    {% endif %}
                                                     {% set dietPeriodNumbers = moduleNumber == 1 ? ['LMT'] :['Period1', 'Period2', 'Period3'] %}
                                                     <div class="tab-content" id="myTabContent">
                                                         {% for dietPeriodNumber in dietPeriodNumbers %}
                                                             <div class="tab-pane fade {% if dietPeriodNumber == 'LMT' or dietPeriodNumber == activeDietPeriod %} show active{% endif %}" id="{{ dietPeriodNumber }}">
                                                                 <div class="row">
-                                                                    <div class="col-md-8 g-0">
+                                                                    <div class="col-md-8">
                                                                         {% set dietPeriodStatus = dietPeriodStatusMap[moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber]] %}
                                                                         <p class="text-lg-start">
                                                                             NPH Module {{ moduleNumber }} Collections: <strong>Diet {{ dietPeriodNumber|replace({'Period': 'Period '}) }}</strong>
@@ -196,13 +198,15 @@
                                                                                     {% set sampleChecked = 'checked' %}
                                                                                 {% endif %}
                                                                             {% endfor %}
-                                                                            <div class="btn-group btn-group-toggle" id="sample_process_box_{{ dietPeriodNumber }}">
-                                                                                <label class="btn btn-sm {% if sampleChecked %} btn-success {% else %} btn-outline-success {% endif %}">
-                                                                                    <input class="form-check-input sample-process-complete-check" id="sample_process_complete_check_{{ dietPeriodNumber }}" type="checkbox" value="1"
-                                                                                       data-visit-type="{{ dietPeriodNumber }}" data-module-number="{{ moduleNumber }}" data-diet-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] }}" {{ sampleChecked }}>
-                                                                                    Sample Processing Complete
-                                                                                </label>
-                                                                            </div>
+                                                                            {% if not participant.isAouDeactivated and not nphModuleDeactivatedFlag %}
+                                                                                <div class="btn-group btn-group-toggle" id="sample_process_box_{{ dietPeriodNumber }}">
+                                                                                    <label class="btn btn-sm {% if sampleChecked %} btn-success {% else %} btn-outline-success {% endif %}">
+                                                                                        <input class="form-check-input sample-process-complete-check" id="sample_process_complete_check_{{ dietPeriodNumber }}" type="checkbox" value="1"
+                                                                                           data-visit-type="{{ dietPeriodNumber }}" data-module-number="{{ moduleNumber }}" data-diet-status="{{ moduleDietPeriodsStatus[moduleNumber][dietPeriodNumber] }}" {{ sampleChecked }}>
+                                                                                        Sample Processing Complete
+                                                                                    </label>
+                                                                                </div>
+                                                                            {% endif %}
                                                                         </div>
                                                                     {% endif %}
                                                                 </div>
@@ -239,10 +243,12 @@
                                                                                     {% if VisitCode|slice(-5) == 'Stool' %}
                                                                                         {% set generateOrderType = 'stool' %}
                                                                                     {% endif %}
-                                                                                    <a class="btn btn-primary btn-xs m-0 generate-orders-button" data-module="{{ moduleNumber }}" data-period="{{ dietPeriodNumber }}" data-warning-displayed="{{ warningDisplayed }}"
-                                                                                       role="button" href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: generateOrderVisitType, orderType: generateOrderType}) }}">
-                                                                                        <i class="fa fa-plus-circle"></i> Generate Orders
-                                                                                    </a>
+                                                                                    {% if not participant.isAouDeactivated and not nphModuleDeactivatedFlag %}
+                                                                                        <a class="btn btn-primary btn-xs m-0 generate-orders-button" data-module="{{ moduleNumber }}" data-period="{{ dietPeriodNumber }}" data-warning-displayed="{{ warningDisplayed }}"
+                                                                                           role="button" href="{{ path('nph_generate_oder', {participantId: participant.id, module: moduleNumber, visit: generateOrderVisitType, orderType: generateOrderType}) }}">
+                                                                                            <i class="fa fa-plus-circle"></i> Generate Orders
+                                                                                        </a>
+                                                                                    {% endif %}
                                                                                 {% endif %}
                                                                                 <span class="text-danger diet-visit-status-icon" id="diet_visit_status_icon_{{ VisitCode }}" style="display: none;"><i class="fs-5 fa fa-exclamation-triangle" data-bs-toggle="tooltip" data-bs-placement="right" title="Incomplete Samples" ></i></span>
                                                                                 {% set sampleProcessingComplete = false %}
@@ -280,32 +286,34 @@
                                                                                                 </div>
                                                                                             {% endif %}
                                                                                         </div>
-                                                                                        {% if moduleNumber == 3 and dlwSummary[moduleNumber] is defined and dlwSummary[moduleNumber][VisitCode] is defined %}
-                                                                                            {% if dlwSummary[moduleNumber][VisitCode] %}
+                                                                                        {% if not participant.isAouDeactivated and not nphModuleDeactivatedFlag %}
+                                                                                            {% if moduleNumber == 3 and dlwSummary[moduleNumber] is defined and dlwSummary[moduleNumber][VisitCode] is defined %}
+                                                                                                {% if dlwSummary[moduleNumber][VisitCode] %}
+                                                                                                    <div class="col-md-3 well well-sm right-float">
+                                                                                                        <div class="col-sm-12 d-flex justify-content-center" {% if visit['dlwGenerated'] is defined and visit['dlwGenerated'] == false %} data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="At least one DLW order must be generated to enter DLW Dosage information." {% endif %}>
+                                                                                                            <a class="text-center btn dlw-collect-button mb-2 {% if visit['dlwGenerated'] is defined and visit['dlwGenerated'] == false %} disabled {% endif %}" role="button"
+                                                                                                               href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
+                                                                                                                Enter DLW Dosage
+                                                                                                            </a>
+                                                                                                        </div>
+                                                                                                        <div class="col-sm-12 d-flex justify-content-center">
+                                                                                                            <span class="dlw-collect-text">Last Saved {{ dlwSummary[moduleNumber][VisitCode]|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                {% endif %}
+                                                                                            {% elseif dlwDiet %}
                                                                                                 <div class="col-md-3 well well-sm right-float">
                                                                                                     <div class="col-sm-12 d-flex justify-content-center" {% if visit['dlwGenerated'] is defined and visit['dlwGenerated'] == false %} data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="At least one DLW order must be generated to enter DLW Dosage information." {% endif %}>
-                                                                                                        <a class="text-center btn dlw-collect-button mb-2 {% if visit['dlwGenerated'] is defined and visit['dlwGenerated'] == false %} disabled {% endif %}" role="button"
+                                                                                                        <a class="text-center btn dlw-collect-button align-middle inline nowrap{% if visit['dlwGenerated'] is defined and visit['dlwGenerated'] == false %} disabled {% endif %}" role="button"
                                                                                                            href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
                                                                                                             Enter DLW Dosage
                                                                                                         </a>
                                                                                                     </div>
                                                                                                     <div class="col-sm-12 d-flex justify-content-center">
-                                                                                                        <span class="dlw-collect-text">Last Saved {{ dlwSummary[moduleNumber][VisitCode]|date('n/j/Y g:ia', app.user.timezone) }}</span>
+                                                                                                        <span class="dlw-collect-text">Not Completed </span>
                                                                                                     </div>
                                                                                                 </div>
                                                                                             {% endif %}
-                                                                                        {% elseif dlwDiet %}
-                                                                                            <div class="col-md-3 well well-sm right-float">
-                                                                                                <div class="col-sm-12 d-flex justify-content-center" {% if visit['dlwGenerated'] is defined and visit['dlwGenerated'] == false %} data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="At least one DLW order must be generated to enter DLW Dosage information." {% endif %}>
-                                                                                                    <a class="text-center btn dlw-collect-button align-middle inline nowrap{% if visit['dlwGenerated'] is defined and visit['dlwGenerated'] == false %} disabled {% endif %}" role="button"
-                                                                                                       href="{{ path('nph_dlw_collect', {participantId: participant.id, module: moduleNumber, visit: VisitCode}) }}">
-                                                                                                        Enter DLW Dosage
-                                                                                                    </a>
-                                                                                                </div>
-                                                                                                <div class="col-sm-12 d-flex justify-content-center">
-                                                                                                    <span class="dlw-collect-text">Not Completed </span>
-                                                                                                </div>
-                                                                                            </div>
                                                                                         {% endif %}
                                                                                     {% else %}
                                                                                         <div class="{{ textDivSize }}">
