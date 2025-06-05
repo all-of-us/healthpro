@@ -148,15 +148,20 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
+        if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule())) {
+            throw $this->createNotFoundException('Withdrawn participant.');
+        }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
         $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
+        $disableOrderCollectForm = $nphNphParticipantSummaryService->isParticipantDeactivated($participant, $order->getModule());
         $oderCollectForm = $this->createForm(
             NphOrderCollect::class,
             $orderCollectionData,
             ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
                 $this->getSecurityUser()->getTimezone(), 'disableMetadataFields' => $order->isMetadataFieldDisabled()
-                , 'disableStoolCollectedTs' => $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs()]
+                , 'disableStoolCollectedTs' => $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' =>
+                $order->getCreatedTs(), 'disabled' => $disableOrderCollectForm]
         );
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted()) {
@@ -182,7 +187,8 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
-            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper
+            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper,
+            'disableOrderCollectForm' => $disableOrderCollectForm
         ]);
     }
 
