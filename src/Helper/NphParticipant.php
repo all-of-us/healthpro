@@ -387,12 +387,25 @@ class NphParticipant
             }
             foreach ($this->rdrData->$key as $status) {
                 if (isset($status->module) && $status->module === $module) {
-                    if (!isset($consentStatus['time']) || strtotime($status->time) > strtotime($consentStatus['time'])) {
-                        $consentStatus['time'] = $status->time ?? null;
-                        if (in_array($status->value, $config['triggerValues'])) {
-                            $consentStatus['value'] = $config['mappedValue'];
+                    $statusTime = isset($status->time) ? strtotime($status->time) : null;
+                    $consentStatus['time'] = $status->time ?? null;
+                    if (in_array($status->value, $config['triggerValues'])) {
+                        $mappedValue = $config['mappedValue'];
+                        // Re-consent check for DEACTIVATED or WITHDRAWN
+                        if ($statusTime !== null) {
+                            $consentField = 'nph' . ucfirst($module) . 'ConsentStatus';
+                            if (isset($this->rdrData->$consentField) && isset($this->rdrData->$consentField->time)) {
+                                $consentTime = strtotime($this->rdrData->$consentField->time);
+                                if ($consentTime > $statusTime) {
+                                    // If Re-consented after deactivation or withdrawal => consider ACTIVE
+                                    break 2;
+                                }
+                            }
                         }
+                        $consentStatus['value'] = $mappedValue;
                     }
+                    // Exit after first match for this module
+                    break 2;
                 }
             }
         }
