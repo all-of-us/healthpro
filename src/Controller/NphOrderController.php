@@ -248,6 +248,9 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
+        if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule())) {
+            throw $this->createNotFoundException('Withdrawn participant.');
+        }
         $sample = $this->em->getRepository(NphSample::class)->findOneBy([
             'nphOrder' => $order, 'id' => $sampleId
         ]);
@@ -265,7 +268,9 @@ class NphOrderController extends BaseController
         $sampleData = $nphOrderService->getExistingSampleData($sample);
         $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
         $canGenerateOrders = $nphOrderService->canGenerateOrders($participantId, $order->getModule(), $dietPeriod, $participant->module);
-        $isFormDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$canGenerateOrders);
+        $isParticipantDeactivated = $nphNphParticipantSummaryService->isParticipantDeactivated($participant, $order->getModule());
+        $isFormDisabled = $isParticipantDeactivated || $sample->isDisabled() || ($sample->getModifyType() !==
+            NphSample::UNLOCK && !$canGenerateOrders);
         $isFreezeTsDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $order->isFreezeTsDisabled($sample->getModifyType()) : false;
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
@@ -359,8 +364,8 @@ class NphOrderController extends BaseController
             'order' => $order,
             'isFreezeTsDisabled' => $isFreezeTsDisabled,
             'allowResubmit' => false,
-            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper
-
+            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper,
+            'isParticipantDeactivated' => $isParticipantDeactivated
         ]);
     }
 

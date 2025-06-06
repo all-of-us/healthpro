@@ -201,6 +201,9 @@
             </div>
         </div>
         <div class="col-sm-7">
+            {% if isParticipantDeactivated %}
+                {% include 'program/nph/order/partials/form-participant-deactivated-banner.html.twig' %}
+            {% endif %}
             {% include 'program/nph/order/partials/sample-finalize-banner-message.html.twig' %}
             <div class="panel panel-default">
                 {% if biobankView %}
