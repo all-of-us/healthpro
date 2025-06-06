@@ -63,6 +63,9 @@ class NphOrderController extends BaseController
             throw $this->createAccessDeniedException('DOB has not been provided. The participant must complete “The Basics” survey that captures their DOB to unlock order generation.');
         }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
+        if ($nphParticipantSummaryService->isParticipantWithdrawn($participant, $module)) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
+        }
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $dietPeriod = $module === 1 ? $visit : substr($visit, 0, 7);
         if (!$nphOrderService->canGenerateOrders($participantId, $module, $dietPeriod, $participant->module)) {
@@ -149,7 +152,7 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException('Order not found.');
         }
         if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule())) {
-            throw $this->createNotFoundException('Withdrawn participant.');
+            throw $this->createAccessDeniedException('Withdrawn participant.');
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
         $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
@@ -249,7 +252,7 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException('Order not found.');
         }
         if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule())) {
-            throw $this->createNotFoundException('Withdrawn participant.');
+            throw $this->createAccessDeniedException('Withdrawn participant.');
         }
         $sample = $this->em->getRepository(NphSample::class)->findOneBy([
             'nphOrder' => $order, 'id' => $sampleId
@@ -406,6 +409,9 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException('Participant not found.');
         }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
+        if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $module)) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
+        }
         $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSamplesByParticipantId($participantId, $module);
         $nphSampleModifyForm = $this->createForm(NphSampleModifyBulkType::class, null, [
             'type' => $type, 'samples' => $activeSamples, 'activeSamples' => $activeSamples,
@@ -473,6 +479,9 @@ class NphOrderController extends BaseController
         }
         if ($order->canModify($type) === false) {
             throw $this->createNotFoundException();
+        }
+        if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule())) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
         }
         $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSampleCodes($order, $this->siteService->getSiteId());
         $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
@@ -567,6 +576,9 @@ class NphOrderController extends BaseController
         if ($sample->getModifyType() !== NphSample::UNLOCK) {
             throw $this->createAccessDeniedException();
         }
+        if ($nphParticipantSummaryService->isParticipantWithdrawn($participant, $sample->getNphOrder()->getModule())) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
+        }
         $order = $this->em->getRepository(NphOrder::class)->find($orderId);
         $nphOrderService->loadModules(
             $order->getModule(),
@@ -632,6 +644,9 @@ class NphOrderController extends BaseController
         Request $request
     ): Response {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
+        if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $module)) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
+        }
         $dlwObject = $this->em->getRepository(NphDlw::class)->findOneBy([
             'NphParticipant' => $participantId,
             'visitPeriod' => $visit,
