@@ -389,7 +389,7 @@ class NphParticipant
                 if (isset($status->module) && $status->module === $module) {
                     $statusTime = isset($status->time) ? strtotime($status->time) : null;
                     $consentStatus['time'] = $status->time ?? null;
-                    if (in_array($status->value, $config['triggerValues'])) {
+                    if (isset($status->value) && in_array($status->value, $config['triggerValues'])) {
                         $mappedValue = $config['mappedValue'];
                         // Re-consent check for DEACTIVATED or WITHDRAWN
                         if ($statusTime !== null) {
