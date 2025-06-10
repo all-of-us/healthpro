@@ -16,6 +16,9 @@
         <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}.</span>
     </div>
     {% endif %}
+    {% if disableOrderCollectForm %}
+        {% include 'program/nph/order/partials/form-participant-deactivated-banner.html.twig' %}
+    {% endif %}
     <div class="row">
         <div class="col-sm-12">
             {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
@@ -54,17 +57,19 @@
                     {% endif %}
                     <th>Notes <i class="fa fa-question-circle text-primary" aria-hidden="true" id="collection_notes_help" role="button"></i></th>
                     <th>
-                        {% if order.canCancel %}
-                            <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
-                                type: 'cancel' }) }}" class="btn btn-xs btn-danger">
-                                Cancel
-                            </a>
-                        {% endif %}
-                        {% if order.canRestore(activeSamples) %}
-                            <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
-                                type: 'restore' }) }}" class="btn btn-xs btn-success">
-                                Restore
-                            </a>
+                        {% if not disableOrderCollectForm %}
+                            {% if order.canCancel %}
+                                <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
+                                    type: 'cancel' }) }}" class="btn btn-xs btn-danger">
+                                    Cancel
+                                </a>
+                            {% endif %}
+                            {% if order.canRestore(activeSamples) %}
+                                <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
+                                    type: 'restore' }) }}" class="btn btn-xs btn-success">
+                                    Restore
+                                </a>
+                            {% endif %}
                         {% endif %}
                     </th>
                 </tr>
@@ -122,7 +127,7 @@
                                         View
                                     </a>
                                 </p>
-                                {% if nphSample.canUnlock %}
+                                {% if not disableOrderCollectForm and nphSample.canUnlock %}
                                     <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
                                         order.id, sampleId: nphSample.id, modifyType: 'unlock'}) }}" class="btn
                                         btn-warning btn-xs">
@@ -185,7 +190,7 @@
             {% endif %}
             {{ form_rest(orderCollectForm) }}
             <div class="form-group">
-                {% if not order.isDisabled %}
+                {% if not disableOrderCollectForm and not order.isDisabled %}
                     <button type="submit" class="btn btn-primary" id="order_next_btn" formnovalidate>Save</button>
                 {% endif %}
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"

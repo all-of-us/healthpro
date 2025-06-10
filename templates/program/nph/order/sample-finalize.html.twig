@@ -126,7 +126,7 @@
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
     </div>
     {{ macros.displayModifyBannerMessage(sample) }}
-    {% if sampleModifyForm is not empty %}
+    {% if not isParticipantDeactivated and sampleModifyForm is not empty %}
         <div>
             <h3>Unlock Sample For Editing</h3>
             {{ form_start(sampleModifyForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
@@ -201,6 +201,9 @@
             </div>
         </div>
         <div class="col-sm-7">
+            {% if isParticipantDeactivated %}
+                {% include 'program/nph/order/partials/form-participant-deactivated-banner.html.twig' %}
+            {% endif %}
             {% include 'program/nph/order/partials/sample-finalize-banner-message.html.twig' %}
             <div class="panel panel-default">
                 {% if biobankView %}

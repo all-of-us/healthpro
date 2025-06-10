@@ -59,7 +59,7 @@
                     View
                 </a>
             </p>
-            {% if nphSample.canUnlock %}
+            {% if not disableOrderCollectForm and nphSample.canUnlock %}
                 <a href="{{ path('nph_sample_finalize', { participantId: participant.id, orderId:
                     order.id, sampleId: nphSample.id, modifyType: 'unlock'}) }}" class="btn
                                         btn-warning btn-xs">

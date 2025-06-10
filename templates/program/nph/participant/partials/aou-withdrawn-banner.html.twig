@@ -1,0 +1,9 @@
+<div class="card">
+    <div class="card-header bg-warning font-bold">
+        <i class="fa fa-minus-circle"></i> Withdrawn Participant
+    </div>
+    <div class="card-body">
+        <p>This participant has withdrawn from the All of Us Program, resulting in their withdrawal from the Nutrition for Precision Health Program. Data cannot be viewed, collected, or sent for this participant.</p>
+        <span class="font-bold">Withdrawal Time:</span> {{ time ? time|date('n/j/Y g:ia', app.user.timezone) : '--' }}
+    </div>
+</div>
