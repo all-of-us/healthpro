@@ -215,16 +215,20 @@ class NphOrderController extends BaseController
                 if (!$participant) {
                     throw $this->createNotFoundException('Participant not found.');
                 }
-                if ($participant->nphPairedSiteSuffix === $this->siteService->getSiteId()) {
-                    return $this->redirectToRoute('nph_sample_finalize', [
-                        'participantId' => $sample->getNphOrder()->getParticipantId(),
-                        'orderId' => $sample->getNphOrder()->getId(),
-                        'sampleId' => $sample->getId()
-                    ]);
+                if ($nphParticipantSummaryService->isParticipantWithdrawn($participant, $sample->getNphOrder()->getModule())) {
+                    $flashMessage = 'This participant has been withdrawn. Data cannot  be viewed, collected, or sent for this participant.';
+                } else {
+                    if ($participant->nphPairedSiteSuffix === $this->siteService->getSiteId()) {
+                        return $this->redirectToRoute('nph_sample_finalize', [
+                            'participantId' => $sample->getNphOrder()->getParticipantId(),
+                            'orderId' => $sample->getNphOrder()->getId(),
+                            'sampleId' => $sample->getId()
+                        ]);
+                    }
+                    $flashMessage = 'Lookup for this sample ID is not permitted because the participant is paired with another site';
                 }
-                $crossSiteErrorMessage = 'Lookup for this sample ID is not permitted because the participant is paired with another site';
             }
-            $this->addFlash('error', $crossSiteErrorMessage ?? 'Sample ID not found');
+            $this->addFlash('error', $flashMessage ?? 'Sample ID not found');
         }
 
         return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
