@@ -63,6 +63,9 @@ class NphOrderController extends BaseController
             throw $this->createAccessDeniedException('DOB has not been provided. The participant must complete “The Basics” survey that captures their DOB to unlock order generation.');
         }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
+        if ($nphParticipantSummaryService->isParticipantWithdrawn($participant, $module)) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
+        }
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $dietPeriod = $module === 1 ? $visit : substr($visit, 0, 7);
         if (!$nphOrderService->canGenerateOrders($participantId, $module, $dietPeriod, $participant->module)) {
@@ -148,15 +151,20 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
+        if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule())) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
+        }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
         $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
+        $disableOrderCollectForm = $nphNphParticipantSummaryService->isParticipantDeactivated($participant, $order->getModule());
         $oderCollectForm = $this->createForm(
             NphOrderCollect::class,
             $orderCollectionData,
             ['samples' => $sampleLabelsIds, 'orderType' => $order->getOrderType(), 'timeZone' =>
                 $this->getSecurityUser()->getTimezone(), 'disableMetadataFields' => $order->isMetadataFieldDisabled()
-                , 'disableStoolCollectedTs' => $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' => $order->getCreatedTs()]
+                , 'disableStoolCollectedTs' => $order->isStoolCollectedTsDisabled(), 'orderCreatedTs' =>
+                $order->getCreatedTs(), 'disabled' => $disableOrderCollectForm]
         );
         $oderCollectForm->handleRequest($request);
         if ($oderCollectForm->isSubmitted()) {
@@ -182,7 +190,8 @@ class NphOrderController extends BaseController
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
-            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper
+            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper,
+            'disableOrderCollectForm' => $disableOrderCollectForm
         ]);
     }
 
@@ -206,16 +215,20 @@ class NphOrderController extends BaseController
                 if (!$participant) {
                     throw $this->createNotFoundException('Participant not found.');
                 }
-                if ($participant->nphPairedSiteSuffix === $this->siteService->getSiteId()) {
-                    return $this->redirectToRoute('nph_sample_finalize', [
-                        'participantId' => $sample->getNphOrder()->getParticipantId(),
-                        'orderId' => $sample->getNphOrder()->getId(),
-                        'sampleId' => $sample->getId()
-                    ]);
+                if ($nphParticipantSummaryService->isParticipantWithdrawn($participant, $sample->getNphOrder()->getModule())) {
+                    $flashMessage = 'This participant has been withdrawn. Data cannot  be viewed, collected, or sent for this participant.';
+                } else {
+                    if ($participant->nphPairedSiteSuffix === $this->siteService->getSiteId()) {
+                        return $this->redirectToRoute('nph_sample_finalize', [
+                            'participantId' => $sample->getNphOrder()->getParticipantId(),
+                            'orderId' => $sample->getNphOrder()->getId(),
+                            'sampleId' => $sample->getId()
+                        ]);
+                    }
+                    $flashMessage = 'Lookup for this sample ID is not permitted because the participant is paired with another site';
                 }
-                $crossSiteErrorMessage = 'Lookup for this sample ID is not permitted because the participant is paired with another site';
             }
-            $this->addFlash('error', $crossSiteErrorMessage ?? 'Sample ID not found');
+            $this->addFlash('error', $flashMessage ?? 'Sample ID not found');
         }
 
         return $this->render('program/nph/order/sample-aliquot-lookup.html.twig', [
@@ -242,6 +255,9 @@ class NphOrderController extends BaseController
         if (empty($order)) {
             throw $this->createNotFoundException('Order not found.');
         }
+        if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule())) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
+        }
         $sample = $this->em->getRepository(NphSample::class)->findOneBy([
             'nphOrder' => $order, 'id' => $sampleId
         ]);
@@ -259,7 +275,9 @@ class NphOrderController extends BaseController
         $sampleData = $nphOrderService->getExistingSampleData($sample);
         $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
         $canGenerateOrders = $nphOrderService->canGenerateOrders($participantId, $order->getModule(), $dietPeriod, $participant->module);
-        $isFormDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$canGenerateOrders);
+        $isParticipantDeactivated = $nphNphParticipantSummaryService->isParticipantDeactivated($participant, $order->getModule());
+        $isFormDisabled = $isParticipantDeactivated || $sample->isDisabled() || ($sample->getModifyType() !==
+            NphSample::UNLOCK && !$canGenerateOrders);
         $isFreezeTsDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $order->isFreezeTsDisabled($sample->getModifyType()) : false;
         $sampleFinalizeForm = $this->createForm(
             NphSampleFinalizeType::class,
@@ -353,8 +371,8 @@ class NphOrderController extends BaseController
             'order' => $order,
             'isFreezeTsDisabled' => $isFreezeTsDisabled,
             'allowResubmit' => false,
-            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper
-
+            'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper,
+            'isParticipantDeactivated' => $isParticipantDeactivated
         ]);
     }
 
@@ -395,6 +413,9 @@ class NphOrderController extends BaseController
             throw $this->createNotFoundException('Participant not found.');
         }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
+        if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $module)) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
+        }
         $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSamplesByParticipantId($participantId, $module);
         $nphSampleModifyForm = $this->createForm(NphSampleModifyBulkType::class, null, [
             'type' => $type, 'samples' => $activeSamples, 'activeSamples' => $activeSamples,
@@ -462,6 +483,9 @@ class NphOrderController extends BaseController
         }
         if ($order->canModify($type) === false) {
             throw $this->createNotFoundException();
+        }
+        if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule())) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
         }
         $activeSamples = $this->em->getRepository(NphSample::class)->findActiveSampleCodes($order, $this->siteService->getSiteId());
         $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
@@ -556,6 +580,9 @@ class NphOrderController extends BaseController
         if ($sample->getModifyType() !== NphSample::UNLOCK) {
             throw $this->createAccessDeniedException();
         }
+        if ($nphParticipantSummaryService->isParticipantWithdrawn($participant, $sample->getNphOrder()->getModule())) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
+        }
         $order = $this->em->getRepository(NphOrder::class)->find($orderId);
         $nphOrderService->loadModules(
             $order->getModule(),
@@ -621,6 +648,9 @@ class NphOrderController extends BaseController
         Request $request
     ): Response {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
+        if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $module)) {
+            throw $this->createAccessDeniedException('Withdrawn participant.');
+        }
         $dlwObject = $this->em->getRepository(NphDlw::class)->findOneBy([
             'NphParticipant' => $participantId,
             'visitPeriod' => $visit,

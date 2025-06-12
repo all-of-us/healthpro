@@ -1,0 +1,9 @@
+<div class="card">
+    <div class="card-header bg-warning font-bold">
+        <i class="fa fa-minus-circle"></i> Withdrawn from module
+    </div>
+    <div class="card-body">
+        <p>The participant has been withdrawn from this module. Data cannot be viewed, collected, or sent for this module. If applicable, other modules may still be active.</p>
+        <span class="font-bold">Withdrawal Time:</span> {{ time ? time|date('n/j/Y g:ia', app.user.timezone) : '--' }}
+    </div>
+</div>

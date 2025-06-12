@@ -122,11 +122,11 @@
 {% block body %}
     {% set order = sample.nphOrder %}
     {% set sampleCode =  sample.sampleCode %}
-    <div class="page-header">
+    <div class="page-header" id="aliquot_samples_header" data-sample-code="{{ sampleCode }}" data-sample-urine-24="{{ constant('App\\Entity\\NphSample::SAMPLE_URINE_24') }}">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
     </div>
     {{ macros.displayModifyBannerMessage(sample) }}
-    {% if sampleModifyForm is not empty %}
+    {% if not isParticipantDeactivated and sampleModifyForm is not empty %}
         <div>
             <h3>Unlock Sample For Editing</h3>
             {{ form_start(sampleModifyForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
@@ -201,6 +201,9 @@
             </div>
         </div>
         <div class="col-sm-7">
+            {% if isParticipantDeactivated %}
+                {% include 'program/nph/order/partials/form-participant-deactivated-banner.html.twig' %}
+            {% endif %}
             {% include 'program/nph/order/partials/sample-finalize-banner-message.html.twig' %}
             <div class="panel panel-default">
                 {% if biobankView %}
@@ -312,7 +315,7 @@
                     <div class="panel-heading text-warning bg-warning" id="aliquotTimeWarning" hidden="hidden">
                         <p><i class="fa fa-warning"></i> Please ensure collection and aliquot times are correct.</p>
                         <ul>
-                            <li>As a general guideline, samples should be aliquoted within 2 hours of collection.</li>
+                            <li>As a general guideline, samples should be aliquoted within {{ sampleCode == constant('App\\Entity\\NphSample::SAMPLE_URINE_24') ? 8 : 2 }} hours of collection.</li>
                             <li>Double check the AM/PM selection for each time.</li>
                             <li>If the times entered are correct, you may continue with finalization.</li>
                         </ul>

@@ -115,6 +115,18 @@ class NphParticipantSummaryService
         }
     }
 
+    public function isParticipantWithdrawn(NphParticipant $participant, string $module): bool
+    {
+        $isNphModuleWithdrawn = "isNphModule{$module}Withdrawn";
+        return $participant->isAouWithdrawn || $participant->$isNphModuleWithdrawn;
+    }
+
+    public function isParticipantDeactivated(NphParticipant $participant, string $module): bool
+    {
+        $isNphModuleDeactivated = "isNphModule{$module}Deactivated";
+        return $participant->isAouDeactivated || $participant->$isNphModuleDeactivated;
+    }
+
     private function getParticipantByIdQuery(string $participantId): string
     {
         return "
@@ -154,6 +166,24 @@ class NphParticipantSummaryService
                                     status
                                     current
                                 }
+                            },
+                            aouDeactivationStatus {
+                                time
+                                value
+                            },
+                            aouWithdrawalStatus {
+                                time
+                                value
+                            },
+                            nphDeactivationStatus {
+                                module
+                                time
+                                value
+                            },
+                            nphWithdrawalStatus {
+                                module
+                                time
+                                value
                             }
                         }
                     }
@@ -289,6 +319,7 @@ class NphParticipantSummaryService
                             lastName
                             middleName
                             nphDeactivationStatus {
+                                module
                                 time
                                 value
                             }
@@ -300,6 +331,7 @@ class NphParticipantSummaryService
                             nphPairedOrg
                             nphPairedSite
                             nphWithdrawalStatus {
+                                module
                                 time
                                 value
                             }

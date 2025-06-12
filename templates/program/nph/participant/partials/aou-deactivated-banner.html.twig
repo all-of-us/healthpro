@@ -1,0 +1,9 @@
+<div class="card mb-2">
+    <div class="card-header bg-danger font-bold text-white">
+        <i class="fa fa-times-circle"></i> Deactivated Participant
+    </div>
+    <div class="card-body">
+        <p>This participant has deactivated from the All of Us Program, resulting in their deactivation from the Nutrition for Precision Health Program. No new data can be collected or sent for this participant.</p>
+        <span class="font-bold">Deactivation Time:</span> {{ time ? time|date('n/j/Y g:ia', app.user.timezone) : '--' }}
+    </div>
+</div>

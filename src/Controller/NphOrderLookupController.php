@@ -92,15 +92,19 @@ class NphOrderLookupController extends AbstractController
                 if (!$participant) {
                     throw $this->createNotFoundException('Participant not found.');
                 }
-                if ($participant->nphPairedSiteSuffix === $siteService->getSiteId()) {
-                    return $this->redirectToRoute('nph_order_collect', [
-                        'participantId' => $order->getParticipantId(),
-                        'orderId' => $order->getId()
-                    ]);
+                if ($participantSummary->isParticipantWithdrawn($participant, $order->getModule())) {
+                    $flashMessage = 'This participant has been withdrawn. Data cannot  be viewed, collected, or sent for this participant.';
+                } else {
+                    if ($participant->nphPairedSiteSuffix === $siteService->getSiteId()) {
+                        return $this->redirectToRoute('nph_order_collect', [
+                            'participantId' => $order->getParticipantId(),
+                            'orderId' => $order->getId()
+                        ]);
+                    }
+                    $flashMessage = 'Lookup for this Order ID is not permitted because the participant is paired with another site';
                 }
-                $crossSiteErrorMessage = 'Lookup for this Order ID is not permitted because the participant is paired with another site';
             }
-            $this->addFlash('error', $crossSiteErrorMessage ?? 'Order ID not found');
+            $this->addFlash('error', $flashMessage ?? 'Order ID not found');
         }
         return $idForm;
     }
@@ -129,17 +133,21 @@ class NphOrderLookupController extends AbstractController
                     if (!$participant) {
                         throw $this->createNotFoundException('Participant not found.');
                     }
-                    if ($participant->nphPairedSiteSuffix === $siteService->getSiteId()) {
-                        return $this->redirectToRoute('nph_sample_finalize', [
-                            'participantId' => $sample->getNphOrder()->getParticipantId(),
-                            'orderId' => $sample->getNphOrder()->getId(),
-                            'sampleId' => $sample->getId()
-                        ]);
+                    if ($nphParticipantSummaryService->isParticipantWithdrawn($participant, $sample->getNphOrder()->getModule())) {
+                        $flashMessage = 'This participant has been withdrawn. Data cannot  be viewed, collected, or sent for this participant.';
+                    } else {
+                        if ($participant->nphPairedSiteSuffix === $siteService->getSiteId()) {
+                            return $this->redirectToRoute('nph_sample_finalize', [
+                                'participantId' => $sample->getNphOrder()->getParticipantId(),
+                                'orderId' => $sample->getNphOrder()->getId(),
+                                'sampleId' => $sample->getId()
+                            ]);
+                        }
+                        $flashMessage = "Lookup for this $fieldLabel is not permitted because the participant is paired with another site";
                     }
-                    $crossSiteErrorMessage = "Lookup for this $fieldLabel is not permitted because the participant is paired with another site";
                 }
             }
-            $this->addFlash('error', $crossSiteErrorMessage ?? "$fieldLabel not found");
+            $this->addFlash('error', $flashMessage ?? "$fieldLabel not found");
         }
         return $form;
     }

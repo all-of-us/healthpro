@@ -53,7 +53,7 @@ class NphOrder
         'Period3DSMT' => 'Diet Period 3 - DSMT',
         'Period3LMT' => 'Diet Period 3 - LMT',
     ];
-    private const TIMEPOINT_DISPLAY_NAME_MAPPER = [
+    public const TIMEPOINT_DISPLAY_NAME_MAPPER = [
         'day0' => 'Day 0',
         'day2' => 'Day 2',
         'day12' => 'Day 12',
@@ -64,7 +64,7 @@ class NphOrder
         'day6E' => 'Day 6 E',
         'day7F' => 'Day 7 F',
         'day13G' => 'Day 13 G',
-        'day14F' => 'Day 14 F',
+        'day14F' => 'Day 14 H',
         'preDSMT' => 'Pre DSMT',
         'minus15min' => '-15 min',
         'minus5min' => '-5 min',
