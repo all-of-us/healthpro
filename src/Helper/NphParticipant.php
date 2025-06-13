@@ -393,9 +393,9 @@ class NphParticipant
                         $mappedValue = $config['mappedValue'];
                         // Re-consent check for DEACTIVATED or WITHDRAWN
                         if ($statusTime !== null) {
-                            $consentField = 'nph' . ucfirst($module) . 'ConsentStatus';
-                            if (isset($this->rdrData->$consentField) && isset($this->rdrData->$consentField->time)) {
-                                $consentTime = strtotime($this->rdrData->$consentField->time);
+                            $consentTime = $this->getModuleConsentStatusTime(substr($module, -1));
+                            if ($consentTime) {
+                                $consentTime = strtotime($consentTime);
                                 if ($consentTime > $statusTime) {
                                     // If Re-consented after deactivation or withdrawal => consider ACTIVE
                                     break 2;
@@ -412,6 +412,26 @@ class NphParticipant
         $consentStatus['value'] = $consentStatus['value'] ?? self::DEFAULT_CONSENT_STATUS;
         $consentStatus['time'] = $consentStatus['time'] ?? null;
         return $consentStatus;
+    }
+
+    private function getModuleConsentStatusTime(string $module)
+    {
+        $latestDate = null;
+        $consentStatusTime = null;
+        $consentField = "nphModule{$module}ConsentStatus";
+        $consentValue = "m{$module}_consent";
+        if (isset($this->rdrData->$consentField) && is_array($this->rdrData->$consentField)) {
+            foreach ($this->rdrData->$consentField as $consent) {
+                if ($consent->value === $consentValue) {
+                    $consentDate = new \DateTime($consent->time);
+                    if ($latestDate === null || $consentDate > $latestDate) {
+                        $latestDate = $consentDate;
+                        $consentStatusTime = $consent->time;
+                    }
+                }
+            }
+        }
+        return $consentStatusTime ?? null;
     }
 
     private function isAouWithdrawn(): bool

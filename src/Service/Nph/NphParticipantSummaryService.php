@@ -147,6 +147,16 @@ class NphParticipantSummaryService
                                 value
                                 optIn
                             }
+                            nphModule2ConsentStatus {
+                                time
+                                value
+                                optIn
+                            },
+                            nphModule3ConsentStatus {
+                                time
+                                value
+                                optIn
+                            },
                             nphEnrollmentStatus {
                                 time
                                 value
@@ -340,6 +350,16 @@ class NphParticipantSummaryService
                             siteId
                             zipCode
                             nphModule1ConsentStatus {
+                                time
+                                value
+                                optIn
+                            },
+                            nphModule2ConsentStatus {
+                                time
+                                value
+                                optIn
+                            },
+                            nphModule3ConsentStatus {
                                 time
                                 value
                                 optIn
