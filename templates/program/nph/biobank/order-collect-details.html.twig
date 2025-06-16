@@ -28,6 +28,11 @@
                     <h4><i class="fa fa-medkit" aria-hidden="true"></i> {{ order.createdTs|date('n/j/Y') }}</h4>
                 </div>
             </div>
+            {% if isParticipantWithdrawn %}
+                {% include 'program/nph/order/partials/form-participant-withdrawn-banner.html.twig' %}
+            {% elseif isParticipantDeactivated %}
+                {% include 'program/nph/order/partials/form-participant-deactivated-banner.html.twig' %}
+            {% endif %}
         </div>
     </div>
     <div class="alert bg-light well-sm margin-top-15">

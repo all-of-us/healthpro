@@ -315,11 +315,15 @@ class NphBiobankController extends BaseController
             throw $this->createNotFoundException('Order not found.');
         }
         $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participant->id, $participant->biobankId);
+        $isParticipantWithdrawn = $nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule());
+        $isParticipantDeactivated = $nphNphParticipantSummaryService->isParticipantDeactivated($participant, $order->getModule());
         return $this->render('program/nph/biobank/order-collect-details.html.twig', [
             'order' => $order,
             'participant' => $participant,
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
+            'isParticipantDeactivated' => $isParticipantDeactivated,
+            'isParticipantWithdrawn' => $isParticipantWithdrawn
         ]);
     }
 

@@ -26,6 +26,12 @@
         </div>
     </div>
 
+    {% if participant.isAouWithdrawn %}
+        {% include 'program/nph/participant/partials/aou-withdrawn-banner.html.twig' with { time: participant.aouConsentStatusTime } %}
+    {% elseif participant.isAouDeactivated %}
+        {% include 'program/nph/participant/partials/aou-deactivated-banner.html.twig' with { time: participant.aouConsentStatusTime } %}
+    {% endif %}
+
     {% if participant.module %}
         <div class="row mt-2">
             <div class="col-md-12" role="tabpanel">

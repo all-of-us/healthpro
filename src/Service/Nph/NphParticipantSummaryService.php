@@ -252,7 +252,35 @@ class NphParticipantSummaryService
                                 time
                                 value
                             },
+                            aouDeactivationStatus {
+                                time,
+                                value
+                            },
+                            aouWithdrawalStatus {
+                                time
+                                value
+                            },
+                            nphWithdrawalStatus {
+                                module
+                                time
+                                value
+                            }
+                            nphDeactivationStatus {
+                                module
+                                time
+                                value
+                            },
                             nphModule1ConsentStatus {
+                                time
+                                value
+                                optIn
+                            },
+                            nphModule2ConsentStatus {
+                                time
+                                value
+                                optIn
+                            },
+                            nphModule3ConsentStatus {
                                 time
                                 value
                                 optIn
