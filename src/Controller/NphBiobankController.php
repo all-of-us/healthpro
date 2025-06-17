@@ -359,7 +359,10 @@ class NphBiobankController extends BaseController
         $sampleData = $nphOrderService->getExistingSampleData($sample);
         $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
         $canGenerateOrders = $nphOrderService->canGenerateOrders($participant->id, $order->getModule(), $dietPeriod, $participant->module);
-        $isSampleDisabled = $sample->isDisabled() || ($sample->getModifyType() !== NphSample::UNLOCK && !$canGenerateOrders);
+        $isParticipantWithdrawn = $nphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule());
+        $isParticipantDeactivated = $nphParticipantSummaryService->isParticipantDeactivated($participant, $order->getModule());
+        $isSampleDisabled = $isParticipantWithdrawn || $isParticipantDeactivated || $sample->isDisabled() ||
+            ($sample->getModifyType() !== NphSample::UNLOCK && !$canGenerateOrders);
         $isFormDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2 ? $isSampleDisabled : true;
         $isFreezeTsDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2 ? $order->isFreezeTsDisabled($sample->getModifyType()) : false;
         $sampleFinalizeForm = $this->createForm(
@@ -453,7 +456,6 @@ class NphBiobankController extends BaseController
                 $sampleResubmitForm->addError(new FormError('Please correct the errors below'));
             }
         }
-
         return $this->render('program/nph/order/sample-finalize.html.twig', [
             'sampleIdForm' => $sampleIdForm->createView(),
             'sampleFinalizeForm' => $sampleFinalizeForm->createView(),
@@ -471,7 +473,9 @@ class NphBiobankController extends BaseController
             'isFormDisabled' => $isFormDisabled,
             'visitDiet' => $nphOrderService->getVisitDiet(),
             'isFreezeTsDisabled' => $isFreezeTsDisabled,
-            'allowResubmit' => $isFormDisabled && $sample->getModifyType() !== NphSample::UNLOCK
+            'allowResubmit' => $isFormDisabled && $sample->getModifyType() !== NphSample::UNLOCK,
+            'isParticipantWithdrawn' => $isParticipantWithdrawn,
+            'isParticipantDeactivated' => $isParticipantDeactivated
         ]);
     }
 
