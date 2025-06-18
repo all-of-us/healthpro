@@ -126,7 +126,7 @@
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
     </div>
     {{ macros.displayModifyBannerMessage(sample) }}
-    {% if not isParticipantDeactivated and sampleModifyForm is not empty %}
+    {% if not isParticipantDeactivated and not isParticipantWithdrawn and sampleModifyForm is not empty %}
         <div>
             <h3>Unlock Sample For Editing</h3>
             {{ form_start(sampleModifyForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
@@ -201,7 +201,9 @@
             </div>
         </div>
         <div class="col-sm-7">
-            {% if isParticipantDeactivated %}
+            {% if isParticipantWithdrawn %}
+                {% include 'program/nph/order/partials/form-participant-withdrawn-banner.html.twig' %}
+            {% elseif isParticipantDeactivated %}
                 {% include 'program/nph/order/partials/form-participant-deactivated-banner.html.twig' %}
             {% endif %}
             {% include 'program/nph/order/partials/sample-finalize-banner-message.html.twig' %}
@@ -437,7 +439,9 @@
                         </button>
                         {% if biobankView %}
                             <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-default">Cancel</a>
-                            <button type="button" class="btn btn-success pull-right" disabled>Resubmit</button>
+                            {% if not isParticipantDeactivated and not isParticipantWithdrawn %}
+                                <button type="button" class="btn btn-success pull-right" disabled>Resubmit</button>
+                            {% endif %}
                         {% else %}
                             <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
                         {% endif %}
@@ -450,7 +454,9 @@
                             {{ form_end(sampleResubmitForm) }}
                             <button type="button" class="btn btn-primary" disabled>Mark as Finalized</button>
                             <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-default">Cancel</a>
-                            <button type="button" class="btn btn-success pull-right" id="sample_refinalize_btn" {% if sample.rdrId is empty %} disabled {% endif %}>Resubmit</button>
+                            {% if not isParticipantDeactivated and not isParticipantWithdrawn %}
+                                <button type="button" class="btn btn-success pull-right" id="sample_refinalize_btn" {% if sample.rdrId is empty %} disabled {% endif %}>Resubmit</button>
+                            {% endif %}
                         </p>
                     {% endif %}
 

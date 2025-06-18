@@ -276,6 +276,7 @@ class NphOrderController extends BaseController
         $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
         $canGenerateOrders = $nphOrderService->canGenerateOrders($participantId, $order->getModule(), $dietPeriod, $participant->module);
         $isParticipantDeactivated = $nphNphParticipantSummaryService->isParticipantDeactivated($participant, $order->getModule());
+        $isParticipantWithdrawn = $nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule());
         $isFormDisabled = $isParticipantDeactivated || $sample->isDisabled() || ($sample->getModifyType() !==
             NphSample::UNLOCK && !$canGenerateOrders);
         $isFreezeTsDisabled = $order->getOrderType() === NphOrder::TYPE_STOOL ? $order->isFreezeTsDisabled($sample->getModifyType()) : false;
@@ -372,7 +373,8 @@ class NphOrderController extends BaseController
             'isFreezeTsDisabled' => $isFreezeTsDisabled,
             'allowResubmit' => false,
             'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper,
-            'isParticipantDeactivated' => $isParticipantDeactivated
+            'isParticipantDeactivated' => $isParticipantDeactivated,
+            'isParticipantWithdrawn' => $isParticipantWithdrawn
         ]);
     }
 
