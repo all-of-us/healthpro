@@ -30,77 +30,103 @@
     {% endif %}
     {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
     {{ form_errors(sampleModifyForm) }}
-    <table class="table table-samples bulk-modify-table">
-        <thead class="bg-light sticky-top top-0">
-            <tr>
-                <th>
-                    <input type="checkbox" id="modify_check_all" checked="true"> {{ type == constant('App\\Entity\\NphSample::CANCEL') ? 'Cancel' : 'Restore'}}
-                </th>
-                <th>Visit</th>
-                <th>Timepoint</th>
-                <th>Sample</th>
-                <th>Collected</th>
-                <th>Aliquoted and Finalized</th>
-            </tr>
-        </thead>
-        <tbody class="modify-samples">
-        {% for index, nphSample in activeSamples %}
-            {% set sampleOrder = nphSample.nphOrder %}
-            {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') and nphSample.sampleCode in activeSamples %}
-                {% set sampleClass = 'no-restore' %}
-            {% else %}
-                {% set sampleClass = '' %}
-            {% endif %}
-            <tr class="row-samples {{ sampleClass }}">
-                <td>
-                    {{ form_widget(sampleModifyForm[nphSample.sampleId]) }}
-                </td>
-                <td>
-                    <p>{{ nphSample.nphOrder.visitDisplayName }}</p>
-                </td>
-                <td>
-                    <p>{{ nphSample.nphOrder.timepointDisplayName }}</p>
-                </td>
-                <td>
-                    <p>({{ ordersSummary[sampleOrder.visitPeriod][sampleOrder.Timepoint][sampleOrder.OrderType][nphSample.SampleCode][sampleOrder.orderId]['sampleName'] }})
-                        {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL')%}
-                            <span class="text-danger">Cancelled</span>
-                        {% else %}
-                            <span class="text-success">Active</span>
-                        {% endif %}
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {% if nphSample.collectedTs is not empty %}
-                            <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ nphSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) }}
-                        {% else %}
-                            <i class="fa fa-times text-danger"></i>
-                        {% endif %}
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {% if nphSample.finalizedTs is not empty %}
-                            <i class="fa fa-check text-success" aria-hidden="true"></i>
-                            {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
-                        {% else %}
-                            <i class="fa fa-times text-danger"></i>
-                        {% endif %}
-                    </p>
-                </td>
-            </tr>
-            {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') and nphSample.sampleCode in activeSamples %}
-                <tr class="row-message"><td></td><td colspan="3"><span class="text-warning">An active order already exists for this timepoint/sample. To restore this sample, cancel the active order.</span></td></tr>
-            {% endif %}
+
+    {% set groupedByPhase = {} %}
+    {% for sample in activeSamples %}
+        {% set visitPeriod = sample.nphOrder.visitPeriod %}
+        {% set phaseKey = visitPeriod|slice(0, 7) %}
+        {% if groupedByPhase[phaseKey] is not defined %}
+            {% set groupedByPhase = groupedByPhase|merge({ (phaseKey): [] }) %}
+        {% endif %}
+        {% set groupedByPhase = groupedByPhase|merge({ (phaseKey): groupedByPhase[phaseKey]|merge([sample]) }) %}
+    {% endfor %}
+
+    {% set phaseLabels = {
+        'LMT': 'Module 1 Samples',
+        'Period1': 'Diet Period 1 Samples',
+        'Period2': 'Diet Period 2 Samples',
+        'Period3': 'Diet Period 3 Samples'
+    } %}
+
+    <div class="accordion mb-4" id="samplesAccordion">
+        {% for phase, samples in groupedByPhase %}
+            {% set collapseId = 'collapse-' ~ loop.index %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading-{{ loop.index }}">
+                    <button class="accordion-button d-flex align-items-center gap-2 collapsed"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#{{ collapseId }}"
+                            aria-expanded="false"
+                            aria-controls="{{ collapseId }}">
+                        <input type="checkbox" class="modify-check-all" checked />
+                        <span>{{ phaseLabels[phase] ?? phase }}</span>
+                    </button>
+                </h2>
+                <div id="{{ collapseId }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ loop.index }}">
+                    <div class="accordion-body">
+                        <table class="table table-samples bulk-modify-table">
+                            <thead class="bg-light sticky-top top-0">
+                            <tr>
+                                <th>{{ type == constant('App\\Entity\\NphSample::CANCEL') ? 'Cancel' : 'Restore' }}</th>
+                                <th>Visit</th>
+                                <th>Timepoint</th>
+                                <th>Sample</th>
+                                <th>Collected</th>
+                                <th>Aliquoted and Finalized</th>
+                            </tr>
+                            </thead>
+                            <tbody class="modify-samples">
+                            {% for nphSample in samples %}
+                                {% set sampleOrder = nphSample.nphOrder %}
+                                {% set sampleClass = nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') and nphSample.sampleCode in activeSamples ? 'no-restore' : '' %}
+                                <tr class="row-samples {{ sampleClass }}">
+                                    <td>{{ form_widget(sampleModifyForm[nphSample.sampleId]) }}</td>
+                                    <td><p>{{ sampleOrder.visitDisplayName }}</p></td>
+                                    <td><p>{{ sampleOrder.timepointDisplayName }}</p></td>
+                                    <td>
+                                        <p>
+                                            ({{ ordersSummary[sampleOrder.visitPeriod][sampleOrder.Timepoint][sampleOrder.OrderType][nphSample.SampleCode][sampleOrder.orderId]['sampleName'] }})
+                                            {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') %}
+                                                <span class="text-danger">Cancelled</span>
+                                            {% else %}
+                                                <span class="text-success">Active</span>
+                                            {% endif %}
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <p>
+                                            {% if nphSample.collectedTs is not empty %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {{ nphSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                                            {% else %}
+                                                <i class="fa fa-times text-danger"></i>
+                                            {% endif %}
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <p>
+                                            {% if nphSample.finalizedTs is not empty %}
+                                                <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                {{ nphSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
+                                            {% else %}
+                                                <i class="fa fa-times text-danger"></i>
+                                            {% endif %}
+                                        </p>
+                                    </td>
+                                </tr>
+
+                                {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') and nphSample.sampleCode in activeSamples %}
+                                    <tr class="row-message"><td></td><td colspan="3"><span class="text-warning">An active order already exists for this timepoint/sample. To restore this sample, cancel the active order.</span></td></tr>
+                                {% endif %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         {% endfor %}
-        <tr>
-            <td colspan="3" {% if not sampleModifyForm['samplesCheckAll'].vars.valid %}
-                class="border-0 has-error"{% endif %}>{{ form_errors(sampleModifyForm['samplesCheckAll']) }}</td>
-        </tr>
-        </tbody>
-    </table>
+    </div>
     <div style="display: none">{{ form_widget(sampleModifyForm['samplesCheckAll']) }}</div>
     <div class="row">
         <div class="col-sm-12">
@@ -108,7 +134,7 @@
             <p>
                 <button type="submit" name="reportable" class="btn btn-{{ type == constant('App\\Entity\\NphSample::RESTORE') ? 'success' : 'danger' }}">{{ type|capitalize }}</button>
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
-                   class="btn btn-default">Exit</a>
+                   class="btn btn-secondary">Exit</a>
             </p>
         </div>
     </div>
