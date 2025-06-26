@@ -15,7 +15,10 @@ class NphSampleLookupType extends AbstractType
         $builder
             ->add('sampleId', Type\TextType::class, [
                 'label' => $options['label'] ?? 'Scan or manually enter the collection sample ID',
-                'attr' => ['placeholder' => $options['placeholder'] ?? 'Scan barcode or enter collection sample ID'],
+                'attr' => [
+                    'placeholder' => $options['placeholder'] ?? 'Scan barcode or enter collection sample ID',
+                    'autofocus' => true
+                ],
                 'constraints' => [
                     new Constraints\NotBlank(),
                     new Constraints\Type('string')
