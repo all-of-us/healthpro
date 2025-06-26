@@ -26,6 +26,12 @@
         </div>
     </div>
 
+    {% if participant.isAouWithdrawn %}
+        {% include 'program/nph/participant/partials/aou-withdrawn-banner.html.twig' with { time: participant.aouConsentStatusTime } %}
+    {% elseif participant.isAouDeactivated %}
+        {% include 'program/nph/participant/partials/aou-deactivated-banner.html.twig' with { time: participant.aouConsentStatusTime } %}
+    {% endif %}
+
     {% if participant.module %}
         <div class="row mt-2">
             <div class="col-md-12" role="tabpanel">
@@ -98,7 +104,16 @@
                             </div>
                             <div class="col-sm-10 ps-0">
                                 {% set dietPeriodNumbers = moduleNumber == 1 ? ['LMT'] :['Period1', 'Period2', 'Period3'] %}
-                                <div class="tab-content" id="myTabContent">
+                                {% set nphModuleWithdrawnFlag = attribute(participant, 'isNphModule' ~ moduleNumber ~ 'Withdrawn') %}
+                                {% set nphModuleDeactivatedFlag = attribute(participant, 'isNphModule' ~ moduleNumber ~ 'Deactivated') %}
+                                {% if nphModuleWithdrawnFlag %}
+                                    {% set consentStatusTime = attribute(participant, 'module' ~ moduleNumber ~ 'NphConsentStatusTime') %}
+                                    {% include 'program/nph/participant/partials/nph-module-withdrawn-banner.html.twig' with { time: consentStatusTime } %}
+                                {% elseif nphModuleDeactivatedFlag %}
+                                    {% set consentStatusTime = attribute(participant, 'module' ~ moduleNumber ~ 'NphConsentStatusTime') %}
+                                    {% include 'program/nph/participant/partials/nph-module-deactivated-banner.html.twig' with { time: consentStatusTime } %}
+                                {% endif %}
+                                <div class="tab-content mt-2" id="myTabContent">
                                     {% for dietPeriodNumber in dietPeriodNumbers %}
                                         <div class="tab-pane fade {% if dietPeriodNumber == 'LMT' or dietPeriodNumber == activeDietPeriod %} show active{% endif %}" id="{{ dietPeriodNumber }}">
                                             <div class="row">
