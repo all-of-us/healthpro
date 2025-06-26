@@ -160,7 +160,14 @@
                                                         {% include 'program/nph/participant/partials/nph-module-deactivated-banner.html.twig' with { time: consentStatusTime } %}
                                                     {% endif %}
                                                     {% if not participant.isAouDeactivated and not nphModuleDeactivatedFlag %}
-                                                        <a class="float-end badge btn rounded-1 border-1 border-secondary border fw-semibold text-black text-decoration-none {% if sampleStatusCounts[moduleNumber]['active'] is defined and  sampleStatusCounts[moduleNumber]['active'] == 0%} disabled {% endif%}"  href="{{ path('nph_samples_modify_all', {participantId: participant.id, module: moduleNumber, type: 'cancel'}) }}">Cancel All</a>
+                                                        <div class="float-end">
+                                                            <a class="badge btn me-2 rounded-1 border-1 border-secondary border fw-semibold text-black text-decoration-none {% if sampleStatusCounts[moduleNumber]['active'] is defined and  sampleStatusCounts[moduleNumber]['active'] == 0%} disabled {% endif%}"  href="{{ path('nph_samples_modify_all', {participantId: participant.id, module: moduleNumber, type: 'cancel'}) }}">
+                                                                Cancel All
+                                                            </a>
+                                                            <span role="button" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" title="The 'Cancel All' feature allows users to cancel all samples within the current <span class='text-decoration-underline'>Module</span>">
+                                                                <i class="fa fa-exclamation-circle text-primary"></i>
+                                                            </span>
+                                                        </div>
                                                     {% endif %}
                                                     {% set dietPeriodNumbers = moduleNumber == 1 ? ['LMT'] :['Period1', 'Period2', 'Period3'] %}
                                                     <div class="tab-content" id="myTabContent">
