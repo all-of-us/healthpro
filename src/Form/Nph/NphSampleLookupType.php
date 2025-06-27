@@ -17,7 +17,7 @@ class NphSampleLookupType extends AbstractType
                 'label' => $options['label'] ?? 'Scan or manually enter the collection sample ID',
                 'attr' => [
                     'placeholder' => $options['placeholder'] ?? 'Scan barcode or enter collection sample ID',
-                    'autofocus' => true
+                    'autofocus' => $options['autofocus']
                 ],
                 'constraints' => [
                     new Constraints\NotBlank(),
@@ -30,7 +30,8 @@ class NphSampleLookupType extends AbstractType
     {
         $resolver->setDefaults([
             'label' => null,
-            'placeholder' => null
+            'placeholder' => null,
+            'autofocus' => false
         ]);
     }
 }
