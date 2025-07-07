@@ -27,7 +27,6 @@ $(document).ready(function () {
 
     const initializeDataTable = () => {
         $("table.quick-view-table").DataTable({
-            order: [[8, "desc"]],
             pageLength: 1000,
             lengthMenu: [[1000], [1000]], // Disable the entries dropdown
             searching: false,
