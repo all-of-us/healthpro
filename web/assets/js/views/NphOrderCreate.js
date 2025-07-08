@@ -303,8 +303,21 @@ $(document).ready(function () {
         });
     });
 
+    const $iframe = $("#nph_downtime_video_iframe");
+
     $(document).on("hidden.bs.modal", "#downtime-references-modal", function () {
         // Stop video
-        $("#nph_downtime_video_iframe").attr("src", "");
+        $iframe.attr("src", "");
+    });
+
+    const $videoCollapse = $("#downtime-video-tutorial-collapse");
+
+    $videoCollapse.on("hidden.bs.collapse", function () {
+        $iframe.attr("src", "");
+    });
+
+    $videoCollapse.on("shown.bs.collapse", function () {
+        const mediaSrc = $iframe.closest(".downtime-media-src").data("media-src");
+        $iframe.attr("src", mediaSrc);
     });
 });
