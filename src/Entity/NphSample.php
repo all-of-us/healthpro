@@ -24,6 +24,12 @@ class NphSample
     public const BIOBANK_MODIFY_REASON = 'biobank';
     public const NPH_ADMIN_MODIFY_REASON = 'admin';
     public const SAMPLE_URINE_24 = 'URINE24';
+    public const DISPLAY_CANCEL = 'Canceled';
+    public const DISPLAY_UNLOCK = 'Unlocked';
+    public const DISPLAY_CREATED = 'Created';
+    public const DISPLAY_COLLECTED = 'Collected';
+    public const DISPLAY_BIOBANK_FINALIZED = 'Biobank Finalized';
+    public const DISPLAY_FINALIZED = 'Finalized';
 
     private const RDR_MICROLITER_UNITS = [
         'μL' => 'uL'
@@ -364,26 +370,31 @@ class NphSample
     public function getStatus(): string
     {
         if ($this->modifyType === NphSample::CANCEL) {
-            return 'Canceled';
+            return self::DISPLAY_CANCEL;
         }
 
         if ($this->modifyType === NphSample::UNLOCK) {
-            return 'Unlocked';
+            return self::DISPLAY_UNLOCK;
         }
 
         if ($this->collectedTs === null && $this->finalizedTs === null) {
-            return 'Created';
+            return self::DISPLAY_CREATED;
         }
 
         if ($this->finalizedTs === null) {
-            return 'Collected';
+            return self::DISPLAY_COLLECTED;
         }
 
         if ($this->biobankFinalized) {
-            return 'Biobank Finalized';
+            return self::DISPLAY_BIOBANK_FINALIZED;
         }
 
-        return 'Finalized';
+        return self::DISPLAY_FINALIZED;
+    }
+
+    public function isFinalized(): bool
+    {
+        return $this->getStatus() === self::DISPLAY_FINALIZED || $this->getStatus() === self::DISPLAY_BIOBANK_FINALIZED;
     }
 
     /**
