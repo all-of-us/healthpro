@@ -2,6 +2,47 @@
   "version": "2",
   "notes": "Module 2 samples",
   "samplesInformation": {
+    "STOOL": {
+      "label": "Stool",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "placeholder": true,
+      "identifier": "Stool"
+    },
+    "ST1": {
+      "label": "95% Ethanol Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST1-K"
+    },
+    "ST2": {
+      "label": "95% Ethanol Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST2-K"
+    },
+    "ST3": {
+      "label": "DNA/RNA Shield Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST3-K"
+    },
+    "ST4": {
+      "label": "DNA/RNA Shield Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST4-K"
+    },
     "SST8P5": {
       "label": "8.5 mL SST",
       "color": "Red and gray",
@@ -224,47 +265,6 @@
           "addNew": false
         }
       }
-    },
-    "STOOL": {
-      "label": "Stool",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool",
-      "placeholder": true,
-      "identifier": "Stool"
-    },
-    "ST1": {
-      "label": "95% Ethanol Tube 1",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool",
-      "identifier": "ST1-K"
-    },
-    "ST2": {
-      "label": "95% Ethanol Tube 2",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool",
-      "identifier": "ST2-K"
-    },
-    "ST3": {
-      "label": "DNA/RNA Shield Tube 1",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool",
-      "identifier": "ST3-K"
-    },
-    "ST4": {
-      "label": "DNA/RNA Shield Tube 2",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool",
-      "identifier": "ST4-K"
     }
   }
 }

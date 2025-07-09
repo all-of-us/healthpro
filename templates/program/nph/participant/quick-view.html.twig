@@ -1,6 +1,8 @@
 {% macro displaySampleStatus(nphSample) %}
     {% if nphSample.modifyType == constant('App\\Entity\\NphSample::CANCEL') %}
         {{ 'Cancelled' }}
+    {% elseif nphSample.modifyType == constant('App\\Entity\\NphSample::UNLOCK') %}
+        {{ 'Unlocked' }}
     {% elseif nphSample.finalizedTs %}
         {{ 'Finalized' }}
     {% elseif nphSample.collectedTs %}
@@ -74,29 +76,31 @@
                                                 {% set visitSuffix = module == 1 ? 'LMT' : visit|split(period)|last %}
                                                 {% for timepoint, samples in timepoints %}
                                                     {% for sampleCode, sampleDescription in samples %}
-                                                        {% set matchedOrder = null %}
-                                                        {% set matchedSample = null %}
-                                                        {% for order in orders %}
-                                                            {% if order.visitPeriod == visit and order.timepoint == timepoint %}
-                                                                {% for nphSample in order.nphSamples %}
-                                                                    {% if nphSample.sampleCode == sampleCode %}
-                                                                        {% set matchedOrder = order %}
-                                                                        {% set matchedSample = nphSample %}
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                            {% endif %}
-                                                        {% endfor %}
-                                                        <tr>
-                                                            <td>{{ visitSuffix }} Visit</td>
-                                                            <td>{{ timePointsInfo[timepoint] }}</td>
-                                                            <td>{{ matchedOrder ? matchedOrder.orderId : '--' }}</td>
-                                                            <td>{{ sampleDescription }}</td>
-                                                            <td>{{ matchedSample ? matchedSample.sampleId: '--' }}</td>
-                                                            <td>{{ matchedOrder ? matchedOrder.createdTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
-                                                            <td>{{ matchedSample and matchedSample.collectedTs ? matchedSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
-                                                            <td>{{ matchedSample and matchedSample.finalizedTs ? matchedSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
-                                                            <td data-order="{{ matchedSample ? _self.getStatusSortValue(matchedSample) : 0 }}">{{ matchedSample ? _self.displaySampleStatus(matchedSample) : '--' }}</td>
-                                                        </tr>
+                                                        {% if sampleCode not in [constant('App\\Entity\\NphSample::SAMPLE_STOOL'), constant('App\\Entity\\NphSample::SAMPLE_STOOL_2')] %}
+                                                            {% set matchedOrder = null %}
+                                                            {% set matchedSample = null %}
+                                                            {% for order in orders %}
+                                                                {% if order.visitPeriod == visit and order.timepoint == timepoint %}
+                                                                    {% for nphSample in order.nphSamples %}
+                                                                        {% if nphSample.sampleCode == sampleCode %}
+                                                                            {% set matchedOrder = order %}
+                                                                            {% set matchedSample = nphSample %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                            <tr>
+                                                                <td>{{ visitSuffix }} Visit</td>
+                                                                <td>{{ timePointsInfo[timepoint] }}</td>
+                                                                <td>{{ matchedOrder ? matchedOrder.orderId : '--' }}</td>
+                                                                <td>{{ sampleDescription }}</td>
+                                                                <td>{{ matchedSample ? matchedSample.sampleId: '--' }}</td>
+                                                                <td>{{ matchedOrder ? matchedOrder.createdTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                                <td>{{ matchedSample and matchedSample.collectedTs ? matchedSample.collectedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                                <td>{{ matchedSample and matchedSample.finalizedTs ? matchedSample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) : '--' }}</td>
+                                                                <td data-order="{{ matchedSample ? _self.getStatusSortValue(matchedSample) : 0 }}">{{ matchedSample ? _self.displaySampleStatus(matchedSample) : '--' }}</td>
+                                                            </tr>
+                                                        {% endif %}
                                                     {% endfor %}
                                                 {% endfor %}
                                             {% endif %}
