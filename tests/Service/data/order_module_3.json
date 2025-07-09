@@ -13,13 +13,6 @@
     "postDSMT": "Post DSMT"
   },
   "samples": {
-    "1SST4": "4 mL SST",
-    "LIH4": "4 mL Li Hep",
-    "EDTA4": "4 mL EDTA",
-    "P800": "2 mL P800",
-    "URINE": "Spot Urine",
-    "SALIVA": "Saliva",
-    "URINEDLW": "Urine DLW",
     "STOOL": "Stool Kit 1",
     "ST1": "95% Ethanol Tube 1",
     "ST2": "95% Ethanol Tube 2",
@@ -30,12 +23,17 @@
     "ST6": "95% Ethanol Tube 2",
     "ST7": "DNA/RNA Shield Tube 1",
     "ST8": "DNA/RNA Shield Tube 2",
+    "1SST4": "4 mL SST",
+    "LIH4": "4 mL Li Hep",
+    "EDTA4": "4 mL EDTA",
+    "P800": "2 mL P800",
+    "URINE": "Spot Urine",
+    "SALIVA": "Saliva",
+    "URINEDLW": "Urine DLW",
     "URINE24": "24 Hour Urine"
   },
   "timePointSamples": {
     "preDSMT": {
-      "URINE": "Spot Urine",
-      "SALIVA": "Saliva",
       "STOOL": "Stool Kit 1",
       "ST1": "95% Ethanol Tube 1",
       "ST2": "95% Ethanol Tube 2",
@@ -45,7 +43,9 @@
       "ST5": "95% Ethanol Tube 1",
       "ST6": "95% Ethanol Tube 2",
       "ST7": "DNA/RNA Shield Tube 1",
-      "ST8": "DNA/RNA Shield Tube 2"
+      "ST8": "DNA/RNA Shield Tube 2",
+      "URINE": "Spot Urine",
+      "SALIVA": "Saliva"
     },
     "minus15min": {
       "1SST4": "4 mL SST",

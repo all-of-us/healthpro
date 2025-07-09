@@ -13,6 +13,11 @@
     "postLMT": "Post LMT"
   },
   "samples": {
+    "STOOL": "Stool",
+    "ST1": "95% Ethanol Tube 1",
+    "ST2": "95% Ethanol Tube 2",
+    "ST3": "DNA/RNA Shield Tube 1",
+    "ST4": "DNA/RNA Shield Tube 2",
     "SST8P5": "8.5 mL SST",
     "LIHP1": "6 mL Li Hep",
     "EDTA10": "10 mL EDTA",
@@ -21,25 +26,20 @@
     "SALIVA": "Saliva",
     "HAIR": "Hair",
     "NAILB": "Big Toenails",
-    "NAILL": "Other Toenails",
-    "STOOL": "Stool",
-    "ST1": "95% Ethanol Tube 1",
-    "ST2": "95% Ethanol Tube 2",
-    "ST3": "DNA/RNA Shield Tube 1",
-    "ST4": "DNA/RNA Shield Tube 2"
+    "NAILL": "Other Toenails"
   },
   "timePointSamples": {
     "preLMT": {
-      "URINES": "Spot Urine",
-      "SALIVA": "Saliva",
-      "HAIR": "Hair",
-      "NAILB": "Big Toenails",
-      "NAILL": "Other Toenails",
       "STOOL": "Stool",
       "ST1": "95% Ethanol Tube 1",
       "ST2": "95% Ethanol Tube 2",
       "ST3": "DNA/RNA Shield Tube 1",
-      "ST4": "DNA/RNA Shield Tube 2"
+      "ST4": "DNA/RNA Shield Tube 2",
+      "URINES": "Spot Urine",
+      "SALIVA": "Saliva",
+      "HAIR": "Hair",
+      "NAILB": "Big Toenails",
+      "NAILL": "Other Toenails"
     },
     "minus15min": {
       "SST8P5": "8.5 mL SST",
