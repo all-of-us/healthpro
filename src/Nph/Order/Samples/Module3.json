@@ -2,6 +2,98 @@
   "version": "1",
   "notes": "Module 3 samples",
   "samplesInformation": {
+    "STOOL": {
+      "label": "Stool Kit 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "placeholder": true,
+      "identifier": "Stool",
+      "typeDisplayName": "Stool Kit 1"
+    },
+    "ST1": {
+      "label": "95% Ethanol Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST1-K",
+      "typeDisplayName": "Stool Kit 1"
+    },
+    "ST2": {
+      "label": "95% Ethanol Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST2-K",
+      "typeDisplayName": "Stool Kit 1"
+    },
+    "ST3": {
+      "label": "DNA/RNA Shield Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST3-K",
+      "typeDisplayName": "Stool Kit 1"
+    },
+    "ST4": {
+      "label": "DNA/RNA Shield Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool",
+      "identifier": "ST4-K",
+      "typeDisplayName": "Stool Kit 1"
+    },
+    "STOOL2": {
+      "label": "Stool Kit 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool2",
+      "placeholder": true,
+      "identifier": "Stool",
+      "typeDisplayName": "Stool Kit 2"
+    },
+    "ST5": {
+      "label": "95% Ethanol Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool2",
+      "identifier": "ST1-K",
+      "typeDisplayName": "Stool Kit 2"
+    },
+    "ST6": {
+      "label": "95% Ethanol Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool2",
+      "identifier": "ST2-K",
+      "typeDisplayName": "Stool Kit 2"
+    },
+    "ST7": {
+      "label": "DNA/RNA Shield Tube 1",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool2",
+      "identifier": "ST3-K",
+      "typeDisplayName": "Stool Kit 2"
+    },
+    "ST8": {
+      "label": "DNA/RNA Shield Tube 2",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "Stool",
+      "type": "stool2",
+      "identifier": "ST4-K",
+      "typeDisplayName": "Stool Kit 2"
+    },
     "1SST4": {
       "label": "4 mL SST",
       "color": "Red and gray",
@@ -244,98 +336,6 @@
           "collectMetadata": false
         }
       }
-    },
-    "STOOL": {
-      "label": "Stool Kit 1",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool",
-      "placeholder": true,
-      "identifier": "Stool",
-      "typeDisplayName": "Stool Kit 1"
-    },
-    "ST1": {
-      "label": "95% Ethanol Tube 1",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool",
-      "identifier": "ST1-K",
-      "typeDisplayName": "Stool Kit 1"
-    },
-    "ST2": {
-      "label": "95% Ethanol Tube 2",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool",
-      "identifier": "ST2-K",
-      "typeDisplayName": "Stool Kit 1"
-    },
-    "ST3": {
-      "label": "DNA/RNA Shield Tube 1",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool",
-      "identifier": "ST3-K",
-      "typeDisplayName": "Stool Kit 1"
-    },
-    "ST4": {
-      "label": "DNA/RNA Shield Tube 2",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool",
-      "identifier": "ST4-K",
-      "typeDisplayName": "Stool Kit 1"
-    },
-    "STOOL2": {
-      "label": "Stool Kit 2",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool2",
-      "placeholder": true,
-      "identifier": "Stool",
-      "typeDisplayName": "Stool Kit 2"
-    },
-    "ST5": {
-      "label": "95% Ethanol Tube 1",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool2",
-      "identifier": "ST1-K",
-      "typeDisplayName": "Stool Kit 2"
-    },
-    "ST6": {
-      "label": "95% Ethanol Tube 2",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool2",
-      "identifier": "ST2-K",
-      "typeDisplayName": "Stool Kit 2"
-    },
-    "ST7": {
-      "label": "DNA/RNA Shield Tube 1",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool2",
-      "identifier": "ST3-K",
-      "typeDisplayName": "Stool Kit 2"
-    },
-    "ST8": {
-      "label": "DNA/RNA Shield Tube 2",
-      "color": "Yellow",
-      "temperature": "Refrigerated",
-      "specimen": "Stool",
-      "type": "stool2",
-      "identifier": "ST4-K",
-      "typeDisplayName": "Stool Kit 2"
     },
     "URINE24": {
       "label": "24 Hour Urine",
