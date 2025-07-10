@@ -200,7 +200,9 @@ class NphOrderController extends BaseController
         Request $request,
         NphParticipantSummaryService $nphParticipantSummaryService
     ): Response {
-        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
+        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null, [
+            'autofocus' => true
+        ]);
         $sampleIdForm->handleRequest($request);
 
         if ($sampleIdForm->isSubmitted() && $sampleIdForm->isValid()) {
@@ -270,7 +272,9 @@ class NphOrderController extends BaseController
             $participantId,
             $participant->biobankId
         );
-        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null);
+        $sampleIdForm = $this->createForm(NphSampleLookupType::class, null, [
+            'autofocus' => $sample->isFinalized()
+        ]);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
         $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
