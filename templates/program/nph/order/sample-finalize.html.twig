@@ -318,7 +318,7 @@
                         </div>
                         <hr>
                     {% endif %}
-                    <div class="panel-heading text-warning bg-warning" id="aliquotTimeWarning" hidden="hidden">
+                    <div class="alert alert-warning d-none" id="aliquotTimeWarning" role="alert">
                         <p><i class="fa fa-warning"></i> Please ensure collection and aliquot times are correct.</p>
                         <ul>
                             <li>As a general guideline, samples should be aliquoted within {{ sampleCode == constant('App\\Entity\\NphSample::SAMPLE_URINE_24') ? 8 : 2 }} hours of collection.</li>
@@ -326,7 +326,7 @@
                             <li>If the times entered are correct, you may continue with finalization.</li>
                         </ul>
                     </div>
-                    <div class="panel-heading text-warning bg-warning" id="freezeTimeWarning" hidden="hidden">
+                    <div class="alert alert-warning d-none" id="freezeTimeWarning" role="alert">
                         <p><i class="fa fa-warning"></i> Please ensure the Collection Time and Freeze Time are correct.</p>
                         <ul>
                             <li>As a general guideline, the Freeze Time should be less than 72 hours after Collection Time.</li>

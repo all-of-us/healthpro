@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    const bootstrapVersion = $(".page-header").data('bs-version') ?? 3;
+    const bootstrapVersion = $(".page-header").data("bs-version") ?? 3;
     if ($("#order-barcode").length === 1) {
         JsBarcode("#order-barcode", $("#order_info").data("order-id"), {
             width: 2,
