@@ -2,14 +2,16 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header nph-finalize-modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title"><i class="fa fa-exclamation-circle"></i> Finalization</h4>
+                <h5 class="modal-title" id="confirmationModalLabel">
+                    <i class="fa fa-exclamation-circle"></i> Finalization
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p class="alert alert-success">Are you sure you want to finalize this sample?</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                 <button id="confirm_finalize_btn" type="button" class="btn btn-success">Finalize</button>
             </div>
         </div>

@@ -125,7 +125,7 @@ a {
     color: #6f42c1;
 }
 
-.aou-order-form .col-form-label, .aou-order-form .form-label {
+.aou-order-form .col-form-label, .aou-order-form .form-label, .nph-order-form .form-label {
     font-weight: 700;
 }
 
