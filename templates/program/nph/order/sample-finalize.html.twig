@@ -125,7 +125,7 @@
     {% form_theme sampleFinalizeForm 'custom_bootstrap_5_layout.html.twig' %}
     {% set order = sample.nphOrder %}
     {% set sampleCode =  sample.sampleCode %}
-    <div class="page-header" id="aliquot_samples_header" data-sample-code="{{ sampleCode }}" data-sample-urine-24="{{ constant('App\\Entity\\NphSample::SAMPLE_URINE_24') }}">
+    <div class="page-header border-bottom mb-3" id="aliquot_samples_header" data-sample-code="{{ sampleCode }}" data-sample-urine-24="{{ constant('App\\Entity\\NphSample::SAMPLE_URINE_24') }}" data-bs-version="5">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
     </div>
     {{ macros.displayModifyBannerMessage(sample) }}
