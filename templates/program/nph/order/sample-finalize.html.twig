@@ -219,8 +219,11 @@
                 {% endif %}
                 <div class="card-body">
                     {% if order.downtimeGenerated() %}
-                        <div class="alert bg-success well-sm margin-top-15 text-success">
-                            <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}. [Order generation time: {{ order.createdTs|date('n/j/Y g:ia', app.user.timezone)}}] </span>
+                        <div class="alert alert-success mt-3">
+                            <span>
+                                This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}.
+                                [Order generation time: {{ order.createdTs|date('n/j/Y g:ia', app.user.timezone) }}]
+                            </span>
                         </div>
                     {% endif %}
                     {% if isFormDisabled %}
@@ -455,15 +458,18 @@
                     {{ form_end(sampleFinalizeForm) }}
 
                     {% if allowResubmit %}
-                        <p class="mt-3">
+                        {% form_theme sampleResubmitForm 'custom_bootstrap_5_layout.html.twig' %}
+                        <div>
                             {{ form_start(sampleResubmitForm) }}
                             {{ form_end(sampleResubmitForm) }}
-                            <button type="button" class="btn btn-primary" disabled>Mark as Finalized</button>
-                            <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-secondary">Cancel</a>
-                            {% if not isParticipantDeactivated and not isParticipantWithdrawn %}
-                                <button type="button" class="btn btn-success float-end" id="sample_refinalize_btn" {% if sample.rdrId is empty %} disabled {% endif %}>Resubmit</button>
-                            {% endif %}
-                        </p>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" disabled>Mark as Finalized</button>
+                                <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-secondary">Cancel</a>
+                                {% if not isParticipantDeactivated and not isParticipantWithdrawn %}
+                                    <button type="button" class="btn btn-success float-end" id="sample_refinalize_btn" {% if sample.rdrId is empty %} disabled {% endif %}>Resubmit</button>
+                                {% endif %}
+                            </div>
+                        </div>
                     {% endif %}
 
                     {% if sample.modifyType == 'unlock' and not biobankView %}
