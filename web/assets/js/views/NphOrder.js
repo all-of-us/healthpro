@@ -8,18 +8,20 @@ $(document).ready(function () {
         });
     }
 
-    if (bootstrapVersion === 3) {
-        $(".order-ts").pmiDateTimePicker({
-            maxDate: new Date().setHours(23, 59, 59, 999)
-        });
-    } else {
-        document.querySelectorAll(".order-ts").forEach((element) => {
-            bs5DateTimepicker(element, {
-                clock: true,
-                sideBySide: true,
-                useCurrent: true
+    if ($(".order-ts").length > 0) {
+        if (bootstrapVersion === 3) {
+            $(".order-ts").pmiDateTimePicker({
+                maxDate: new Date().setHours(23, 59, 59, 999)
             });
-        });
+        } else {
+            document.querySelectorAll(".order-ts").forEach((element) => {
+                bs5DateTimepicker(element, {
+                    clock: true,
+                    sideBySide: true,
+                    useCurrent: true
+                });
+            });
+        }
     }
 
     $(".toggle-help-image").on("click", function (e) {

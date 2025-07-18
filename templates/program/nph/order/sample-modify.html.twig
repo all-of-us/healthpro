@@ -1,6 +1,8 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% block title %}Sample - Modify - {% endblock %}
 {% block body %}
+    {% form_theme sampleModifyForm 'custom_bootstrap_5_layout.html.twig' %}
     <h2 class="{% if type == 'cancel' %} text-danger {% elseif type == 'restore' %} text-success {% endif %}">
         <i class="fa fa-medkit" aria-hidden="true"></i> {{ type|capitalize }} Samples
         <small>
@@ -13,7 +15,7 @@
 
     {% include 'program/nph/order/partials/order-participant-details-barcode.html.twig' %}
 
-    <div class="alert bg-light well-sm">
+    <div class="alert alert-secondary py-2">
         {{ timePoints[order.timepoint] }} {{ order.orderType|capitalize }}
     </div>
     {% if type == constant('App\\Entity\\NphSample::CANCEL') %}
@@ -23,11 +25,11 @@
     {% endif %}
     {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
     {{ form_errors(sampleModifyForm) }}
-    <table class="table table-samples">
+    <table class="table table-samples table-borderless">
         <thead>
-        <tr>
+        <tr class="border-bottom">
             <th>
-                <input type="checkbox" id="modify_check_all"> {{ type == constant('App\\Entity\\NphSample::CANCEL') ? 'Cancel' : 'Restore'}}
+                <input type="checkbox" id="order_modify_check_all"> {{ type == constant('App\\Entity\\NphSample::CANCEL') ? 'Cancel' : 'Restore'}}
             </th>
             <th>Sample</th>
             <th>Collected</th>
@@ -132,7 +134,7 @@
             <p>
                 <button type="submit" name="reportable" class="btn btn-{{ type == constant('App\\Entity\\NphSample::RESTORE') ? 'success' : 'danger' }}">{{ type|capitalize }}</button>
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
-                   class="btn btn-default">Exit</a>
+                   class="btn btn-secondary">Exit</a>
             </p>
         </div>
     </div>
