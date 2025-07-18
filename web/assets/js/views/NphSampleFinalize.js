@@ -448,23 +448,4 @@ $(document).ready(function () {
     $("#aliquot_mop_expand").on("click", function () {
         $("#aliquot_mop_modal").modal("show");
     });
-
-    $(".toggle-chart-image").on("click", function (e) {
-        displayChartImageModal(e);
-    });
-
-    const displayChartImageModal = function (e) {
-        let image = $(e.currentTarget).data("img");
-        let caption = $(e.currentTarget).data("caption");
-        let html = "";
-        if (image) {
-            html += '<img src="' + image + '" class="img-responsive" />';
-        }
-        if (caption) {
-            html += caption;
-        }
-        this.$("#chartImageModal .modal-body").html(html);
-        let chartImageModal = new bootstrap.Modal(this.$("#chartImageModal")[0]);
-        chartImageModal.show();
-    };
 });
