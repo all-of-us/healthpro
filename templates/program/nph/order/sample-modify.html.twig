@@ -23,7 +23,7 @@
     {% else %}
         <p class="text-success">Select samples to be restored</p>
     {% endif %}
-    {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+    {{ form_start(sampleModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit nph-modify-form' } }) }}
     {{ form_errors(sampleModifyForm) }}
     <table class="table table-samples table-borderless">
         <thead>
