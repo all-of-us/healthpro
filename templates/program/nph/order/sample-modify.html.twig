@@ -15,7 +15,7 @@
 
     {% include 'program/nph/order/partials/order-participant-details-barcode.html.twig' %}
 
-    <div class="alert alert-secondary py-2">
+    <div class="alert bg-light py-2">
         {{ timePoints[order.timepoint] }} {{ order.orderType|capitalize }}
     </div>
     {% if type == constant('App\\Entity\\NphSample::CANCEL') %}
