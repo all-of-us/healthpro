@@ -102,7 +102,7 @@ class NphSampleFinalizeType extends NphOrderForm
                     'label' => false,
                     'entry_options' => [
                         'widget' => 'single_text',
-                        'format' => 'M/d/yyyy h:mm a',
+                        'format' => 'MM/dd/yyyy h:mm a',
                         'html5' => false,
                         'view_timezone' => $options['timeZone'],
                         'model_timezone' => 'UTC',
@@ -133,6 +133,7 @@ class NphSampleFinalizeType extends NphOrderForm
                         ],
                         'attr' => [
                             'class' => 'order-ts aliquot-ts',
+                            'autocomplete' => 'off',
                             'data-field-type' => 'aliquot',
                             'data-parsley-aliquot-date-comparison' => "nph_sample_finalize_{$sample}CollectedTs"
                         ]

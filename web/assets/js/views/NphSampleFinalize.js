@@ -266,11 +266,17 @@ $(document).ready(function () {
     let aliquotSampleCode = aliquotSamplesHeaderSelector.data("sample-code");
     let sampleUrine24 = aliquotSamplesHeaderSelector.data("sample-urine-24");
 
-    $(".aliquot-ts, .freeze-ts").on("dp.change", function (event) {
-        let collectedTsSelector = $('input[id*="CollectedTs"]');
-        let orderCollectedTs = new Date(collectedTsSelector.val());
-        let fieldTs = new Date($(this).val());
-        let fieldType = $(this).data("field-type");
+    document.querySelectorAll(".aliquot-ts, .freeze-ts").forEach((element) => {
+        element.addEventListener("change", (event) => {
+            handleTimestampChange(event, $(event.currentTarget));
+        });
+    });
+
+    const handleTimestampChange = (event, $element) => {
+        const collectedTsInput = $('input[id*="CollectedTs"]');
+        const orderCollectedTs = new Date(collectedTsInput.val());
+        const fieldTs = new Date($element.val());
+        const fieldType = $element.data("field-type");
         let differenceCheck = 2;
         if (aliquotSampleCode === sampleUrine24) {
             differenceCheck = 8;
@@ -278,20 +284,21 @@ $(document).ready(function () {
         if (fieldType === "freeze") {
             differenceCheck = 72;
         }
-        let difference = Math.abs(fieldTs.getTime() - orderCollectedTs.getTime()) / (60 * 60 * 1000);
+        const difference = Math.abs(fieldTs - orderCollectedTs) / (1000 * 60 * 60);
+
         if (difference > differenceCheck) {
-            $(this).addClass("date-range-warning");
-            collectedTsSelector.addClass("date-range-warning");
-            $("#" + fieldType + "TimeWarning").show();
+            $element.addClass("date-range-warning");
+            collectedTsInput.addClass("date-range-warning");
+            $(`#${fieldType}TimeWarning`).removeClass("d-none");
         } else {
-            $(this).removeClass("date-range-warning");
-            collectedTsSelector.removeClass("date-range-warning");
-            if ($("td.has-warning>input.order-ts").length === 0) {
-                $("#" + fieldType + "TimeWarning").hide();
+            $element.removeClass("date-range-warning");
+            collectedTsInput.removeClass("date-range-warning");
+            if ($("td.has-warning > input.order-ts").length === 0) {
+                $(`#${fieldType}TimeWarning`).addClass("d-none");
             }
         }
         clearServerErrors(event);
-    });
+    };
 
     disableEnableAliquotFields();
 
@@ -359,8 +366,10 @@ $(document).ready(function () {
         trigger: "blur"
     });
 
-    $(document).on("dp.hide", ".order-ts", function () {
-        $(this).parsley().validate();
+    document.querySelectorAll(".order-ts").forEach((element) => {
+        element.addEventListener("change", () => {
+            $(element).parsley().validate();
+        });
     });
 
     const clearServerErrors = (e) => {
@@ -439,4 +448,23 @@ $(document).ready(function () {
     $("#aliquot_mop_expand").on("click", function () {
         $("#aliquot_mop_modal").modal("show");
     });
+
+    $(".toggle-chart-image").on("click", function (e) {
+        displayChartImageModal(e);
+    });
+
+    const displayChartImageModal = function (e) {
+        let image = $(e.currentTarget).data("img");
+        let caption = $(e.currentTarget).data("caption");
+        let html = "";
+        if (image) {
+            html += '<img src="' + image + '" class="img-responsive" />';
+        }
+        if (caption) {
+            html += caption;
+        }
+        this.$("#chartImageModal .modal-body").html(html);
+        let chartImageModal = new bootstrap.Modal(this.$("#chartImageModal")[0]);
+        chartImageModal.show();
+    };
 });

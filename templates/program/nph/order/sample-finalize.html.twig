@@ -1,3 +1,4 @@
+{% set bootstrapVersion = 5 %}
 {% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% block title %}Sample Aliquot Lookup - {% endblock %}
@@ -120,14 +121,17 @@
 
 {% endmacro %}
 {% block body %}
+    {% form_theme sampleIdForm 'custom_bootstrap_5_layout.html.twig' %}
+    {% form_theme sampleFinalizeForm 'custom_bootstrap_5_layout.html.twig' %}
     {% set order = sample.nphOrder %}
     {% set sampleCode =  sample.sampleCode %}
-    <div class="page-header" id="aliquot_samples_header" data-sample-code="{{ sampleCode }}" data-sample-urine-24="{{ constant('App\\Entity\\NphSample::SAMPLE_URINE_24') }}">
+    <div class="page-header border-bottom mb-3" id="aliquot_samples_header" data-sample-code="{{ sampleCode }}" data-sample-urine-24="{{ constant('App\\Entity\\NphSample::SAMPLE_URINE_24') }}" data-bs-version="5">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Aliquot Samples</h2>
     </div>
     {{ macros.displayModifyBannerMessage(sample) }}
     {% if not isParticipantDeactivated and not isParticipantWithdrawn and sampleModifyForm is not empty %}
-        <div>
+        {% form_theme sampleModifyForm 'custom_bootstrap_5_layout.html.twig' %}
+        <div class="nph-order-form">
             <h3>Unlock Sample For Editing</h3>
             {{ form_start(sampleModifyForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
             {{ form_errors(sampleModifyForm) }}
@@ -138,17 +142,17 @@
                 </button>
                 {% if biobankView %}
                     <a href="{{ path('nph_biobank_participant', { biobankId: participant.biobankid }) }}"
-                       class="btn btn-default">Exit</a>
+                       class="btn btn-secondary">Exit</a>
                 {% else %}
                     <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
-                       class="btn btn-default">Exit</a>
+                       class="btn btn-secondary">Exit</a>
                 {% endif %}
             </p>
             {{ form_end(sampleModifyForm) }}
             <hr>
         </div>
     {% endif %}
-    <div class="row">
+    <div class="row nph-order-form mb-5">
         <div class="col-sm-5">
             {% if biobankView %}
                 {{ form_start(sampleIdForm, { attr: { action: path('nph_biobank_samples_aliquot') } }) }}
@@ -160,7 +164,7 @@
                 <button type="submit" class="btn btn-primary">Go</button>
             </p>
             {{ form_end(sampleIdForm) }}
-            <div class="well bg-white">
+            <div class="card bg-white p-3">
                 <div class="text-center">
                     {% if aliquots %}
                         <p><u>Expected Tubes and Volumes for {{ samples[sampleCode] }}</u></p>
@@ -179,11 +183,11 @@
                     {% else %}
                         <p><strong>Instructions for Stool Kit</strong></p>
                     {% endif %}
-                    <a role="button" class="expand-pdf" data-toggle="collapse" data-target="#aliquot_instructions" aria-expanded="true" aria-controls="aliquot_instructions">
+                    <a role="button" class="expand-pdf" data-bs-toggle="collapse" data-bs-target="#aliquot_instructions" aria-expanded="true" aria-controls="aliquot_instructions">
                         Aliquot PDF
                     </a>
-                    <div class="collapse in" id="aliquot_instructions">
-                        <div class="pull-left">
+                    <div class="collapse show" id="aliquot_instructions">
+                        <div class="float-start text-primary">
                             <a role="button" id="aliquot_mop_expand"><i class="fa fa-expand-arrows-alt"></i> Expand</a>
                         </div>
                         <div class="text-right">
@@ -191,7 +195,7 @@
                             {% if sampleOrderType == 'stool2' %}
                                 {% set sampleOrderType = 'stool' %}
                             {% endif %}
-                            <a class="pull-right" href="{{ path('aliquot_instructions_file', { id: sampleOrderType}) }}" target="_blank">
+                            <a class="float-end" href="{{ path('aliquot_instructions_file', { id: sampleOrderType}) }}" target="_blank">
                                 <i class="fa fa-external-link" aria-hidden="true"></i> Open/Download
                             </a>
                         </div>
@@ -207,16 +211,19 @@
                 {% include 'program/nph/order/partials/form-participant-deactivated-banner.html.twig' %}
             {% endif %}
             {% include 'program/nph/order/partials/sample-finalize-banner-message.html.twig' %}
-            <div class="panel panel-default">
+            <div class="card">
                 {% if biobankView %}
                     {% include 'program/nph/order/partials/sample-finalize-participant-details-biobank.html.twig' %}
                 {% else %}
                     {% include 'program/nph/order/partials/sample-finalize-participant-details.html.twig' %}
                 {% endif %}
-                <div class="panel-body">
+                <div class="card-body">
                     {% if order.downtimeGenerated() %}
-                        <div class="alert bg-success well-sm margin-top-15 text-success">
-                            <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}. [Order generation time: {{ order.createdTs|date('n/j/Y g:ia', app.user.timezone)}}] </span>
+                        <div class="alert alert-success mt-3">
+                            <span>
+                                This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}.
+                                [Order generation time: {{ order.createdTs|date('n/j/Y g:ia', app.user.timezone) }}]
+                            </span>
                         </div>
                     {% endif %}
                     {% if isFormDisabled %}
@@ -257,8 +264,8 @@
                     {% endif %}
                     {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_URINE') or order.orderType == constant('App\\Entity\\NphOrder::TYPE_24URINE')  %}
                         <label>
-                            Color and Clarity
-                            <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
+                            <span class="font-bold">Color and Clarity</span>
+                            <span class="toggle-chart-image text-primary" role="button" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
                             <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                         </span>
                         </label>
@@ -278,8 +285,8 @@
                     {% endif %}
                     {% if order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL') or order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL_2') %}
                         <label>
-                            Bristol Stool Chart Questions
-                            <span class="toggle-help-image" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">
+                            <span class="font-bold">Bristol Stool Chart Questions</span>
+                            <span class="toggle-chart-image text-primary" role="button" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">
                             <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                         </span>
                         </label>
@@ -314,7 +321,7 @@
                         </div>
                         <hr>
                     {% endif %}
-                    <div class="panel-heading text-warning bg-warning" id="aliquotTimeWarning" hidden="hidden">
+                    <div class="alert alert-warning d-none" id="aliquotTimeWarning" role="alert">
                         <p><i class="fa fa-warning"></i> Please ensure collection and aliquot times are correct.</p>
                         <ul>
                             <li>As a general guideline, samples should be aliquoted within {{ sampleCode == constant('App\\Entity\\NphSample::SAMPLE_URINE_24') ? 8 : 2 }} hours of collection.</li>
@@ -322,7 +329,7 @@
                             <li>If the times entered are correct, you may continue with finalization.</li>
                         </ul>
                     </div>
-                    <div class="panel-heading text-warning bg-warning" id="freezeTimeWarning" hidden="hidden">
+                    <div class="alert alert-warning d-none" id="freezeTimeWarning" role="alert">
                         <p><i class="fa fa-warning"></i> Please ensure the Collection Time and Freeze Time are correct.</p>
                         <ul>
                             <li>As a general guideline, the Freeze Time should be less than 72 hours after Collection Time.</li>
@@ -331,9 +338,9 @@
                         </ul>
                     </div>
                     <span></span>
-                    <label>Aliquot</label>
+                    <label class="font-bold">Aliquot</label>
                     {% if aliquots is not empty %}
-                        <table class="table table-samples">
+                        <table class="table table-samples table-borderless">
                             <thead>
                             <tr>
                                 <td class="col-md-4 required aliquot-tube-td" id="aliquot-tube">Matrix Aliquot Tube/Aliquot Container</td>
@@ -409,7 +416,7 @@
                     <div style="display: none">{{ form_widget(sampleFinalizeForm['aliquotError']) }}</div>
                     <hr>
                     <div class="form-group">
-                        <div class="pull-right pb-2">
+                        <div class="float-end pb-2">
                             {% if not isFormDisabled %}
                                 <button type="button" class="btn btn-warning btn-xs" id="collection_notes_edit">
                                     Edit
@@ -417,7 +424,7 @@
                                 <button type="button" class="btn btn-success btn-xs" id="collection_notes_save" style="display: none">
                                     Save
                                 </button>
-                                <button type="button" class="btn btn-xs" id="collection_notes_revert" style="display: none">
+                                <button type="button" class="btn btn-secondary btn-xs" id="collection_notes_revert" style="display: none">
                                     Revert
                                 </button>
                             {% endif %}
@@ -427,41 +434,46 @@
                         {{ form_widget(sampleFinalizeForm[sampleCode ~ 'CollectedNotes']) }}
                         {{ form_errors(sampleFinalizeForm[sampleCode ~ 'CollectedNotes']) }}
                     </div>
-                    <div class="form-group" {% if allowResubmit %} style="display: none" {% endif %}>
+                    <div class="form-group mt-2" {% if allowResubmit %} style="display: none" {% endif %}>
                         {{ form_label(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
                         {{ form_widget(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
                         {{ form_errors(sampleFinalizeForm[sampleCode ~ 'Notes']) }}
                     </div>
                     {% if not allowResubmit %}
-                        <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
-                                {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL_2')) and biobankView) or isFormDisabled %}disabled{% endif %}>
-                            Mark as Finalized
-                        </button>
-                        {% if biobankView %}
-                            <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-default">Cancel</a>
-                            {% if not isParticipantDeactivated and not isParticipantWithdrawn %}
-                                <button type="button" class="btn btn-success pull-right" disabled>Resubmit</button>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary" id="sample_finalize_btn"
+                                    {% if (not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL')) and not (order.orderType == constant('App\\Entity\\NphOrder::TYPE_STOOL_2')) and biobankView) or isFormDisabled %}disabled{% endif %}>
+                                Mark as Finalized
+                            </button>
+                            {% if biobankView %}
+                                <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-secondary">Cancel</a>
+                                {% if not isParticipantDeactivated and not isParticipantWithdrawn %}
+                                    <button type="button" class="btn btn-success float-end" disabled>Resubmit</button>
+                                {% endif %}
+                            {% else %}
+                                <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-secondary">Cancel</a>
                             {% endif %}
-                        {% else %}
-                            <a href="{{ path('nph_samples_aliquot') }}" class="btn btn-default">Cancel</a>
-                        {% endif %}
+                        </div>
                     {% endif %}
                     {{ form_end(sampleFinalizeForm) }}
 
                     {% if allowResubmit %}
-                        <p>
+                        {% form_theme sampleResubmitForm 'custom_bootstrap_5_layout.html.twig' %}
+                        <div>
                             {{ form_start(sampleResubmitForm) }}
                             {{ form_end(sampleResubmitForm) }}
-                            <button type="button" class="btn btn-primary" disabled>Mark as Finalized</button>
-                            <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-default">Cancel</a>
-                            {% if not isParticipantDeactivated and not isParticipantWithdrawn %}
-                                <button type="button" class="btn btn-success pull-right" id="sample_refinalize_btn" {% if sample.rdrId is empty %} disabled {% endif %}>Resubmit</button>
-                            {% endif %}
-                        </p>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-primary" disabled>Mark as Finalized</button>
+                                <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-secondary">Cancel</a>
+                                {% if not isParticipantDeactivated and not isParticipantWithdrawn %}
+                                    <button type="button" class="btn btn-success float-end" id="sample_refinalize_btn" {% if sample.rdrId is empty %} disabled {% endif %}>Resubmit</button>
+                                {% endif %}
+                            </div>
+                        </div>
                     {% endif %}
 
                     {% if sample.modifyType == 'unlock' and not biobankView %}
-                        <div class="pull-right">
+                        <div class="float-end">
                             {{ form_start(revertForm, { 'action': path('nph_sample_revert', { participantId: participant.id, orderId: order.id, sampleId: sample.id }), 'method': 'POST', attr: { class: 'revert-form disable-enter prevent-resubmit' }}) }}
                             {{ form_errors(revertForm) }}
                             {{ form_end(revertForm) }}
@@ -475,6 +487,7 @@
     {% include 'program/nph/order/partials/sample-finalize-confirmation-resubmit-modal.html.twig' %}
     {% include 'program/nph/order/partials/modals/aliquot-collection-notes-help-modal.html.twig' %}
     {% include 'program/nph/order/partials/modals/aliquot-mop-modal.html.twig' %}
+    {% include 'program/nph/order/partials/modals/aliquot-chart-image-modal.html.twig' %}
     <div id="quick_view_modal" class="modal fade" tabindex="-1" role="dialog">
         <div class="modal-dialog custom-modal-size">
             <div class="modal-content">

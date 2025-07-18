@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    const bootstrapVersion = $(".page-header").data("bs-version") ?? 3;
     if ($("#order-barcode").length === 1) {
         JsBarcode("#order-barcode", $("#order_info").data("order-id"), {
             width: 2,
@@ -7,9 +8,19 @@ $(document).ready(function () {
         });
     }
 
-    $(".order-ts").pmiDateTimePicker({
-        maxDate: new Date().setHours(23, 59, 59, 999)
-    });
+    if (bootstrapVersion === 3) {
+        $(".order-ts").pmiDateTimePicker({
+            maxDate: new Date().setHours(23, 59, 59, 999)
+        });
+    } else {
+        document.querySelectorAll(".order-ts").forEach((element) => {
+            bs5DateTimepicker(element, {
+                clock: true,
+                sideBySide: true,
+                useCurrent: true
+            });
+        });
+    }
 
     $(".toggle-help-image").on("click", function (e) {
         displayHelpModal(e);

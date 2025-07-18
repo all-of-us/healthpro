@@ -1,14 +1,16 @@
-<div class="panel-heading clearfix">
-    <div class="col-sm-5">
-        <strong>Biobank ID</strong> {{ participant.biobankId }} <br>
-        <strong>Site</strong> {{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }} <br>
-    </div>
-    <div class="col-sm-7 text-right">
-        <strong class="text-primary">
-            Module {{ order.module }} | {{ order.visitDisplayName }} | {{ timePoints[order.timepoint] }}
-            | {{ samples[sampleCode]}}
-        </strong><br>
-        <strong>Order ID</strong> {{ sample.nphOrder.orderId }}<br>
-        <strong>Collection Sample ID</strong> {{ sample.sampleId }}
+<div class="card-header clearfix">
+    <div class="row">
+        <div class="col-sm-5">
+            <strong>Biobank ID</strong> {{ participant.biobankId }} <br>
+            <strong>Site</strong> {{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }} <br>
+        </div>
+        <div class="col-sm-7 text-end">
+            <strong class="text-primary">
+                Module {{ order.module }} | {{ order.visitDisplayName }} | {{ timePoints[order.timepoint] }}
+                | {{ samples[sampleCode]}}
+            </strong><br>
+            <strong>Order ID</strong> {{ sample.nphOrder.orderId }}<br>
+            <strong>Collection Sample ID</strong> {{ sample.sampleId }}
+        </div>
     </div>
 </div>
