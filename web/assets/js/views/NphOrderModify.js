@@ -26,4 +26,15 @@ $(document).ready(function () {
         const checked = $accordionItem.find(".modify-samples input[type='checkbox']:enabled:checked").length;
         $checkAll.prop("checked", total > 0 && total === checked);
     });
+
+    $("#order_modify_check_all").on("change", function () {
+        const isChecked = $(this).is(":checked");
+        $('.modify-samples input[type="checkbox"]:not(:disabled)').prop("checked", isChecked);
+    });
+
+    $('.modify-samples input[type="checkbox"]:not(:disabled)').on("change", function () {
+        const total = $('.modify-samples input[type="checkbox"]:not(:disabled)').length;
+        const checked = $('.modify-samples input[type="checkbox"]:not(:disabled):checked').length;
+        $("#order_modify_check_all").prop("checked", total === checked);
+    });
 });
