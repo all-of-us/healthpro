@@ -73,13 +73,14 @@ class NphOrderForm extends AbstractType
                 'required' => false,
                 'label' => 'Collection Time',
                 'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
+                'format' => $formType === self::FORM_FINALIZE_TYPE ? 'MM/dd/yyyy h:mm a' : 'M/d/yyyy h:mm a',
                 'html5' => false,
                 'model_timezone' => 'UTC',
                 'view_timezone' => $options['timeZone'],
                 'constraints' => $constraints,
                 'attr' => [
                     'class' => 'order-ts',
+                    'autocomplete' => 'off',
                     'readonly' => $options['disableStoolCollectedTs'],
                     'data-parsley-custom-date-comparison' => $orderCreatedTs->format('m/d/Y g:i A')
                 ],

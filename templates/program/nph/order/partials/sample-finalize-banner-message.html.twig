@@ -7,14 +7,10 @@
                 {{ sample.modifyType == constant('App\\Entity\\NphSample::EDITED') and sample.biobankFinalized ? 'Refinalized' : 'Finalized' }}
                 by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
                 on
-                {% if sample.biobankFinalized %}
+                {% if sample.modifyType == constant('App\\Entity\\NphSample::EDITED') %}
                     {{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}
                 {% else %}
-                    {% if sample.modifyType == constant('App\\Entity\\NphSample::EDITED') %}
-                        {{ macros.displayDateAndTimezone(sample.modifiedTs, sample.modifiedTimezoneId) }}
-                    {% else %}
-                        {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
-                    {% endif %}
+                    {{ macros.displayDateAndTimezone(sample.finalizedTs, sample.finalizedTimezoneId) }}
                 {% endif %}
             </strong>
         {% else %}
@@ -22,14 +18,10 @@
                 {{ sample.modifyType == constant('App\\Entity\\NphSample::EDITED') and sample.biobankFinalized ? 'Refinalized' : 'Finalized' }}
                 by {{ sample.biobankFinalized ? 'Biobank User' : sample.finalizedUser.email|default('Unknown') }}
                 on
-                {% if sample.biobankFinalized %}
+                {% if sample.modifyType == constant('App\\Entity\\NphSample::EDITED') %}
                     {{ sample.modifiedTs|date('n/j/Y g:ia', app.user.timezone) }}
                 {% else %}
-                    {% if sample.modifyType == constant('App\\Entity\\NphSample::EDITED') %}
-                        {{ sample.modifiedTs|date('n/j/Y g:ia', app.user.timezone) }}
-                    {% else %}
-                        {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
-                    {% endif %}
+                    {{ sample.finalizedTs|date('n/j/Y g:ia', app.user.timezone) }}
                 {% endif %}
             </strong>
         {% endif %}
