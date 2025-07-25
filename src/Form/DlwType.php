@@ -117,7 +117,7 @@ class DlwType extends AbstractType
                 ]
             ])
             ->add('doseAdministered', DateTimeType::class, [
-                'format' => 'M/d/yyyy h:mm a',
+                'format' => 'MM/dd/yyyy h:mm a',
                 'html5' => false,
                 'required' => true,
                 'widget' => 'single_text',

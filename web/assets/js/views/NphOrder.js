@@ -8,17 +8,21 @@ $(document).ready(function () {
         });
     }
 
-    if ($(".order-ts").length > 0) {
+    const $orderTsSelector = $(".order-ts");
+    if ($orderTsSelector.length > 0) {
+        const maxDate = new Date();
+        maxDate.setHours(23, 59, 59, 999);
         if (bootstrapVersion === 3) {
-            $(".order-ts").pmiDateTimePicker({
-                maxDate: new Date().setHours(23, 59, 59, 999)
+            $orderTsSelector.pmiDateTimePicker({
+                maxDate: maxDate
             });
         } else {
             document.querySelectorAll(".order-ts").forEach((element) => {
                 bs5DateTimepicker(element, {
                     clock: true,
                     sideBySide: true,
-                    useCurrent: true
+                    useCurrent: true,
+                    maxDate: maxDate
                 });
             });
         }
