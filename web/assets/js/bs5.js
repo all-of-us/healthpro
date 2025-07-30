@@ -55,6 +55,18 @@ $(document).ready(function () {
         if (params.hasOwnProperty("useCurrent")) {
             options.useCurrent = params["useCurrent"];
         }
+        element.addEventListener("click", (e) => {
+            if (element.readOnly) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            }
+        });
+        element.addEventListener("focus", (e) => {
+            if (element.readOnly) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            }
+        });
         new tempusDominus.TempusDominus(element, options);
     };
 
