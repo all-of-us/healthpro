@@ -17,8 +17,8 @@ $(document).ready(function () {
                 maxDate: maxDate
             });
         } else {
-            document.querySelectorAll(".order-ts").forEach((element) => {
-                bs5DateTimepicker(element, {
+            $orderTsSelector.each(function () {
+                bs5DateTimepicker(this, {
                     clock: true,
                     sideBySide: true,
                     useCurrent: true,

@@ -67,7 +67,13 @@ $(document).ready(function () {
                 e.stopImmediatePropagation();
             }
         });
-        new tempusDominus.TempusDominus(element, options);
+        const instance = new tempusDominus.TempusDominus(element, options);
+        element._bs5dtp = instance;
+        return instance;
+    };
+
+    window.bs5DateTimepicker.getInstance = (element) => {
+        return element._bs5dtp;
     };
 
     document.querySelectorAll('[data-bs-toggle="tab"]').forEach((el) => {
