@@ -9,6 +9,7 @@ $(document).ready(function () {
 
     const $orderTsSelector = $(".order-ts");
     const maxDate = new Date();
+    maxDate.setHours(23, 59, 59, 999);
     $orderTsSelector.each(function () {
         bs5DateTimepicker(this, {
             clock: true,
