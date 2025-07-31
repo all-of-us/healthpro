@@ -157,7 +157,8 @@ class NphOrderController extends BaseController
         $nphOrderService->loadModules($order->getModule(), $order->getVisitPeriod(), $participantId, $participant->biobankId);
         $sampleLabelsIds = $nphOrderService->getSamplesWithLabelsAndIds($order->getNphSamples());
         $orderCollectionData = $nphOrderService->getExistingOrderCollectionData($order);
-        $disableOrderCollectForm = $nphNphParticipantSummaryService->isParticipantDeactivated($participant, $order->getModule());
+        $isParticipantDeactivated = $nphNphParticipantSummaryService->isParticipantDeactivated($participant, $order->getModule());
+        $disableOrderCollectForm = $order->isCancelled() || $isParticipantDeactivated;
         $oderCollectForm = $this->createForm(
             NphOrderCollect::class,
             $orderCollectionData,
@@ -191,7 +192,8 @@ class NphOrderController extends BaseController
             'timePoints' => $nphOrderService->getTimePoints(),
             'samples' => $nphOrderService->getSamples(),
             'modulePeriodVisitMapper' => Nomenclature::$modulePeriodVisitMapper,
-            'disableOrderCollectForm' => $disableOrderCollectForm
+            'disableOrderCollectForm' => $disableOrderCollectForm,
+            'isParticipantDeactivated' => $isParticipantDeactivated
         ]);
     }
 

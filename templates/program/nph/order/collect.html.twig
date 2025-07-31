@@ -18,7 +18,7 @@
         <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}.</span>
     </div>
     {% endif %}
-    {% if disableOrderCollectForm %}
+    {% if isParticipantDeactivated %}
         {% include 'program/nph/order/partials/form-participant-deactivated-banner.html.twig' %}
     {% endif %}
     <div class="row">
@@ -36,7 +36,7 @@
                     {% endif %}
                     <div class="form-group pt-2">
                         <label class="form-label">Scan or manually check all successfully collected samples:</label>
-                        <input type="text" class="form-control" id="scan_barcode" placeholder="scan barcode or enter collection sample ID">
+                        <input type="text" class="form-control" id="scan_barcode" placeholder="scan barcode or enter collection sample ID" {% if disableOrderCollectForm %} disabled {% endif %}>
                         <span class="text-danger" id="sample_scan_error" style="display: none">Sample not found</span>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                     {% endif %}
                     <th>Notes <i class="fa fa-question-circle text-primary" aria-hidden="true" id="collection_notes_help" role="button"></i></th>
                     <th>
-                        {% if not disableOrderCollectForm %}
+                        {% if not isParticipantDeactivated %}
                             {% if order.canCancel %}
                                 <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
                                     type: 'cancel' }) }}" class="btn btn-xs btn-danger">
@@ -152,7 +152,7 @@
                 <hr>
                 <h4>
                     Color and Clarity
-                    <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
+                    <span class="toggle-chart-image text-primary" role="button" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
                             <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                         </span>
                 </h4>
@@ -191,7 +191,7 @@
                 </div>
             {% endif %}
             {{ form_rest(orderCollectForm) }}
-            <div class="form-group mb-4">
+            <div class="form-group my-4">
                 {% if not disableOrderCollectForm and not order.isDisabled %}
                     <button type="submit" class="btn btn-primary" id="order_next_btn" formnovalidate>Save</button>
                 {% endif %}

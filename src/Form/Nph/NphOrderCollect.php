@@ -59,7 +59,7 @@ class NphOrderCollect extends NphOrderForm
                 'constraints' => $constraints,
                 'label' => 'Collection Time',
                 'widget' => 'single_text',
-                'format' => 'M/d/yyyy h:mm a',
+                'format' => 'MM/dd/yyyy h:mm a',
                 'html5' => false,
                 'model_timezone' => 'UTC',
                 'view_timezone' => $options['timeZone'],

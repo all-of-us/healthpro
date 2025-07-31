@@ -138,7 +138,9 @@ a {
     border-color: #7a8086
 }
 
-.aou-order-form .form-check-input[disabled] ~ .form-check-label, .aou-order-form .form-check-input:disabled ~ .form-check-label {
+.aou-order-form .form-check-input[disabled] ~ .form-check-label,
+.aou-order-form .form-check-input:disabled ~ .form-check-label,
+.nph-order-collect-form .form-check-input:disabled ~ .form-check-label {
     opacity: 1;
 }
 

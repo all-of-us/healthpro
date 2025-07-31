@@ -42,10 +42,13 @@ $(document).ready(function () {
         let sampleScanErrorSel = $("#sample_scan_error");
         if (barcode.length === 10) {
             $(".row-samples").each(function () {
-                let sampleId = $(this).find("input:checkbox").data("sample-id").toString();
+                let checkbox = $(this).find("input:checkbox");
+                let sampleId = checkbox.data("sample-id").toString();
                 if (barcode === sampleId) {
-                    $(this).find("input:checkbox").prop("checked", true);
                     sampleFound = true;
+                    if (!checkbox.prop("disabled")) {
+                        checkbox.prop("checked", true);
+                    }
                     return false;
                 }
             });

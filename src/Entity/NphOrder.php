@@ -548,4 +548,14 @@ class NphOrder
     {
         return self::TIMEPOINT_DISPLAY_NAME_MAPPER[$this->timepoint];
     }
+
+    public function isCancelled(): bool
+    {
+        foreach ($this->getNphSamples() as $nphSample) {
+            if ($nphSample->getModifyType() !== NphSample::CANCEL) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
