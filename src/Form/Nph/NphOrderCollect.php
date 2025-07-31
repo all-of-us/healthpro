@@ -65,6 +65,7 @@ class NphOrderCollect extends NphOrderForm
                 'view_timezone' => $options['timeZone'],
                 'attr' => [
                     'class' => 'order-ts',
+                    'autocomplete' => 'off',
                     'readonly' => $options['disableStoolCollectedTs']
                 ]
             ]);

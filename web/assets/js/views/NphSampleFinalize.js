@@ -367,12 +367,6 @@ $(document).ready(function () {
         trigger: "blur"
     });
 
-    document.querySelectorAll(".order-ts").forEach((element) => {
-        element.addEventListener("change", () => {
-            $(element).parsley().validate();
-        });
-    });
-
     const clearServerErrors = (e) => {
         $(e.currentTarget).next("span.help-block").remove();
     };

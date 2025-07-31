@@ -1,5 +1,4 @@
 $(document).ready(function () {
-    const bootstrapVersion = $(".page-header").data("bs-version") ?? 3;
     if ($("#order-barcode").length === 1) {
         JsBarcode("#order-barcode", $("#order_info").data("order-id"), {
             width: 2,
@@ -9,24 +8,15 @@ $(document).ready(function () {
     }
 
     const $orderTsSelector = $(".order-ts");
-    if ($orderTsSelector.length > 0) {
-        const maxDate = new Date();
-        maxDate.setHours(23, 59, 59, 999);
-        if (bootstrapVersion === 3) {
-            $orderTsSelector.pmiDateTimePicker({
-                maxDate: maxDate
-            });
-        } else {
-            $orderTsSelector.each(function () {
-                bs5DateTimepicker(this, {
-                    clock: true,
-                    sideBySide: true,
-                    useCurrent: true,
-                    maxDate: maxDate
-                });
-            });
-        }
-    }
+    const maxDate = new Date();
+    $orderTsSelector.each(function () {
+        bs5DateTimepicker(this, {
+            clock: true,
+            sideBySide: true,
+            useCurrent: true,
+            maxDate: maxDate
+        });
+    });
 
     $(".toggle-help-image").on("click", function (e) {
         displayHelpModal(e);
@@ -116,8 +106,10 @@ $(document).ready(function () {
         trigger: "blur"
     });
 
-    $(document).on("dp.hide", ".order-ts", function () {
-        $(this).parsley().validate();
+    $orderTsSelector.each(function () {
+        $(this).on("change", function () {
+            $(this).parsley().validate();
+        });
     });
 
     $(document).on("click", "#confirm_btn", function () {
