@@ -28,10 +28,7 @@
     color: #FFFFFF;
 }
 .nph-module-badge {
-    border-radius: 5px 5px 0 0;
     color: #FFFFFF;
-    font-size: small;
-    padding-left: 5px;
 }
 .nph-module-badge.nph-module-1 {
     background-color: #5D01A5;
