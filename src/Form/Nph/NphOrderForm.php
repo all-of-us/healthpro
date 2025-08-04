@@ -73,7 +73,7 @@ class NphOrderForm extends AbstractType
                 'required' => false,
                 'label' => 'Collection Time',
                 'widget' => 'single_text',
-                'format' => $formType === self::FORM_FINALIZE_TYPE ? 'MM/dd/yyyy h:mm a' : 'M/d/yyyy h:mm a',
+                'format' => 'MM/dd/yyyy h:mm a',
                 'html5' => false,
                 'model_timezone' => 'UTC',
                 'view_timezone' => $options['timeZone'],

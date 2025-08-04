@@ -1,27 +1,29 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'base.html.twig' %}
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% block title %} Order Collect - {% endblock %}
 {% block body %}
+    {% form_theme orderCollectForm 'custom_bootstrap_5_layout.html.twig' %}
     {% include 'program/nph/order/partials/order-header.html.twig' %}
-    <div class="alert bg-light well-sm margin-top-15">
+    <div class="alert bg-light py-2">
         <span class="font-bold">{{ timePoints[order.timepoint] }} {{ order.orderTypeDisplayName }}</span>
-        <div class="pull-right">
+        <div class="float-end">
             <a href="{{ path('nph_order_label_print', {'participantId': order.participantId, 'module': order.module, 'visit': order.visitPeriod, 'sampleGroup': order.nphSamples[0].sampleGroup}) }}">
                 View Order Summary/Reprint Labels
             </a>
         </div>
     </div>
     {% if order.downtimeGenerated() %}
-    <div class="alert bg-success well-sm margin-top-15 text-success">
+    <div class="alert alert alert-success mt-2">
         <span>This sample was generated as part of a downtime order initiated by: {{ order.downtimeGeneratedUser.getEmail }} on {{ order.downtimeGeneratedTs|date('n/j/Y', app.user.timezone) }}.</span>
     </div>
     {% endif %}
-    {% if disableOrderCollectForm %}
+    {% if isParticipantDeactivated %}
         {% include 'program/nph/order/partials/form-participant-deactivated-banner.html.twig' %}
     {% endif %}
     <div class="row">
         <div class="col-sm-12">
-            {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit'} }) }}
+            {{ form_start(orderCollectForm, { attr: { class: 'disable-enter prevent-resubmit nph-order-collect-form'} }) }}
             {{ form_errors(orderCollectForm) }}
             <div class="row">
                 <div class="col-sm-6">
@@ -32,20 +34,20 @@
                             {{ form_errors(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
                         </div>
                     {% endif %}
-                    <div class="form-group">
-                        <label>Scan or manually check all successfully collected samples:</label>
-                        <input type="text" class="form-control" id="scan_barcode" placeholder="scan barcode or enter collection sample ID">
+                    <div class="form-group pt-2">
+                        <label class="form-label">Scan or manually check all successfully collected samples:</label>
+                        <input type="text" class="form-control" id="scan_barcode" placeholder="scan barcode or enter collection sample ID" {% if disableOrderCollectForm %} disabled {% endif %}>
                         <span class="text-danger" id="sample_scan_error" style="display: none">Sample not found</span>
                     </div>
                 </div>
                 <div class="col-sm-3">
                     <div class="form-group">
-                        <label data-toggle="tooltip" title="Order generation time can only be edited by a HealthPro admin within Management Tools.">Order Generation Time</label>
+                        <label class="form-label" data-toggle="tooltip" title="Order generation time can only be edited by a HealthPro admin within Management Tools.">Order Generation Time</label>
                         <input type="text" class="form-control" value="{{ order.createdTs|date('n/j/Y g:ia', app.user.getInfo.timezone) }}" disabled>
                     </div>
                 </div>
             </div>
-            <table class="table table-samples">
+            <table class="table table-samples table-borderless">
                 <thead>
                 <tr>
                     <th>Collection Sample</th>
@@ -57,7 +59,7 @@
                     {% endif %}
                     <th>Notes <i class="fa fa-question-circle text-primary" aria-hidden="true" id="collection_notes_help" role="button"></i></th>
                     <th>
-                        {% if not disableOrderCollectForm %}
+                        {% if not isParticipantDeactivated %}
                             {% if order.canCancel %}
                                 <a href="{{ path('nph_samples_modify', { participantId: participant.id, orderId: order.id,
                                     type: 'cancel' }) }}" class="btn btn-xs btn-danger">
@@ -78,7 +80,7 @@
                 {% for index, nphSample in order.nphSamples %}
                     {% if nphSample.modifyType in [constant('CANCEL', nphSample), constant('UNLOCK', nphSample)] %}
                         <tr>
-                            <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample) }}</td>
+                            <td colspan="4">{{ macros.displayModifyBannerMessageBs5(nphSample) }}</td>
                         </tr>
                     {% endif %}
                     {% if order.orderType == constant('TYPE_24URINE', order) %}
@@ -150,7 +152,7 @@
                 <hr>
                 <h4>
                     Color and Clarity
-                    <span class="toggle-help-image" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
+                    <span class="toggle-chart-image text-primary" role="button" data-img="{{ asset('img/nph/urine_color_clarity_chart.png') }}">
                             <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                         </span>
                 </h4>
@@ -171,7 +173,7 @@
                 <hr>
                 <h4>
                     Bristol Stool Chart Questions
-                    <span class="toggle-help-image" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">
+                    <span class="toggle-chart-image text-primary" role="button" data-img="{{ asset('img/nph/bristol_stool_chart.png') }}">
                         <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
                     </span>
                 </h4>
@@ -180,26 +182,27 @@
                     {{ form_label(orderCollectForm['bowelType']) }}
                     {{ form_widget(orderCollectForm['bowelType']) }}
                 </div>
-                <div class="form-group">
+                <div class="form-group mt-2">
                     {{ form_label(orderCollectForm['bowelQuality']) }}
                     {{ form_widget(orderCollectForm['bowelQuality']) }}
                 </div>
-                <div class="alert alert-reminder">
+                <div class="alert alert-reminder mt-2">
                     <i class="fa fa-lg fa-thumbtack text-reminder"></i> Reminder: Stool tubes must be finalized via the Aliquot Samples page.
                 </div>
             {% endif %}
             {{ form_rest(orderCollectForm) }}
-            <div class="form-group">
+            <div class="form-group my-4">
                 {% if not disableOrderCollectForm and not order.isDisabled %}
                     <button type="submit" class="btn btn-primary" id="order_next_btn" formnovalidate>Save</button>
                 {% endif %}
                 <a href="{{ path('nph_participant_summary', { participantId: participant.id }) }}"
-                   class="btn btn-default">Exit</a>
+                   class="btn btn-secondary">Exit</a>
             </div>
             {{ form_end(orderCollectForm) }}
         </div>
     </div>
     {% include 'program/nph/order/partials/modals/collection-notes-help-modal.html.twig' %}
+    {% include 'program/nph/order/partials/modals/chart-image-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('nph-order') }}

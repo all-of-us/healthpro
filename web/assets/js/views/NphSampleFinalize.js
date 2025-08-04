@@ -94,7 +94,8 @@ $(document).ready(function () {
             if (regex.test(barcode)) {
                 let aliquotTsSelector = $(this).closest("tr").find(".order-ts");
                 aliquotTsSelector.focus();
-                aliquotTsSelector.data("DateTimePicker").date(new Date());
+                const datePicker = bs5DateTimepicker.getInstance(aliquotTsSelector[0]);
+                datePicker.dates.setValue(new tempusDominus.DateTime());
                 aliquotTsSelector.blur();
                 $(this).closest("tr").find(".aliquot-volume").focus();
                 $.ajax({
@@ -364,12 +365,6 @@ $(document).ready(function () {
         errorsWrapper: '<div class="help-block"></div>',
         errorTemplate: "<div></div>",
         trigger: "blur"
-    });
-
-    document.querySelectorAll(".order-ts").forEach((element) => {
-        element.addEventListener("change", () => {
-            $(element).parsley().validate();
-        });
     });
 
     const clearServerErrors = (e) => {

@@ -86,7 +86,8 @@ a {
 .has-error.radio label,
 .has-error.checkbox label,
 .has-error.radio-inline label,
-.has-error.checkbox-inline label {
+.has-error.checkbox-inline label,
+.help-block .parsley-required {
     color: #a94442;
 }
 .has-error .form-control {
@@ -125,7 +126,11 @@ a {
     color: #6f42c1;
 }
 
-.aou-order-form .col-form-label, .aou-order-form .form-label, .nph-order-form .form-label, .nph-modify-form .form-label {
+.aou-order-form .col-form-label,
+.aou-order-form .form-label,
+.nph-order-form .form-label,
+.nph-modify-form .form-label,
+.nph-order-collect-form .form-label {
     font-weight: 700;
 }
 
@@ -133,7 +138,9 @@ a {
     border-color: #7a8086
 }
 
-.aou-order-form .form-check-input[disabled] ~ .form-check-label, .aou-order-form .form-check-input:disabled ~ .form-check-label {
+.aou-order-form .form-check-input[disabled] ~ .form-check-label,
+.aou-order-form .form-check-input:disabled ~ .form-check-label,
+.nph-order-collect-form .form-check-input:disabled ~ .form-check-label {
     opacity: 1;
 }
 
