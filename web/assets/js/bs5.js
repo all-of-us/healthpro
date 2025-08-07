@@ -55,7 +55,25 @@ $(document).ready(function () {
         if (params.hasOwnProperty("useCurrent")) {
             options.useCurrent = params["useCurrent"];
         }
-        new tempusDominus.TempusDominus(element, options);
+        element.addEventListener("click", (e) => {
+            if (element.readOnly) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            }
+        });
+        element.addEventListener("focus", (e) => {
+            if (element.readOnly) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+            }
+        });
+        const instance = new tempusDominus.TempusDominus(element, options);
+        element._bs5dtp = instance;
+        return instance;
+    };
+
+    window.bs5DateTimepicker.getInstance = (element) => {
+        return element._bs5dtp;
     };
 
     document.querySelectorAll('[data-bs-toggle="tab"]').forEach((el) => {

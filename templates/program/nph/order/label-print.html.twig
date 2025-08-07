@@ -1,9 +1,11 @@
+{% set bootstrapVersion = 5 %}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}NPH Print Label{% endblock %}
 
 {% block body %}
-    <div class="page-header">
+    <div class="page-header border-bottom mb-2">
         <h2>
             <i class="fa fa-medkit" aria-hidden="true"></i>
             Generate Orders and Print Labels
@@ -14,15 +16,15 @@
             {% include 'program/nph/order/partials/participant-details-with-name.html.twig' %}
         </div>
         <div class="col-sm-6">
-            <div class="alert well-sm text-white nph-module-badge nph-module-{{ module }}">Module | NPH Module {{ module }}</div>
-            <div class="alert well-sm text-white nph-visit nph-visit-badge">Visit | {{ modulePeriodVisitMapper[module~'_'~visit]|default(visitDisplayName) }}</div>
+            <div class="alert text-white nph-module-badge nph-module-{{ module }}">Module | NPH Module {{ module }}</div>
+            <div class="alert text-white nph-visit nph-visit-badge">Visit | {{ modulePeriodVisitMapper[module~'_'~visit]|default(visitDisplayName) }}</div>
         </div>
     </div>
-    <div class="row" style="padding-top: 2em">
+    <div class="row my-4">
         <div class="col-sm-6">
             <div class="clearfix">
-                    <label>Order Summary</label>
-                    <span class="alert well-sm nph-samples-badge pull-right text-white">
+                    <label class="font-bold">Order Summary</label>
+                    <span class="badge nph-samples-badge float-end text-white fs-6 mb-2 p-2">
                         Total # of Samples
                         <span class="badge badge-light" id="samples_count">{{ sampleCount }}</span>
                     </span>
@@ -63,12 +65,12 @@
             <a class="btn btn-primary" role="button" href="{{ path('nph_participant_summary', {participantId: participant.id}) }}">Return to Participant</a>
         </div>
         <div class="col-sm-6" style="height: 600px">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                        <a class="pull-right" href="{{ path('nph_render_pdf_sample_group', {'participantId': participant.id,'module': module,'visit': visit, 'sampleGroup': sampleGroup}) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
-                    <h3 class="panel-title">Labels</h3>
+            <div class="card">
+                <div class="card-header">
+                        <a class="float-end" href="{{ path('nph_render_pdf_sample_group', {'participantId': participant.id,'module': module,'visit': visit, 'sampleGroup': sampleGroup}) }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Open/Download</a>
+                    <h5 class="card-title">Labels</h5>
                 </div>
-                <div class="panel-body">
+                <div class="card-body">
                     <div id="labels-loading-widget" class="text-center hidden-ie">
                         <p id="labels-loading"><i class="fa fa-spinner fa-spin fa-fw"></i> Loading</p>
                         <p id="labels-loaded">

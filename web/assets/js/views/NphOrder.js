@@ -1,5 +1,4 @@
 $(document).ready(function () {
-    const bootstrapVersion = $(".page-header").data("bs-version") ?? 3;
     if ($("#order-barcode").length === 1) {
         JsBarcode("#order-barcode", $("#order_info").data("order-id"), {
             width: 2,
@@ -8,21 +7,17 @@ $(document).ready(function () {
         });
     }
 
-    if ($(".order-ts").length > 0) {
-        if (bootstrapVersion === 3) {
-            $(".order-ts").pmiDateTimePicker({
-                maxDate: new Date().setHours(23, 59, 59, 999)
-            });
-        } else {
-            document.querySelectorAll(".order-ts").forEach((element) => {
-                bs5DateTimepicker(element, {
-                    clock: true,
-                    sideBySide: true,
-                    useCurrent: true
-                });
-            });
-        }
-    }
+    const $orderTsSelector = $(".order-ts");
+    const maxDate = new Date();
+    maxDate.setHours(23, 59, 59, 999);
+    $orderTsSelector.each(function () {
+        bs5DateTimepicker(this, {
+            clock: true,
+            sideBySide: true,
+            useCurrent: true,
+            maxDate: maxDate
+        });
+    });
 
     $(".toggle-help-image").on("click", function (e) {
         displayHelpModal(e);
@@ -48,10 +43,13 @@ $(document).ready(function () {
         let sampleScanErrorSel = $("#sample_scan_error");
         if (barcode.length === 10) {
             $(".row-samples").each(function () {
-                let sampleId = $(this).find("input:checkbox").data("sample-id").toString();
+                let checkbox = $(this).find("input:checkbox");
+                let sampleId = checkbox.data("sample-id").toString();
                 if (barcode === sampleId) {
-                    $(this).find("input:checkbox").prop("checked", true);
                     sampleFound = true;
+                    if (!checkbox.prop("disabled")) {
+                        checkbox.prop("checked", true);
+                    }
                     return false;
                 }
             });
@@ -112,8 +110,10 @@ $(document).ready(function () {
         trigger: "blur"
     });
 
-    $(document).on("dp.hide", ".order-ts", function () {
-        $(this).parsley().validate();
+    $orderTsSelector.each(function () {
+        $(this).on("change", function () {
+            $(this).parsley().validate();
+        });
     });
 
     $(document).on("click", "#confirm_btn", function () {
