@@ -34,7 +34,7 @@
                             {{ form_errors(orderCollectForm[order.orderType ~ 'CollectedTs']) }}
                         </div>
                     {% endif %}
-                    <div class="form-group pt-2">
+                    <div class="form-group">
                         <label class="form-label">Scan or manually check all successfully collected samples:</label>
                         <input type="text" class="form-control" id="scan_barcode" placeholder="scan barcode or enter collection sample ID" {% if disableOrderCollectForm %} disabled {% endif %}>
                         <span class="text-danger" id="sample_scan_error" style="display: none">Sample not found</span>
@@ -48,7 +48,7 @@
                 </div>
             </div>
             <table class="table table-samples table-borderless">
-                <thead>
+                <thead class="border-bottom">
                 <tr>
                     <th>Collection Sample</th>
                     {% if order.orderType != constant('TYPE_STOOL', order) and order.orderType != constant('TYPE_STOOL_2', order) %}
