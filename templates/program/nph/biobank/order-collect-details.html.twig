@@ -1,47 +1,46 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/nph/biobank/base.html.twig' %}
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% block title %} Order Collection Details - {% endblock %}
 {% block body %}
-    <div class="page-header row participant-name">
+    <div class="page-header border-bottom">
         <h2>
             <i class="fa fa-medkit" aria-hidden="true"></i> Order Collection Details
         </h2>
     </div>
-    <div class="page-header row participant-information">
-        <div class="col-md-12">
-            <div class="row">
-                <div class="col-md-3">
-                    <div><strong>Biobank ID</strong></div>
-                    <div>{{ participant.biobankId }}</div>
-                </div>
-                <div class="col-md-3">
-                    <div><strong>Site</strong></div>
-                    <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
-                </div>
-                <div class="col-sm-4 col-sm-offset-2">
-                    <strong class="text-primary">
-                        Module {{ order.module }} | {{ order.visitDisplayName }} | {{ timePoints[order.timepoint] }}
-                        | {{ order
-                        .orderType|capitalize }}
-                    </strong>
-                    <p>Order ID: <strong>{{ order.orderId }}</strong></p>
-                    <h4><i class="fa fa-medkit" aria-hidden="true"></i> {{ order.createdTs|date('n/j/Y') }}</h4>
-                </div>
+    <div class="border-bottom my-2">
+        <div class="row">
+            <div class="col-md-3">
+                <div><strong>Biobank ID</strong></div>
+                <div>{{ participant.biobankId }}</div>
             </div>
-            {% if isParticipantWithdrawn %}
-                {% include 'program/nph/order/partials/form-participant-withdrawn-banner.html.twig' %}
-            {% elseif isParticipantDeactivated %}
-                {% include 'program/nph/order/partials/form-participant-deactivated-banner.html.twig' %}
-            {% endif %}
+            <div class="col-md-3">
+                <div><strong>Site</strong></div>
+                <div>{{ participant.nphPairedSite ? siteInfo.getNphSiteDisplayName(participant.nphPairedSiteSuffix) : '(not paired)' }}</div>
+            </div>
+            <div class="col-sm-4 offset-sm-2">
+                <strong class="text-primary">
+                    Module {{ order.module }} | {{ order.visitDisplayName }} | {{ timePoints[order.timepoint] }}
+                    | {{ order
+                    .orderType|capitalize }}
+                </strong>
+                <p>Order ID: <strong>{{ order.orderId }}</strong></p>
+                <h4><i class="fa fa-medkit" aria-hidden="true"></i> {{ order.createdTs|date('n/j/Y') }}</h4>
+            </div>
         </div>
+        {% if isParticipantWithdrawn %}
+            {% include 'program/nph/order/partials/form-participant-withdrawn-banner.html.twig' %}
+        {% elseif isParticipantDeactivated %}
+            {% include 'program/nph/order/partials/form-participant-deactivated-banner.html.twig' %}
+        {% endif %}
     </div>
-    <div class="alert bg-light well-sm margin-top-15">
+    <div class="alert bg-light py-2">
         <span class="font-bold">{{ timePoints[order.timepoint] }} {{ order.orderType|capitalize }}</span>
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <table class="table table-samples">
-                <thead>
+            <table class="table table-samples table-borderless">
+                <thead class="border-bottom">
                 <tr>
                     <th>Collection Sample</th>
                     <th>Collection Time</th>
@@ -53,7 +52,7 @@
                 {% for index, nphSample in order.nphSamples %}
                     {% if nphSample.modifyType == constant('CANCEL', nphSample) %}
                         <tr>
-                            <td colspan="4">{{ macros.displayModifyBannerMessage(nphSample, true) }}</td>
+                            <td colspan="4">{{ macros.displayModifyBannerMessageBs5(nphSample, true) }}</td>
                         </tr>
                     {% endif %}
                     <tr class="row-samples">
@@ -102,9 +101,9 @@
             {% endif %}
             {% if order.orderType == constant('TYPE_STOOL', order) or order.orderType == constant('TYPE_STOOL_2', order) %}
                 <hr>
-                <h4>
+                <h5>
                     Bristol Stool Chart Questions
-                </h4>
+                </h5>
                 {% set orderMetadata =  order.metadataArray %}
                 <div class="row">
                     <div class="col-md-3">
@@ -117,10 +116,9 @@
                     </div>
                 </div>
             {% endif %}
-            <br>
-            <div class="form-group">
+            <div class="form-group my-2">
                 <a href="{{ path('nph_biobank_participant', { biobankId: participant.biobankId }) }}"
-                   class="btn btn-default">Exit</a>
+                   class="btn btn-secondary">Exit</a>
             </div>
         </div>
     </div>
