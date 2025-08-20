@@ -16,14 +16,6 @@
                 <dd class="col-sm-8">{{ participant.biobankId }}</dd>
                 <dt class="col-sm-4">Paired Organization</dt>
                 <dd class="col-sm-8">{{ participant.organization ? siteInfo.getOrganizationDisplayName(participant.organization) : '(not paired)' }}</dd>
-                <dt class="col-sm-4">AI/AN</dt>
-                <dd class="col-sm-8">
-                    {% if participant.isAIAN %}
-                        Yes
-                    {% else %}
-                        No
-                    {% endif %}
-                </dd>
             </dl>
         </div>
     </div>

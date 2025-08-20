@@ -26,7 +26,6 @@ class PpscParticipant
     public int|null $age;
     public int|null $ageInMonths;
     public int|null $sexAtBirth;
-    public string|null $isAIAN;
 
     private static array $pediatricWeightBreakpoints = [
         9999,
@@ -201,7 +200,6 @@ class PpscParticipant
                 $this->gender = 'U';
                 break;
         }
-        $this->isAIAN = $participant->aian ?? null;
     }
 
     private function getAgeInMonths(): int|null
