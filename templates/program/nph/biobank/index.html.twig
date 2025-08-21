@@ -1,32 +1,33 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/nph/biobank/base.html.twig' %}
 {% block body %}
-    <div class="page-header">
+    <div class="page-header pb-1 mb-4 mt-2 border-bottom">
         <h2>Welcome!</h2>
     </div>
     <div class="row home-menu row-equal-height">
         <div class="col-sm-6 col-md-4">
-            <a href="{{ path('nph_biobank_participants') }}" class="btn btn-lg btn-default btn-block">
+            <a href="{{ path('nph_biobank_participants') }}" class="btn btn-lg btn-default btn-block border w-100 text-dark">
                 <i class="fa fa-user" aria-hidden="true"></i>
                 Participant Lookup
                 <div class="description">Search for participants by biobank id.</div>
             </a>
         </div>
         <div class="col-sm-6 col-md-4">
-            <a href="{{ path('nph_biobank_order_lookup') }}" class="btn btn-lg btn-default btn-block">
+            <a href="{{ path('nph_biobank_order_lookup') }}" class="btn btn-lg btn-default btn-block border w-100 text-dark">
                 <i class="fa fa-medkit" aria-hidden="true"></i>
                 Order Lookup
                 <div class="description">Search for a biospecimen order by order ID and view recent biospecimen orders.</div>
             </a>
         </div>
         <div class="col-sm-6 col-md-4">
-            <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-lg btn-default btn-block">
+            <a href="{{ path('nph_biobank_samples_aliquot') }}" class="btn btn-lg btn-default btn-block border w-100 text-dark">
                 <i class="fa fa-laptop-medical" aria-hidden="true"></i>
                 Aliquot Lookup
                 <div class="description">Search for a specific sample by collection sample ID or by aliquot sample ID, and view recent aliquot forms. </div>
             </a>
         </div>
         <div class="col-sm-6 col-md-4">
-            <a href="{{ path('nph_biobank_orders_today') }}" class="btn btn-lg btn-default btn-block">
+            <a href="{{ path('nph_biobank_orders_today') }}" class="btn btn-lg btn-default btn-block border w-100 text-dark">
                 <i class="fa fa-list" aria-hidden="true"></i>
                 Daily Review
                 <div class="description">Review Biobank orders that were created today, are unfinalized, or were recently modified.</div>
