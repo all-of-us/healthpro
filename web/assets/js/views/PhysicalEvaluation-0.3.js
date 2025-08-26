@@ -46,10 +46,11 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
         this.updateConversion(e);
     },
     displayHelpModal: function (e) {
-        var id = $(e.currentTarget).data("id");
-        var html = $("#" + id).html();
-        $("#helpModal .modal-body").html(html);
-        $("#helpModal").modal();
+        let id = $(e.currentTarget).data("id");
+        let html = $("#" + id).html();
+        $("#helpModalBs5 .modal-body").html(html);
+        let helpModal = new bootstrap.Modal($("#helpModalBs5")[0]);
+        helpModal.show();
     },
     updateMean: function (e) {
         var field = $(e.currentTarget).closest(".field").data("field");
