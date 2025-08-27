@@ -40,7 +40,6 @@ class Participant
     public $siteSuffix;
     public $enrollmentSiteSuffix;
     public $participantIncentiveDateGiven;
-    public $isAIAN;
     public $nphWithdrawal = false;
     public $nphWithdrawalAuthored = '';
     public $nphDeactivation = false;
@@ -449,10 +448,6 @@ class Participant
         // Set most recent participant incentive date given
         if (isset($participant->participantIncentives)) {
             $this->participantIncentiveDateGiven = $this->getParticipantIncentiveDateGiven($participant->participantIncentives);
-        }
-
-        if (isset($participant->aian)) {
-            $this->isAIAN = $participant->aian;
         }
 
         if (isset($participant->nphWithdrawal)) {
