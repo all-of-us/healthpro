@@ -635,7 +635,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
             }
             val = this.inToCm(inches);
         } else {
-            var unit = block.find(".input-group-addon").text();
+            var unit = block.find(".input-group-text").text();
             val = block.find("input").val();
             if (unit == "in") {
                 val = this.inToCm(val);
@@ -692,12 +692,12 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
         this.$("form").parsley({
             errorClass: "has-error",
             classHandler: function (el) {
-                return el.$element.closest(".form-group");
+                return el.$element.closest(".input-group");
             },
             errorsContainer: function (el) {
-                return el.$element.closest(".form-group");
+                return el.$element.closest(".input-group");
             },
-            errorsWrapper: '<div class="metric-errors help-block"></div>',
+            errorsWrapper: '<div class="metric-errors help-block filled w-100 mt-2"></div>',
             errorTemplate: "<div></div>",
             trigger: "keyup change"
         });
