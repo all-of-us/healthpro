@@ -127,11 +127,8 @@ a {
     color: #6f42c1;
 }
 
-.aou-order-form .col-form-label,
-.aou-order-form .form-label,
-.nph-order-form .form-label,
-.nph-modify-form .form-label,
-.nph-order-collect-form .form-label {
+.col-form-label,
+.form-label {
     font-weight: 700;
 }
 
@@ -139,9 +136,8 @@ a {
     border-color: #7a8086
 }
 
-.aou-order-form .form-check-input[disabled] ~ .form-check-label,
-.aou-order-form .form-check-input:disabled ~ .form-check-label,
-.nph-order-collect-form .form-check-input:disabled ~ .form-check-label {
+.form-check-input[disabled] ~ .form-check-label,
+.form-check-input:disabled ~ .form-check-label {
     opacity: 1;
 }
 
