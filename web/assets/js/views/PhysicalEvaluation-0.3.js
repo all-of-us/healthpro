@@ -310,7 +310,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
     },
     clearServerErrors: function (e) {
         const $input = $(e.currentTarget);
-        $input.removeClass('is-invalid');
+        $input.removeClass("is-invalid");
         const $field = $input.closest(".field");
         $field.find("div.invalid-feedback ul li").remove();
     },
