@@ -26,6 +26,25 @@
          data-z-score-charts="{{ zScoreCharts|json_encode }}"
          data-record-user-values="{{ recordUserValues|json_encode|escape('html_attr') }}">
         {{ form_start(measurementForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
+
+        {% if (not measurement or not measurement.rdrId) and not readOnlyView and not inactiveSiteFormDisabled %}
+            <div id="evaluationAffixSave" class="sticky-top" style="display:none;">
+                <div class="d-flex justify-content-center gap-2">
+                    {% if not measurement or not measurement.finalizedTs %}
+                        <button type="submit" class="btn btn-primary btn-sm" name="save">
+                            Save
+                            <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                        </button>
+                    {% endif %}
+                    <button type="submit" class="btn btn-success btn-sm" name="finalize"
+                            onclick="return confirm('Are you sure you want to finalize these physical measurements?');">
+                        Save and Finalize
+                        <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+
         {% if displayEhrBannerMessage and ehrProtocolBannerMessage is not empty %}
             <div class="alert alert-warning">{{ ehrProtocolBannerMessage }}</div>
         {% endif %}
@@ -131,24 +150,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        {% endif %}
-
-        {% if (not measurement or not measurement.rdrId) and not readOnlyView and not inactiveSiteFormDisabled %}
-            <div id="evaluationAffixSave" class="sticky-top" style="display:none;">
-                <div class="d-flex justify-content-center gap-2">
-                    {% if not measurement or not measurement.finalizedTs %}
-                        <button type="submit" class="btn btn-primary btn-sm" name="save">
-                            Save
-                            <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
-                        </button>
-                    {% endif %}
-                    <button type="submit" class="btn btn-success btn-sm" name="finalize"
-                            onclick="return confirm('Are you sure you want to finalize these physical measurements?');">
-                        Save and Finalize
-                        <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
-                    </button>
                 </div>
             </div>
         {% endif %}
