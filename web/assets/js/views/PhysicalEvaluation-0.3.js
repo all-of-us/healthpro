@@ -309,8 +309,10 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
         }
     },
     clearServerErrors: function (e) {
-        var field = $(e.currentTarget).closest(".field");
-        field.find("span.help-block ul li").remove();
+        const $input = $(e.currentTarget);
+        $input.removeClass('is-invalid');
+        const $field = $input.closest(".field");
+        $field.find("div.invalid-feedback ul li").remove();
     },
     kgToLb: function (kg) {
         return phpRound(parseFloat(kg) * 2.2046, 1);
