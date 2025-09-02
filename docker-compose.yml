@@ -20,7 +20,7 @@ services:
             MYSQL_DATABASE: hpo
             MYSQL_USER: root
             MYSQL_PASSWORD: ''
-        build: .
+        image: healthpro-web
         container_name: healthpro-web
         hostname: healthpro-web
         links:
