@@ -202,8 +202,16 @@ $(document).ready(function () {
             .last()
             .after(newElem);
 
-        $(".order-ts").pmiDateTimePicker({
-            maxDate: new Date().setHours(23, 59, 59, 999)
+        const $orderTsSelector = $(".order-ts");
+        const maxDate = new Date();
+        maxDate.setHours(23, 59, 59, 999);
+        $orderTsSelector.each(function () {
+            bs5DateTimepicker(this, {
+                clock: true,
+                sideBySide: true,
+                useCurrent: true,
+                maxDate: maxDate
+            });
         });
     }
 
