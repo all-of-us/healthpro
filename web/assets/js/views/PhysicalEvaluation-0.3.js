@@ -289,7 +289,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
         }
     },
     checkDiastolic: function (e) {
-        var replicate = $(e.currentTarget).closest(".form-group").data("replicate");
+        var replicate = $(e.currentTarget).closest(".input-group").data("replicate");
         var systolic = parseFloat(
             this.$(".field-blood-pressure-systolic[data-replicate=" + replicate + "] input").val()
         );
@@ -297,7 +297,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
             this.$(".field-blood-pressure-diastolic[data-replicate=" + replicate + "] input").val()
         );
         var container = this.$(".field-blood-pressure-diastolic[data-replicate=" + replicate + "]").closest(
-            ".form-group"
+            ".input-group"
         );
         container.find(".diastolic-warning").remove();
         if (systolic && diastolic && diastolic >= systolic) {
@@ -415,7 +415,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
                 .each(function () {
                     var input = $(this);
                     var field = input.closest(".field").data("field");
-                    var container = input.closest(".form-group");
+                    var container = input.closest(".input-group");
                     container.find(".metric-warnings").remove();
                     if (container.find(".metric-errors div").length > 0) {
                         return;
@@ -493,7 +493,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
         var self = this;
         var input = $(e.currentTarget);
         var field = input.closest(".field").data("field");
-        var container = input.closest(".form-group");
+        var container = input.closest(".input-group");
         container.find(".metric-warnings").remove();
         if (container.find(".metric-errors div").length > 0) {
             return;

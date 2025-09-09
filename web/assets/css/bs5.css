@@ -149,3 +149,7 @@ a {
 .page-notice-form .form-check {
     padding-left: 0;
 }
+
+.lead strong {
+    font-weight: 800;
+}
