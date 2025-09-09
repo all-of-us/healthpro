@@ -1,4 +1,4 @@
-FROM php:8.2
+FROM php:8.2-bullseye
 
 # Fix for issue with OpenJDK install
 RUN mkdir -p /usr/share/man/man1
@@ -10,7 +10,7 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
         default-mysql-client \
         git-all \
         nodejs \
-        openjdk-17-jdk \
+        default-jdk \
         libzstd-dev \
         zlib1g-dev \
         autoconf \
@@ -21,7 +21,7 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
       && rm -rf /var/lib/apt/lists/*
 
 # Install GRPC module for PHP
-RUN MAKEFLAGS="-j $(nproc)" pecl install grpc \
+RUN MAKEFLAGS="-j2" pecl install grpc \
       && docker-php-ext-enable grpc
 
 # Google Cloud Tools
