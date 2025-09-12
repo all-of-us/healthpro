@@ -1,22 +1,22 @@
 {% import 'measurementform/metrics.html.twig' as metrics %}
 {% import 'measurementform/macros/growth-percentile.html.twig' as growthMacros %}
 
-<div class="well">
+<div class="card card-body mb-3">
     <div class="row">
         <div class="col-sm-4">
             {{ metrics.form_row(measurementForm, schema.fields['wheelchair']) }}
         </div>
     </div>
 </div>
-<div class="panel panel-default">
-    <div class="panel-body">
+<div class="card">
+    <div class="card-body">
         <h4>Weight</h4>
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
                 <div class="col-sm-4">
-                    <div class="panel panel-default panel-weight-{{ i + 1 }}">
-                        <div class="panel-body">
-                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                    <div class="card panel-weight-{{ i + 1 }}">
+                        <div class="card-body">
+                            <p class="text-end"><em>Reading #{{ i + 1 }}</em></p>
                             <div class="modification-block">
                                 <div class="modification-affected">
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['weight'], i) }}
@@ -24,7 +24,7 @@
                                         <p class="text-info">Third measurement is required when first two differ by more than 0.1 kg</p>
                                     {% endif %}
                                 </div>
-                                <div class="modification-toggle text-right">
+                                <div class="modification-toggle text-end">
                                     <a class="small weight-modification-toggle">Add protocol modification</a>
                                 </div>
                                 <div class="modification-select weight-modification-select" data-modification-type=".weight-modification" style="display:none">
@@ -42,11 +42,11 @@
         <hr>
         <div class="row">
             <div class="col-sm-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Average</h3>
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title h5 mb-0">Average</h3>
                     </div>
-                    <div class="panel-body">
+                    <div class="card-body">
                         <p class="lead">
                             Weight:
                             <span id="mean-weight"></span>
@@ -58,12 +58,12 @@
                 </div>
             </div>
             <div class="col-sm-4">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Growth Percentile</h3>
+                <div class="card border-primary">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title h5 mb-0">Growth Percentile</h3>
                     </div>
-                    <div class="panel-body">
-                        <div class="row row-no-gutters lead">
+                    <div class="card-body">
+                        <div class="row g-0 lead">
                             <div>Weight:</div>
                             <div>
                                 {{ growthMacros.displayGrowthPercentile('weight-for-age', sexAtBirth) }}

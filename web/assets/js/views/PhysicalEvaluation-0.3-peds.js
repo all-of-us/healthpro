@@ -448,7 +448,7 @@ let viewExtension = Backbone.View.extend({
         }
     },
     checkDiastolic: function (e) {
-        let replicate = $(e.currentTarget).closest(".form-group").data("replicate");
+        let replicate = $(e.currentTarget).closest(".input-group").data("replicate");
         let systolic = parseFloat(
             this.$(".field-blood-pressure-systolic[data-replicate=" + replicate + "] input").val()
         );
@@ -456,7 +456,7 @@ let viewExtension = Backbone.View.extend({
             this.$(".field-blood-pressure-diastolic[data-replicate=" + replicate + "] input").val()
         );
         let container = this.$(".field-blood-pressure-diastolic[data-replicate=" + replicate + "]").closest(
-            ".form-group"
+            ".input-group"
         );
         container.find(".diastolic-warning").remove();
         if (systolic && diastolic && diastolic >= systolic) {
@@ -469,8 +469,10 @@ let viewExtension = Backbone.View.extend({
         this.toggleThirdHeartRate();
     },
     clearServerErrors: function (e) {
-        let field = $(e.currentTarget).closest(".field");
-        field.find("span.help-block ul li").remove();
+        const $input = $(e.currentTarget);
+        $input.removeClass("is-invalid");
+        const $field = $input.closest(".field");
+        $field.find("div.invalid-feedback ul li").remove();
     },
     kgToLb: function (kg) {
         return phpRound(parseFloat(kg) * 2.2046, 1);
@@ -723,7 +725,7 @@ let viewExtension = Backbone.View.extend({
                 .each(function () {
                     let input = $(this);
                     let field = input.closest(".field").data("field");
-                    let container = input.closest(".form-group");
+                    let container = input.closest(".input-group");
                     container.find(".metric-warnings").remove();
                     if (container.find(".metric-errors div").length > 0) {
                         return;
@@ -823,7 +825,7 @@ let viewExtension = Backbone.View.extend({
             input = e;
         }
         let field = input.closest(".field").data("field");
-        let container = input.closest(".form-group");
+        let container = input.closest(".input-group");
         container.find(".metric-warnings").remove();
         if (["height", "weight"].includes(field)) {
             $("#weight-for-length-warning, #bmi-for-age-warning").text("");
@@ -1052,7 +1054,7 @@ let viewExtension = Backbone.View.extend({
             }
             val = this.inToCm(inches);
         } else {
-            let unit = block.find(".input-group-addon").text();
+            let unit = block.find(".input-group-text").text();
             val = block.find("input").val();
             if (unit == "in") {
                 val = this.inToCm(val);
@@ -1132,12 +1134,12 @@ let viewExtension = Backbone.View.extend({
         this.$("form").parsley({
             errorClass: "has-error",
             classHandler: function (el) {
-                return el.$element.closest(".form-group");
+                return el.$element.closest(".input-group");
             },
             errorsContainer: function (el) {
-                return el.$element.closest(".form-group");
+                return el.$element.closest(".input-group");
             },
-            errorsWrapper: '<div class="metric-errors help-block"></div>',
+            errorsWrapper: '<div class="metric-errors help-block filled w-100 mt-2"></div>',
             errorTemplate: "<div></div>",
             trigger: "keyup change"
         });
