@@ -83,7 +83,7 @@
             </h2>
         </div>
         {% if displayInactiveSiteBanner %}
-            {{ macros.displayInactiveSiteBanner('pmb', 3) }}
+            {{ macros.displayInactiveSiteBanner('pmb') }}
         {% endif %}
         {% if measurement.id and measurement.history and measurement.history.type == 'cancel' %}
             <div class="alert alert-danger">
