@@ -15,17 +15,43 @@ class JiraService
     private const DESTINATION_ISSUE_TYPE_RELEASE = '10102'; // 10102 = release
 
     private $client;
+    private $logger;
 
     public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
     {
+        $this->logger = $logger;
+
         if (!$params->has('jira_api_user') || !$params->has('jira_api_token')) {
             $logger->warning('Missing Jira API configuration. See config.yml.dist for details.');
             return;
         }
+
         $this->client = new Client([
-            'base_uri' => self::INSTANCE_URL . '/rest/api/2/',
+            'base_uri' => self::INSTANCE_URL . '/rest/api/3/',
             'auth' => [$params->get('jira_api_user'), $params->get('jira_api_token')]
         ]);
+    }
+
+    /**
+     * Format plain text into Atlassian Document Format (ADF)
+     */
+    private function formatTextADF(string $text): array
+    {
+        return [
+            'type' => 'doc',
+            'version' => 1,
+            'content' => [
+                [
+                    'type' => 'paragraph',
+                    'content' => [
+                        [
+                            'text' => $text,
+                            'type' => 'text'
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 
     public function getVersions(int $count = 10): array
@@ -46,12 +72,14 @@ class JiraService
     public function getIssuesByVersion(string $version): array
     {
         $jql = sprintf('project=%s AND fixVersion=%s', self::SOURCE_PROJECT_KEY, $version);
-        $response = $this->client->request('GET', 'search', [
-            'query' => [
+
+        $response = $this->client->request('POST', 'search/jql', [
+            'json' => [
                 'jql' => $jql,
-                'fields' => 'issuetype,status,summary,assignee'
+                'fields' => ['issuetype', 'status', 'summary', 'assignee']
             ]
         ]);
+
         $responseObject = json_decode($response->getBody()->getContents());
 
         return $responseObject->issues ?? [];
@@ -61,7 +89,7 @@ class JiraService
     {
         $fields = [
             'summary' => $title,
-            'description' => $description,
+            'description' => $this->formatTextADF($description),
             'project' => [
                 'key' => self::DESTINATION_PROJECT_KEY
             ],
@@ -69,16 +97,19 @@ class JiraService
                 'id' => self::DESTINATION_ISSUE_TYPE_RELEASE
             ]
         ];
+
         if ($componentId) {
             $fields['components'] = [
                 ['id' => $componentId]
             ];
         }
+
         $response = $this->client->request('POST', 'issue', [
             'json' => [
                 'fields' => $fields
             ]
         ]);
+
         $responseObject = json_decode($response->getBody()->getContents());
 
         return $responseObject->key ?? null;
@@ -89,11 +120,12 @@ class JiraService
         try {
             $response = $this->client->request('POST', "issue/{$ticketId}/comment", [
                 'json' => [
-                    'body' => $comment
+                    'body' => $this->formatTextADF($comment)
                 ]
             ]);
             return $response && $response->getStatusCode() === 201;
         } catch (\Exception $e) {
+            $this->logger->error("Failed to create Jira comment: " . $e->getMessage());
             return false;
         }
     }
@@ -117,6 +149,7 @@ class JiraService
             ]);
             return $response && $response->getStatusCode() === 200;
         } catch (\Exception $e) {
+            $this->logger->error("Failed to attach Jira file: " . $e->getMessage());
             return false;
         }
     }
