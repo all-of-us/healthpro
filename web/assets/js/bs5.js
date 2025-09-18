@@ -41,6 +41,11 @@ $(document).ready(function () {
                 maxDate: params["maxDate"]
             };
         }
+        if (params.hasOwnProperty("minDate")) {
+            options.restrictions = {
+                minDate: params["minDate"]
+            };
+        }
         if (params.hasOwnProperty("clock")) {
             options.display.components = {
                 clock: params["clock"]

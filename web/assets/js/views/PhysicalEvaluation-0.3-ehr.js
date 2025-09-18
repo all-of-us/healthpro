@@ -838,14 +838,21 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
         this.rendered = false;
         this.hipWaistFields = ["hip-circumference", "waist-circumference"];
         this.render();
-        var today = new Date();
-        var sixMonthsAgo = new Date().setMonth(today.getMonth() - 6);
         if (!this.finalized) {
-            $("input.ehr-date").pmiDateTimePicker({
-                format: "MM/DD/YYYY",
-                maxDate: today.setHours(23, 59, 59, 999),
-                minDate: new Date(sixMonthsAgo).setHours(0, 0, 0, 0),
-                useCurrent: false
+            const ehrDateFields = document.querySelectorAll("input.ehr-date");
+            const today = new Date();
+            const maxDate = new Date(today);
+            maxDate.setHours(23, 59, 59, 999);
+            const sixMonthsAgo = new Date(today);
+            sixMonthsAgo.setMonth(today.getMonth() - 6);
+            sixMonthsAgo.setHours(0, 0, 0, 0);
+            ehrDateFields.forEach((ehrDateField) => {
+                bs5DateTimepicker(ehrDateField, {
+                    format: "MM/dd/yyyy",
+                    maxDate: maxDate,
+                    minDate: sixMonthsAgo,
+                    useCurrent: false
+                });
             });
         }
     },
