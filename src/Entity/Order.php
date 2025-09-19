@@ -939,15 +939,17 @@ class Order
             if (!empty($this->getId())) {
                 // Initial orders doesn't have a version so set version for those orders
                 $this->currentVersion = self::INITIAL_VERSION;
-                if ($pediatricFlag && $physicalMeasurement) {
-                    $summary = $physicalMeasurement->getSummary();
-                    $this->currentVersion = $params['pediatric_order_samples_version'] . '-' . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
+                if ($pediatricFlag) {
+                    $summary = $physicalMeasurement?->getSummary();
+                    $weight = $summary ? $summary['weight']['kg'] : null;
+                    $this->currentVersion = $params['pediatric_order_samples_version'] . '-' . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($weight)}";
                 }
             } elseif (!empty($params['order_samples_version'])) {
                 $this->currentVersion = $params['order_samples_version'];
-                if ($pediatricFlag && $physicalMeasurement) {
-                    $summary = $physicalMeasurement->getSummary();
-                    $this->currentVersion = $params['pediatric_order_samples_version'] . '-' . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($summary['weight']['kg'])}";
+                if ($pediatricFlag) {
+                    $summary = $physicalMeasurement?->getSummary();
+                    $weight = $summary ? $summary['weight']['kg'] : null;
+                    $this->currentVersion = $params['pediatric_order_samples_version'] . '-' . self::PEDIATRIC_ORDER_STRING . "-{$participant->getPediatricWeightBreakpoint($weight)}";
                 }
             }
         }
