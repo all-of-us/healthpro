@@ -533,14 +533,14 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
                     var input = $(this);
                     var field = input.closest(".field").data("field");
                     var container = input.closest(".form-group");
-                    container.find(".metric-warnings").remove();
+                    container.next(".metric-warnings").remove();
                     if (container.find(".metric-errors div").length > 0) {
                         return;
                     }
                     var val = input.val();
                     $.each(warnings, function (key, warning) {
                         if (!warning.consecutive && self.warningConditionMet(warning, val)) {
-                            container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                            container.after($('<div class="metric-warnings text-warning">').text(warning.message));
                             return false; // only show first (highest priority) warning
                         }
                     });
@@ -611,7 +611,7 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
         var input = $(e.currentTarget);
         var field = input.closest(".field").data("field");
         var container = input.closest(".form-group");
-        container.find(".metric-warnings").remove();
+        container.next(".metric-warnings").remove();
         if (container.find(".metric-errors div").length > 0) {
             return;
         }
@@ -633,7 +633,7 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
                             btnTextFalse: "Clear value and reenter"
                         });
                     }
-                    container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                    container.after($('<div class="metric-warnings text-warning">').text(warning.message));
                     return false; // only show first (highest priority) warning
                 }
             });
