@@ -260,9 +260,9 @@ class Participant
         return false;
     }
 
-    public function getPediatricWeightBreakpoint(float $weight): float
+    public function getPediatricWeightBreakpoint(?float $weight): float
     {
-        $breakpoint = 0;
+        $breakpoint = 2.5; // default to 0 to 2.5 if no weight
         foreach (self::$pediatricWeightBreakpoints as $value) {
             if ($weight < $value) {
                 $breakpoint = $value;
