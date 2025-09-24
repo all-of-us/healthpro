@@ -234,7 +234,7 @@ class ReleaseTicketCommand extends Command
             $this->defaultAccountIds['qa'] ?? [],
             $this->defaultAccountIds['dev'] ?? []
         ));
-        $description = $this->templating->render('jira/release.txt.twig', [
+        $descriptionJson = $this->templating->render('jira/release.json.twig', [
             'issues' => $issues,
             'releaseDate' => $this->targetReleaseDate,
             'completeDate' => new \DateTime(),
@@ -242,6 +242,7 @@ class ReleaseTicketCommand extends Command
             'changeManagers' => $changeManagerIds,
             'testers' => $testerIds
         ]);
+        $description = json_decode($descriptionJson, true);
 
         $createResult = $this->jira->createReleaseTicket("HealthPro Release {$version}", $description, $componentId);
         if ($createResult) {

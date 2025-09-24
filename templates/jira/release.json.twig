@@ -1,0 +1,129 @@
+{%- macro mentionAccounts(ids) -%}
+    {%- for id in ids -%}
+        {"type": "mention", "attrs": {"id": "{{ id }}"}}{% if not loop.last %}, {% endif %}
+    {%- endfor -%}
+{%- endmacro -%}
+{
+    "version": 1,
+    "type": "doc",
+    "content": [
+        {
+            "type": "heading",
+            "attrs": {"level": 2},
+            "content": [{"type": "text", "text": "Change Request Form"}]
+        },
+        {
+            "type": "heading",
+            "attrs": {"level": 3},
+            "content": [{"type": "text", "text": "DESCRIPTION"}]
+        },
+        {
+            "type": "paragraph",
+            "content": [
+                {"type": "text", "text": "System: HealthPro"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Developers: "},
+                {{ _self.mentionAccounts(developers) }},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Needed By Date/Event:"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Production: {{ releaseDate|date('n/j/Y') }}"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Priority: Medium"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Configuration/Change Manager: "},
+                {{ _self.mentionAccounts(changeManagers) }}
+            ]
+        },
+        {
+            "type": "heading",
+            "attrs": {"level": 4},
+            "content": [{"type": "text", "text": "This release contains the following Jira tickets"}]
+        }
+        {% if issues %},{% endif %}
+        {% for issue in issues -%}
+        {
+            "type": "heading",
+            "attrs": {"level": 5},
+            "content": [
+                {
+                    "type": "text",
+                    "text": "{{ issue.id }}",
+                    "marks": [
+                        {
+                            "type": "link",
+                            "attrs": { "href": "{{ constant('App\\Service\\JiraService::INSTANCE_URL') }}/browse/{{ issue.id }}" }
+                        }
+                    ]
+                },
+                {"type": "text", "text": " - {{ issue.title|replace({'\"': '\\\"'}) }}"}
+            ]
+        },
+        {
+            "type": "paragraph",
+            "content": [{"type": "text", "text": "Security impact: None"}]
+        }{% if not loop.last %},{% endif %}
+        {%- endfor %}
+        {% if issues %},{% endif %}
+        {
+            "type": "heading",
+            "attrs": {"level": 3},
+            "content": [{"type": "text", "text": "ANTICIPATED IMPACTS"}]
+        },
+        {
+            "type": "paragraph",
+            "content": [
+                {"type": "text", "text": "Software Impact: Improvements to HealthPro"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Training Impact: None"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Data Impact: None"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Security Impact: None"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Related Changes: N/A"}
+            ]
+        },
+        {
+            "type": "heading",
+            "attrs": {"level": 3},
+            "content": [{"type": "text", "text": "TESTING"}]
+        },
+        {
+            "type": "paragraph",
+            "content": [
+                {"type": "text", "text": "Tester: "},
+                {{ _self.mentionAccounts(testers) }},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Date Test Was Completed: {{ completeDate|date('n/j/Y') }}"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Implementation/Deployment Date: Ongoing, incremental testing for each individual story"}
+            ]
+        },
+        {
+            "type": "heading",
+            "attrs": {"level": 2},
+            "content": [{"type": "text", "text": "Security Impact Analysis"}]
+        },
+        {
+            "type": "paragraph",
+            "content": [
+                {"type": "text", "text": "Business Impact: None"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Operational Impact: Improvements to support DRC and All of Us operations"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "System Components Affected: HealthPro"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Security Controls Affected: N/A"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Participant Data Impacted: N/A"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "New Data Types: N/A"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "Downtime Expected: None"},
+                {"type": "hardBreak"},
+                {"type": "text", "text": "New Tools Added: N/A"}
+            ]
+        }
+    ]
+}
