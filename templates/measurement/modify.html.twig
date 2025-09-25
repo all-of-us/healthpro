@@ -1,9 +1,11 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Physical Measurements - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
+    {% form_theme measurementModifyForm 'bootstrap_5_layout.html.twig' %}
     <div id="physicalmeasurement">
-        <div class="page-header">
+        <div class="page-header border-bottom mb-4">
             <h2 class="{% if type == 'cancel' %} text-danger {% elseif type == 'restore' %} text-success {% else %} text-primary {% endif %}">
                 <i class="fa fa-clipboard" aria-hidden="true"></i>
                 {{ type|capitalize }} Physical Measurements
@@ -15,7 +17,7 @@
             {% include 'partials/participant-measurement-summary.html.twig' %}
         </div>
         <div class="col-md-4 col-sm-5">
-            {% include 'partials/participant-measurement-list.html.twig' %}
+            {% include 'partials/participant-measurement-list-bs5.html.twig' %}
         </div>
     </div>
     <div class="row">
@@ -23,12 +25,12 @@
             {{ form_start(measurementModifyForm, { attr: { class: 'warn-unsaved disable-enter prevent-resubmit' } }) }}
             {{ form_errors(measurementModifyForm) }}
             {{ form_rest(measurementModifyForm) }}
-            <p>
+            <p class="my-4">
                 <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">
                     {{ type|capitalize }} Physical Measurements
-                    <span id="spinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                    <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
                 </button>
-                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default">Exit</a>
+                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary">Exit</a>
             </p>
             {{ form_end(measurementModifyForm) }}
         </div>
