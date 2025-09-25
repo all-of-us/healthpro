@@ -2,7 +2,9 @@
     {% import _self as self %}
     {% set name = definition.name %}
     <div data-field="{{ name }}" class="field field-{{ name }} mb-3">
-        {{ form_label(form[name]) }}
+        <label for="{{ form[name].vars.id }}" class="form-label">
+            {{ form[name].vars.label }}
+        </label>
         {% if definition.showHelpModel is defined %}
             <span class="toggle-help-image" data-id="measurementSourceModal">
                 <i class="fa fa-question-circle" aria-hidden="true"></i>

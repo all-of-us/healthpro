@@ -726,7 +726,7 @@ let viewExtension = Backbone.View.extend({
                     let input = $(this);
                     let field = input.closest(".field").data("field");
                     let container = input.closest(".input-group");
-                    container.find(".metric-warnings").remove();
+                    container.next(".metric-warnings").remove();
                     if (container.find(".metric-errors div").length > 0) {
                         return;
                     }
@@ -740,7 +740,7 @@ let viewExtension = Backbone.View.extend({
                                 $("#" + warning.percentile + "-warning").html(warning.message);
                                 return true;
                             } else {
-                                container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                                container.after($('<div class="metric-warnings text-warning">').text(warning.message));
                             }
                             if (warning.hasOwnProperty("percentile") && warning.percentile === "weight-for-age") {
                                 return true;
@@ -861,7 +861,7 @@ let viewExtension = Backbone.View.extend({
                         $("#" + warning.percentile + "-warning").html(warning.message);
                         return true;
                     } else {
-                        container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                        container.after($('<div class="metric-warnings text-warning">').text(warning.message));
                     }
                     if (warning.hasOwnProperty("percentile") && warning.percentile === "weight-for-age") {
                         return true;

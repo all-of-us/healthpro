@@ -129,7 +129,7 @@ PMI.views["PhysicalEvaluation-0.1"] = Backbone.View.extend({
         var input = $(e.currentTarget);
         var field = input.closest(".field").data("field");
         var container = input.closest(".form-group");
-        container.find(".metric-warnings").remove();
+        container.next(".metric-warnings").remove();
         if (container.find(".metric-errors div").length > 0) {
             return;
         }
@@ -152,7 +152,7 @@ PMI.views["PhysicalEvaluation-0.1"] = Backbone.View.extend({
                             btnTextFalse: "Clear value and reenter"
                         });
                     } else {
-                        container.append($('<div class="metric-warnings text-danger">').text(warning.message));
+                        container.after($('<div class="metric-warnings text-danger">').text(warning.message));
                     }
                 }
             });
