@@ -826,7 +826,7 @@ let viewExtension = Backbone.View.extend({
         }
         let field = input.closest(".field").data("field");
         let container = input.closest(".input-group");
-        container.find(".metric-warnings").remove();
+        container.next(".metric-warnings").remove();
         if (["height", "weight"].includes(field)) {
             $("#weight-for-length-warning, #bmi-for-age-warning").text("");
         }
