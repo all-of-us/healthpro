@@ -415,7 +415,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
                 .each(function () {
                     var input = $(this);
                     var field = input.closest(".field").data("field");
-                    var container = input.closest(".input-group");
+                    var container = input.closest(".field");
                     container.next(".metric-warnings").remove();
                     if (container.find(".metric-errors div").length > 0) {
                         return;
@@ -493,7 +493,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
         var self = this;
         var input = $(e.currentTarget);
         var field = input.closest(".field").data("field");
-        var container = input.closest(".input-group");
+        var container = input.closest(".field");
         container.next(".metric-warnings").remove();
         if (container.find(".metric-errors div").length > 0) {
             return;

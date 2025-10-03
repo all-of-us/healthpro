@@ -725,7 +725,7 @@ let viewExtension = Backbone.View.extend({
                 .each(function () {
                     let input = $(this);
                     let field = input.closest(".field").data("field");
-                    let container = input.closest(".input-group");
+                    let container = input.closest(".field");
                     container.next(".metric-warnings").remove();
                     if (container.find(".metric-errors div").length > 0) {
                         return;
@@ -825,7 +825,7 @@ let viewExtension = Backbone.View.extend({
             input = e;
         }
         let field = input.closest(".field").data("field");
-        let container = input.closest(".input-group");
+        let container = input.closest(".field");
         container.next(".metric-warnings").remove();
         if (["height", "weight"].includes(field)) {
             $("#weight-for-length-warning, #bmi-for-age-warning").text("");
