@@ -271,7 +271,7 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
             this.$("#panel-hip-waist input, #panel-hip-waist select").each(function () {
                 $(this).attr("disabled", true);
             });
-            this.$("#hip-waist-skip").html('<span class="label label-danger">Skip</span>');
+            this.$("#hip-waist-skip").html('<span class="badge bg-danger">Skip</span>');
             this.$("#panel-hip-waist>.panel-body").hide();
         }
         if (isPregnant) {

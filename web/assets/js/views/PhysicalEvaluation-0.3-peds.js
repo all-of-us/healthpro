@@ -332,7 +332,7 @@ let viewExtension = Backbone.View.extend({
             this.$("#panel-waist input, #panel-waist select").each(function () {
                 $(this).attr("disabled", true);
             });
-            this.$("#waist-skip").html('<span class="label label-danger">Skip</span>');
+            this.$("#waist-skip").html('<span class="badge bg-danger">Skip</span>');
             this.$("#panel-waist, #panel-waist-mean").hide();
         }
         if (isWheelchairUser) {
