@@ -112,6 +112,11 @@
                             class="has-error"{% endif %}>
                             {{ form_widget(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
                             {{ form_errors(orderCollectForm[nphSample.sampleCode ~ 'Notes']) }}
+                            {% if nphSample.finalizedNotes %}
+                                <a class="text-primary" data-bs-toggle="popover" data-bs-trigger="hover" title="Finalization Notes" data-bs-content="{{ nphSample.finalizedNotes }}">
+                                    Finalization Notes
+                                </a>
+                            {% endif %}
                             {% if index == order.nphSamples|length - 1 %}
                                 <small class="text-warning">
                                     Comments entered in this field are transmitted to the Biobank via reconciliation
