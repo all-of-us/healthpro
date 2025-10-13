@@ -844,7 +844,11 @@ class Measurement
             'waist-circumference'
         ];
         if (in_array($field, $secondThirdFields)) {
-            $values = [$this->fieldData->{$field}[1], $this->fieldData->{$field}[2]];
+            if (!empty($this->fieldData->{$field}[1]) || !empty($this->fieldData->{$field}[2])) {
+                $values = [$this->fieldData->{$field}[1], $this->fieldData->{$field}[2]];
+            } else {
+                $values = [$this->fieldData->{$field}[0]];
+            }
         } else {
             $values = $this->fieldData->{$field};
         }
