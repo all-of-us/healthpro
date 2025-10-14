@@ -487,7 +487,7 @@ PMI.views["PhysicalEvaluation-0.3-ehr"] = Backbone.View.extend({
                     val = `${feet}ft ${inches}in`;
                 }
             } else {
-                let inputVal = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
+                let inputVal = parseFloat($(input).closest(".card-body").find(`input.alt-units-${field}`).val());
                 if (!Number.isNaN(inputVal)) {
                     val = `${inputVal} ${this.conversions[field]}`;
                 }
