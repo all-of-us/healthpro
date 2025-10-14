@@ -156,7 +156,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
                 $(this).attr("disabled", true);
             });
             this.$("#hip-waist-skip").html('<span class="badge bg-danger">Skip</span>');
-            this.$("#panel-hip-waist>.panel-body").hide();
+            this.$("#panel-hip-waist>.card-body").hide();
         }
         if (isPregnant) {
             this.$(".field-weight-prepregnancy").show();
@@ -197,7 +197,7 @@ PMI.views["PhysicalEvaluation-0.3"] = Backbone.View.extend({
                 }
             });
             this.$("#hip-waist-skip").text("");
-            this.$("#panel-hip-waist>.panel-body").show();
+            this.$("#panel-hip-waist>.card-body").show();
         }
     },
     handleHeightProtocol: function () {
