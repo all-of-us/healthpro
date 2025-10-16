@@ -332,7 +332,7 @@ let viewExtension = Backbone.View.extend({
             this.$("#panel-waist input, #panel-waist select").each(function () {
                 $(this).attr("disabled", true);
             });
-            this.$("#waist-skip").html('<span class="label label-danger">Skip</span>');
+            this.$("#waist-skip").html('<span class="badge bg-danger">Skip</span>');
             this.$("#panel-waist, #panel-waist-mean").hide();
         }
         if (isWheelchairUser) {
@@ -526,7 +526,7 @@ let viewExtension = Backbone.View.extend({
                     val = `${feet}ft ${inches}in`;
                 }
             } else {
-                let inputVal = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
+                let inputVal = parseFloat($(input).closest(".card-body").find(`input.alt-units-${field}`).val());
                 if (!Number.isNaN(inputVal)) {
                     val = `${inputVal} ${this.conversions[field]}`;
                 }
@@ -725,8 +725,8 @@ let viewExtension = Backbone.View.extend({
                 .each(function () {
                     let input = $(this);
                     let field = input.closest(".field").data("field");
-                    let container = input.closest(".input-group");
-                    container.next(".metric-warnings").remove();
+                    let container = input.closest(".field");
+                    container.nextAll(".metric-warnings").remove();
                     if (container.find(".metric-errors div").length > 0) {
                         return;
                     }
@@ -825,8 +825,8 @@ let viewExtension = Backbone.View.extend({
             input = e;
         }
         let field = input.closest(".field").data("field");
-        let container = input.closest(".input-group");
-        container.find(".metric-warnings").remove();
+        let container = input.closest(".field");
+        container.nextAll(".metric-warnings").remove();
         if (["height", "weight"].includes(field)) {
             $("#weight-for-length-warning, #bmi-for-age-warning").text("");
         }

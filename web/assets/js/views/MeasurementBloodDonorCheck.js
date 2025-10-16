@@ -1,9 +1,9 @@
 $(document).ready(function () {
-    var toggleDonorType = function () {
+    let toggleDonorType = function () {
         if ($('input[name="form[bloodDonor]"]:checked').val() !== "yes") {
-            $("#blood-donor-type").addClass("hidden");
+            $("#blood-donor-type").addClass("d-none");
         } else {
-            $("#blood-donor-type").removeClass("hidden");
+            $("#blood-donor-type").removeClass("d-none");
         }
     };
     toggleDonorType();

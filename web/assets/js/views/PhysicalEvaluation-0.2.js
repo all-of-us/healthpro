@@ -141,7 +141,7 @@ PMI.views["PhysicalEvaluation-0.2"] = Backbone.View.extend({
             this.$("#panel-hip-waist input, #panel-hip-waist select").each(function () {
                 $(this).attr("disabled", true);
             });
-            this.$("#hip-waist-skip").html('<span class="label label-danger">Skip</span>');
+            this.$("#hip-waist-skip").html('<span class="badge bg-danger">Skip</span>');
         }
         if (isPregnant) {
             this.$(".field-weight-prepregnancy").show();
@@ -340,8 +340,8 @@ PMI.views["PhysicalEvaluation-0.2"] = Backbone.View.extend({
                 .each(function () {
                     var input = $(this);
                     var field = input.closest(".field").data("field");
-                    var container = input.closest(".form-group");
-                    container.next(".metric-warnings").remove();
+                    var container = input.closest(".field");
+                    container.nextAll(".metric-warnings").remove();
                     if (container.find(".metric-errors div").length > 0) {
                         return;
                     }
@@ -417,8 +417,8 @@ PMI.views["PhysicalEvaluation-0.2"] = Backbone.View.extend({
         var self = this;
         var input = $(e.currentTarget);
         var field = input.closest(".field").data("field");
-        var container = input.closest(".form-group");
-        container.next(".metric-warnings").remove();
+        var container = input.closest(".field");
+        container.nextAll(".metric-warnings").remove();
         if (container.find(".metric-errors div").length > 0) {
             return;
         }

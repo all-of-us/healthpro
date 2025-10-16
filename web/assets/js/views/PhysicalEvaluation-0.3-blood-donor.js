@@ -215,7 +215,7 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
                     val = `${feet}ft ${inches}in`;
                 }
             } else {
-                let inputVal = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
+                let inputVal = parseFloat($(input).closest(".card-body").find(`input.alt-units-${field}`).val());
                 if (!Number.isNaN(inputVal)) {
                     val = `${inputVal} ${this.conversions[field]}`;
                 }
@@ -260,8 +260,8 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
                 .each(function () {
                     var input = $(this);
                     var field = input.closest(".field").data("field");
-                    var container = input.closest(".form-group");
-                    container.next(".metric-warnings").remove();
+                    var container = input.closest(".field");
+                    container.nextAll(".metric-warnings").remove();
                     if (container.find(".metric-errors div").length > 0) {
                         return;
                     }
@@ -279,8 +279,8 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
         var self = this;
         var input = $(e.currentTarget);
         var field = input.closest(".field").data("field");
-        var container = input.closest(".form-group");
-        container.next(".metric-warnings").remove();
+        var container = input.closest(".field");
+        container.nextAll(".metric-warnings").remove();
         if (container.find(".metric-errors div").length > 0) {
             return;
         }
