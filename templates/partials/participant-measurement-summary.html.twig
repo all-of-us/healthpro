@@ -1,13 +1,16 @@
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title h5 mb-0">
             <i class="fa fa-id-card-o" aria-hidden="true"></i>
             Physical Measurements Summary
         </h3>
     </div>
-    <div class="panel-body">
-        <p class="lead text-center">Date of Visit: <strong>{{ measurement.finalizedTs|date('n/j/Y') }}</strong></p>
-        <table class="table table-bordered">
+    <div class="card-body">
+        <p class="lead text-center">
+            Date of Visit: <strong>{{ measurement.finalizedTs|date('n/j/Y') }}</strong>
+        </p>
+
+        <table class="table table-bordered align-middle">
             <tr>
                 <th>Height</th>
                 {% if summary.height is defined %}
@@ -30,6 +33,7 @@
                 <th>BMI</th>
                 <td colspan="2">{{ summary.bmi is defined ? summary.bmi|number_format(1) : '--' }}</td>
             </tr>
+
             {% if measurement.isPediatricForm %}
                 <tr>
                     <th>Head Circumference</th>
@@ -41,6 +45,7 @@
                     {% endif %}
                 </tr>
             {% endif %}
+
             {% if not measurement.isPediatricForm %}
                 <tr>
                     <th>Hip Circumference</th>
@@ -52,6 +57,7 @@
                     {% endif %}
                 </tr>
             {% endif %}
+
             <tr>
                 <th>Waist Circumference</th>
                 {% if summary.waist is defined %}
@@ -61,21 +67,21 @@
                     <td colspan="2">--</td>
                 {% endif %}
             </tr>
+
             <tr>
                 <th>
-                    Blood Pressure
-                    <small style="font-weight: normal">(systolic / diastolic)</small>
+                    Blood Pressure <small class="fw-normal">(systolic / diastolic)</small>
                 </th>
                 <td colspan="2">
                     {% if summary.bloodpressure is defined %}
                         {{ summary.bloodpressure.systolic|round }} /
-                        {{ summary.bloodpressure.diastolic|round }}
-                        mmHg
+                        {{ summary.bloodpressure.diastolic|round }} mmHg
                     {% else %}
                         --
                     {% endif %}
                 </td>
             </tr>
+
             <tr>
                 <th>Heart Rate</th>
                 <td colspan="2">
@@ -86,6 +92,8 @@
                     {% endif %}
                 </td>
             </tr>
+
+            {# Pediatric-specific rows #}
             {% if measurement.isPediatricForm %}
                 <tr>
                     <th>Growth Percentile Weight for Age</th>
@@ -122,7 +130,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Growth percentile Weight for Length</th>
+                    <th>Growth Percentile Weight for Length</th>
                     <td colspan="2">
                         {% if summary['growth-percentile-weight-for-length'] is defined and summary['growth-percentile-weight-for-length'] is not empty %}
                             {{ summary['growth-percentile-weight-for-length'] }}th percentile
@@ -165,7 +173,7 @@
                                 {{ summary['growth-percentile-bmi-for-age-male'] }}th percentile (M) <br>
                             {% endif %}
                             {% if summary['growth-percentile-bmi-for-age-female'] is defined %}
-                                {{ summary['growth-percentile-bmi-for-age-female'] }}th percentile (F) <br>
+                                {{ summary['growth-percentile-bmi-for-age-female'] }}th percentile (F)
                             {% endif %}
                         {% else %}
                             --

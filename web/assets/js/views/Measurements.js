@@ -20,12 +20,24 @@ $(document).ready(function () {
         zScoreCharts: measurement.data("z-score-charts"),
         recordUserValues: measurement.data("record-user-values")
     });
-    $("#evaluationAffixSave")
-        .affix({
-            offset: {
-                top: 100,
-                bottom: $(window).height()
-            }
-        })
-        .width(measurement.width());
+
+    const $bar = $("#evaluationAffixSave");
+    const topThreshold = 100; // Show after scrolling 100px
+    const bottomGap = 40; // Hide when within 40px of the bottom
+
+    const toggleVisibility = () => {
+        const scrollTop = $(window).scrollTop();
+        const windowHeight = $(window).height();
+        const docHeight = $(document).height();
+        const nearBottom = scrollTop + windowHeight + bottomGap >= docHeight;
+
+        if (scrollTop > topThreshold && !nearBottom) {
+            $bar.fadeIn();
+        } else {
+            $bar.fadeOut();
+        }
+    };
+
+    $(window).on("scroll resize", toggleVisibility);
+    toggleVisibility();
 });

@@ -110,7 +110,7 @@ class MeasurementType extends AbstractType
                 ]);
                 $dateOptions = [
                     'widget' => 'single_text',
-                    'format' => 'M/d/yyyy',
+                    'format' => 'MM/dd/yyyy',
                     'html5' => false,
                     'required' => false
                 ];

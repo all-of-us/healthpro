@@ -1,22 +1,24 @@
+{% set bootstrapVersion = 5 %}
 {% extends 'program/hpo/ppsc/base.html.twig' %}
 {% block title %}Physical Measurements Blood Donor Check- {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
+    {% form_theme bloodDonorCheckForm 'bootstrap_5_layout.html.twig' %}
     <div>
-        <div class="page-header">
+        <div class="page-header pb-1 mb-3 border-bottom">
             <h2>
                 <i class="fa fa-clipboard" aria-hidden="true"></i> New Physical Measurements
             </h2>
         </div>
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title h5 mb-0">
                     <i class="fa fa-check-circle" aria-hidden="true"></i>
                     Blood Donor Check
                 </h3>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 {{ form_start(bloodDonorCheckForm, { attr: {
                     class: 'disable-enter prevent-resubmit',
                     novalidate: 'novalidate'
@@ -25,16 +27,16 @@
 
                 {{ form_row(bloodDonorCheckForm.bloodDonor) }}
 
-                <div id="blood-donor-type" class="hidden">
+                <div id="blood-donor-type" class="d-none">
                     {{ form_row(bloodDonorCheckForm.bloodDonorType) }}
                 </div>
 
-                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-default blood-donor-cancel" type="button">Cancel</a>
+                <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary blood-donor-cancel" type="button">Cancel</a>
 
-                <div class="pull-left">
+                <div class="float-start">
                     <button type="submit" class="btn btn-primary">
                         Continue
-                        <span id="spinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                        <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
                     </button>
                 </div>
 

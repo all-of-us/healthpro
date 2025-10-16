@@ -35,10 +35,11 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
         this.updateConversion(e);
     },
     displayHelpModal: function (e) {
-        var id = $(e.currentTarget).data("id");
-        var html = $("#" + id).html();
-        $("#helpModal .modal-body").html(html);
-        $("#helpModal").modal();
+        let id = $(e.currentTarget).data("id");
+        let html = $("#" + id).html();
+        $("#helpModalBs5 .modal-body").html(html);
+        let helpModal = new bootstrap.Modal($("#helpModalBs5")[0]);
+        helpModal.show();
     },
     triggerEqualize: function () {
         window.setTimeout(function () {
@@ -161,8 +162,10 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
         }
     },
     clearServerErrors: function (e) {
-        var field = $(e.currentTarget).closest(".field");
-        field.find("span.help-block ul li").remove();
+        const $input = $(e.currentTarget);
+        $input.removeClass("is-invalid");
+        const $field = $input.closest(".field");
+        $field.find("div.invalid-feedback ul li").remove();
     },
     kgToLb: function (kg) {
         return phpRound(parseFloat(kg) * 2.2046, 1);
@@ -212,7 +215,7 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
                     val = `${feet}ft ${inches}in`;
                 }
             } else {
-                let inputVal = parseFloat($(input).closest(".panel-body").find(`input.alt-units-${field}`).val());
+                let inputVal = parseFloat($(input).closest(".card-body").find(`input.alt-units-${field}`).val());
                 if (!Number.isNaN(inputVal)) {
                     val = `${inputVal} ${this.conversions[field]}`;
                 }
@@ -257,15 +260,15 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
                 .each(function () {
                     var input = $(this);
                     var field = input.closest(".field").data("field");
-                    var container = input.closest(".form-group");
-                    container.find(".metric-warnings").remove();
+                    var container = input.closest(".field");
+                    container.nextAll(".metric-warnings").remove();
                     if (container.find(".metric-errors div").length > 0) {
                         return;
                     }
                     var val = input.val();
                     $.each(warnings, function (key, warning) {
                         if (!warning.consecutive && self.warningConditionMet(warning, val)) {
-                            container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                            container.after($('<div class="metric-warnings text-warning">').text(warning.message));
                             return false; // only show first (highest priority) warning
                         }
                     });
@@ -276,8 +279,8 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
         var self = this;
         var input = $(e.currentTarget);
         var field = input.closest(".field").data("field");
-        var container = input.closest(".form-group");
-        container.find(".metric-warnings").remove();
+        var container = input.closest(".field");
+        container.nextAll(".metric-warnings").remove();
         if (container.find(".metric-errors div").length > 0) {
             return;
         }
@@ -285,7 +288,7 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
         if (this.warnings[field]) {
             $.each(this.warnings[field], function (key, warning) {
                 if (!warning.consecutive && self.warningConditionMet(warning, val)) {
-                    container.append($('<div class="metric-warnings text-warning">').text(warning.message));
+                    container.after($('<div class="metric-warnings text-warning">').text(warning.message));
                     return false; // only show first (highest priority) warning
                 }
             });
@@ -392,7 +395,7 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
     convertAltUnits: function (e) {
         var block = $(e.currentTarget).closest(".alt-units-field");
         var val;
-        var unit = block.find(".input-group-addon").text();
+        var unit = block.find(".input-group-text").text();
         val = block.find("input").val();
         if (unit == "lb") {
             val = this.lbToKg(val);
@@ -413,12 +416,12 @@ PMI.views["PhysicalEvaluation-0.3-blood-donor"] = Backbone.View.extend({
         this.$("form").parsley({
             errorClass: "has-error",
             classHandler: function (el) {
-                return el.$element.closest(".form-group");
+                return el.$element.closest(".input-group");
             },
             errorsContainer: function (el) {
-                return el.$element.closest(".form-group");
+                return el.$element.closest(".input-group");
             },
-            errorsWrapper: '<div class="metric-errors help-block"></div>',
+            errorsWrapper: '<div class="metric-errors help-block filled w-100 mt-2"></div>',
             errorTemplate: "<div></div>",
             trigger: "keyup change"
         });

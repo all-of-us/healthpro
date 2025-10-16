@@ -1,17 +1,17 @@
 {% import 'measurementform/metrics.html.twig' as metrics %}
 
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">
+<div class="card mb-3">
+    <div class="card-header">
+        <h3 class="card-title h5 mb-0">
             Blood Pressure
             <span class="toggle-help-image" data-id="bloodPressureModal">
-                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="visually-hidden">Help</span>
             </span>
         </h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
         {% if schema.fields['blood-pressure-location'] is defined %}
-            <div class="well">
+            <div class="card card-body bg-light mb-3">
                 <div class="row">
                     <div class="col-sm-4">
                         {{ metrics.form_row(measurementForm, schema.fields['blood-pressure-location']) }}
@@ -22,9 +22,9 @@
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
                 <div class="col-sm-4 blood-pressure" id="blood-pressure_{{ i }}" {% if i != 0 %} style="display: none" {% endif %}>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <p class="text-right"><em>Reading #{{ i + 1 }}</em></p>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="text-end"><em>Reading #{{ i + 1 }}</em></p>
                             <div class="modification-block">
                                 <div class="modification-affected">
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['blood-pressure-systolic'], i) }}
@@ -32,7 +32,7 @@
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['heart-rate'], i) }}
                                     {{ metrics.form_row_replicate(measurementForm, schema.fields['irregular-heart-rate'], i) }}
                                 </div>
-                                <div class="modification-toggle text-right">
+                                <div class="modification-toggle text-end">
                                     <a class="small">Add protocol modification</a>
                                 </div>
                                 <div class="modification-select" style="display:none">
@@ -67,27 +67,27 @@
 </div>
 
 <div{% if attribute(measurementForm.vars.value, 'weight-protocol-modification') == 'whole-blood-donor' %} style="display:none"{% endif %}>
-    <div class="panel panel-default">
-        <div class="panel-body">
+    <div class="card mb-3">
+        <div class="card-body">
             {{ metrics.form_row(measurementForm, schema.fields['pregnant']) }}
             {{ metrics.form_row(measurementForm, schema.fields['wheelchair']) }}
         </div>
     </div>
 
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3 class="card-title h5 mb-0">
                 Weight
                 <span class="toggle-help-image" data-id="heightWeightModal">
-                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="sr-only">Help</span>
+                    <i class="fa fa-question-circle" aria-hidden="true"></i><span class="visually-hidden">Help</span>
                 </span>
             </h3>
         </div>
-        <div class="panel-body">
+        <div class="card-body">
             <div class="row row-equal-height">
                 <div class="col-sm-4">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
+                    <div class="card">
+                        <div class="card-body">
                             {{ metrics.form_row(measurementForm, schema.fields['weight']) }}
                             {{ metrics.form_row(measurementForm, schema.fields['weight-prepregnancy']) }}
                             {{ metrics.form_row(measurementForm, schema.fields['weight-protocol-modification']) }}
