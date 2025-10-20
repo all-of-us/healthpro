@@ -234,7 +234,7 @@ class ReleaseTicketCommand extends Command
             $this->defaultAccountIds['qa'] ?? [],
             $this->defaultAccountIds['dev'] ?? []
         ));
-        $description = $this->templating->render('jira/release.txt.twig', [
+        $descriptionJson = $this->templating->render('jira/release.json.twig', [
             'issues' => $issues,
             'releaseDate' => $this->targetReleaseDate,
             'completeDate' => new \DateTime(),
@@ -242,6 +242,7 @@ class ReleaseTicketCommand extends Command
             'changeManagers' => $changeManagerIds,
             'testers' => $testerIds
         ]);
+        $description = json_decode($descriptionJson, true);
 
         $createResult = $this->jira->createReleaseTicket("HealthPro Release {$version}", $description, $componentId);
         if ($createResult) {
@@ -260,10 +261,11 @@ class ReleaseTicketCommand extends Command
     {
         $businessApprovalIds = $this->defaultAccountIds['business'];
         $securityApprovalIds = $this->defaultAccountIds['security'];
-        $comment = $this->templating->render('jira/approval-request-comment.txt.twig', [
+        $commentJson = $this->templating->render('jira/approval-request-comment.json.twig', [
             'businessApprovals' => $businessApprovalIds,
             'securityApprovals' => $securityApprovalIds
         ]);
+        $comment = json_decode($commentJson, true);
 
         $createResult = $this->jira->createComment($ticketId, $comment);
         if ($createResult) {
@@ -278,12 +280,13 @@ class ReleaseTicketCommand extends Command
         return 1;
     }
 
-    private function createDeployComment($ticketId, $env, $deployFileName): ?string
+    private function createDeployComment($ticketId, $env, $deployFileName): bool
     {
-        $comment = $this->templating->render('jira/deploy-output-comment.txt.twig', [
+        $commentJson = $this->templating->render('jira/deploy-output-comment.json.twig', [
             'env' => $env,
             'deployFileName' => $deployFileName
         ]);
+        $comment = json_decode($commentJson, true);
         return $this->jira->createComment($ticketId, $comment);
     }
 

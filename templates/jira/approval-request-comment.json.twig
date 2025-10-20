@@ -1,0 +1,28 @@
+{%- set content = [] -%}
+{%- set content = content|merge([{ 'type': 'text', 'text': 'Requesting security approval from ' }]) -%}
+{%- for id in securityApprovals -%}
+    {%- set content = content|merge([{ 'type': 'mention', 'attrs': { 'id': id } }]) -%}
+    {%- if not loop.last -%}
+        {%- set content = content|merge([{ 'type': 'text', 'text': ' or ' }]) -%}
+    {%- endif -%}
+{%- endfor -%}
+{%- set content = content|merge([{ 'type': 'text', 'text': ', business approval from ' }]) -%}
+{%- for id in businessApprovals -%}
+    {%- set content = content|merge([{ 'type': 'mention', 'attrs': { 'id': id } }]) -%}
+    {%- if not loop.last -%}
+        {%- set content = content|merge([{ 'type': 'text', 'text': ' or ' }]) -%}
+    {%- endif -%}
+{%- endfor -%}
+
+{{
+    {
+        'type': 'doc',
+        'version': 1,
+        'content': [
+            {
+                'type': 'paragraph',
+                'content': content
+            }
+        ]
+    }|json_encode|raw
+}}
