@@ -1143,15 +1143,21 @@ class NphOrderService
                 }
             }
         }
+        $allDietCompleteStatuses = $this->em->getRepository(NphSampleProcessingStatus::class)->findBy(
+            ['participantId' => $participantId, 'status' => 1],
+            ['modifiedTs' => 'DESC']
+        );
+        $latestDietCompleteStatuses = [];
+        foreach ($allDietCompleteStatuses as $status) {
+            $key = $status->getModule() . '-' . $status->getPeriod();
+            if (!isset($latestDietCompleteStatuses[$key])) {
+                $latestDietCompleteStatuses[$key] = $status;
+            }
+        }
         foreach ($moduleDietPeriodsStatus as $module => $moduleDietPeriods) {
             foreach ($moduleDietPeriods as $period => $moduleDietStatus) {
-                $dietCompleteStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->findOneBy([
-                    'participantId' => $participantId,
-                    'module' => $module,
-                    'period' => $period,
-                    'status' => 1
-                ], ['modifiedTs' => 'DESC']);
-                if ($dietCompleteStatus) {
+                $key = "{$module}-{$period}";
+                if (isset($latestDietCompleteStatuses[$key])) {
                     if ($moduleDietStatus === NphDietPeriodStatus::IN_PROGRESS_UNFINALIZED) {
                         $moduleDietPeriodsStatus[$module][$period] = 'error_' . $moduleDietStatus . '_complete';
                     } else {
