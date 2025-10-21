@@ -11,7 +11,6 @@
         "@eonasdan/tempus-dominus": "^6.7.11",
         "@fortawesome/fontawesome-free": "^5.15.4",
         "backbone": "^1.4.0",
-        "bootstrap": "^3.4.1",
         "bootstrap-toggle": "^2.2.2",
         "bootstrap5": "npm:bootstrap@^5.3.1",
         "bootstrap5-toggle": "^5.1.2",
