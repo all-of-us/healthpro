@@ -1,4 +1,3 @@
-{% set bootstrapVersion = bootstrapVersion|default(3) %}
 {% set isTraining = isStable %}
 {% set roleNavs = {
     admin: {
@@ -52,7 +51,7 @@
     <title>{% block title %}{% endblock %}HealthPro</title>
 </head>
 <body>
-{% include LoadProgramTemplate(bootstrapVersion == 5 ? 'navbar-bs5.html.twig' : 'navbar.html.twig') %}
+{% include LoadProgramTemplate('navbar-bs5.html.twig') %}
 {% if isTraining %}
     <div class="navbar-warning alert alert-warning">
         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -60,7 +59,7 @@
     </div>
 {% endif %}
 <div class="{% block bodycontainer %}container{% endblock %}">
-    {% if bootstrapVersion == 5 %} <br> {% endif %}
+    <br>
     {% if global_notices is defined and global_notices|length > 0 %}
         {% for notice in global_notices %}
             <div class="alert alert-warning">
@@ -68,43 +67,29 @@
             </div>
         {% endfor %}
     {% endif %}
-    {% if bootstrapVersion == 5 %}
-        <div>
-            {% for flashMessage in app.session.flashbag.get('error') %}
-                <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
-                    <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-            {% for flashMessage in app.session.flashbag.get('notice') %}
-                <div class="alert alert-info alert-dismissible fade show text-center" role="alert">
-                    <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-            {% for flashMessage in app.session.flashbag.get('success') %}
-                <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
-                    <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div id="flash-notices">
-            {% for flashMessage in app.session.flashbag.get('error') %}
-                <div class="alert alert-danger"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
-            {% endfor %}
-            {% for flashMessage in app.session.flashbag.get('notice') %}
-                <div class="alert alert-info"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
-            {% endfor %}
-            {% for flashMessage in app.session.flashbag.get('success') %}
-                <div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">&times;</button>{{ flashMessage }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
+    <div>
+        {% for flashMessage in app.session.flashbag.get('error') %}
+            <div class="alert alert-danger alert-dismissible fade show text-center" role="alert">
+                <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        {% for flashMessage in app.session.flashbag.get('notice') %}
+            <div class="alert alert-info alert-dismissible fade show text-center" role="alert">
+                <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+        {% for flashMessage in app.session.flashbag.get('success') %}
+            <div class="alert alert-success alert-dismissible fade show text-center" role="alert">
+                <strong>{{ flashMessage }}</strong><button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    </div>
 
     {% block body %}{% endblock %}
 </div>
 
 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-    {% include bootstrapVersion == 5 ? 'partials/modals/site-select-bs5.html.twig' : 'partials/modals/site-select.html.twig' %}
+    {% include 'partials/modals/site-select-bs5.html.twig' %}
     <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -140,7 +125,7 @@
 <div id="is-xs" class="visible-xs d-block d-sm-none"></div>
 {% include 'base-body.html.twig' %}
 
-{{ encore_entry_script_tags(bootstrapVersion == 5 ? 'app5' : 'app') }}
+{{ encore_entry_script_tags('app5') }}
 
 {% block pagejs %}{% endblock %}
 </body>

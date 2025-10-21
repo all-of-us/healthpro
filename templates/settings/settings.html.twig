@@ -1,4 +1,3 @@
-{% set bootstrapVersion = 5 %}
 {% extends app.session.get('ppscRequestId') is not empty ? 'program/hpo/ppsc/base.html.twig' : 'base.html.twig' %}
 {% block title %}Settings - {% endblock %}
 {% block body %}
