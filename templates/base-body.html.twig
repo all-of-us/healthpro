@@ -1,11 +1,6 @@
 {# common elements in the BODY tag #}
-{% if bootstrapVersion is defined and bootstrapVersion == 5  %}
-    {% include 'messages/alert-bs5.html.twig' %}
-    {% include 'messages/confirm-bs5.html.twig' %}
-{% else %}
-    {% include 'messages/alert.html.twig' %}
-    {% include 'messages/confirm.html.twig' %}
-{% endif %}
+{% include 'messages/alert-bs5.html.twig' %}
+{% include 'messages/confirm-bs5.html.twig' %}
 {% if hideSystemUsage is not defined and is_granted('IS_AUTHENTICATED_FULLY') and not app.session.get('isUsageAgreed') %}
     {% include 'messages/system-usage.html.twig' %}
 {% endif %}
