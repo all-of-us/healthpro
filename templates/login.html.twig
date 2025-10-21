@@ -9,19 +9,19 @@
 <body>
     <div id="login-container" class="container">
         <div class="row">
-            <div id="login-action-box" class="col-md-5">
+            <div id="login-action-box" class="col-lg-5 col-md-10">
                 <div id="login-logo">
-                    <img src="/assets/img/login/healthpro-logo.svg" alt="HealthPro" class="img-responsive" />
+                    <img src="/assets/img/login/healthpro-logo.svg" alt="HealthPro" class="img-fluid" />
                 </div>
                 <div id="login-action">
                     {% if loginForm is not defined %}
                         <div>
                             <a href="{{ path('login_start') }}">
-                                <img src="/assets/img/login/sign-in-with-google.svg" alt="Sign in with Google" />
+                                <img src="/assets/img/login/sign-in-with-google.svg" alt="Sign in with Google" class="img-fluid" />
                             </a>
                         </div>
                     {% else %}
-                        <div class="text-left">
+                        <div class="text-start">
                             <h4><i class="fa fa-sign-in" aria-hidden="true"></i> Mock Login</h4>
                             {{ form_start(loginForm, { attr: { class: 'prevent-resubmit' } }) }}
                             {{ form_widget(loginForm) }}
@@ -33,14 +33,14 @@
                     {% endif %}
 
                     <hr />
-                    <div class="links">
+                    <div class="fs-5">
                         <i class="fas fa-exclamation-triangle fa-fw"></i> <a href="{{ report_technical_issue_url }}" target="_blank">Report a Technical Issue</a>
                     </div>
                 </div>
-                <div id="login-carousel" class="carousel slide" data-ride="carousel">
+                <div id="login-carousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner" role="listbox">
-                        <div class="item active">
-                            <img src="{{ asset('img/login/nph-new-logo.jpg') }}" alt="Nutrition for Precision Health">
+                        <div class="carousel-item active">
+                            <img src="{{ asset('img/login/nph-new-logo.jpg') }}" class="d-block w-100" alt="Nutrition for Precision Health">
                         </div>
                     </div>
                 </div>
