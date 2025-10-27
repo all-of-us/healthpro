@@ -33,11 +33,11 @@
     {% set errorMessage = 'This participant has not completed consent for enrollment.' %}
 {% endif %}
 
-<div class="panel panel-danger">
-    <div class="panel-heading">
-        <h3 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> {{ errorTitle }}</h3>
+<div class="card border-danger-subtle mb-4">
+    <div class="card-header bg-danger-subtle">
+        <h6 class="text-danger"><i class="fa fa-times-circle" aria-hidden="true"></i> {{ errorTitle }}</h6>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
         <p>{{ errorMessage }}</p>
         {% include 'partials/participant-withdrawn-notice.html.twig' %}
     </div>
