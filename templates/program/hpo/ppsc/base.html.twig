@@ -8,7 +8,7 @@
     <title>{% block title %}{% endblock %}HealthPro</title>
 </head>
 <body>
-{% include LoadProgramTemplate('ppsc/navbar-bs5.html.twig') %}
+{% include LoadProgramTemplate('ppsc/navbar.html.twig') %}
 <div class="{% block bodycontainer %}container{% endblock %}">
     <br>
     {% if global_notices is defined and global_notices|length > 0 %}
@@ -40,7 +40,7 @@
 </div>
 
 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-    {% include 'partials/modals/site-select-bs5.html.twig' %}
+    {% include 'partials/modals/site-select.html.twig' %}
     <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

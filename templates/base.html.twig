@@ -51,7 +51,7 @@
     <title>{% block title %}{% endblock %}HealthPro</title>
 </head>
 <body>
-{% include LoadProgramTemplate('navbar-bs5.html.twig') %}
+{% include LoadProgramTemplate('navbar.html.twig') %}
 {% if isTraining %}
     <div class="navbar-warning alert alert-warning">
         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -89,7 +89,7 @@
 </div>
 
 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-    {% include 'partials/modals/site-select-bs5.html.twig' %}
+    {% include 'partials/modals/site-select.html.twig' %}
     <div class="modal fade" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
