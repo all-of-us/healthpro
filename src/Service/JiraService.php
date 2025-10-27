@@ -23,7 +23,7 @@ class JiraService
             return;
         }
         $this->client = new Client([
-            'base_uri' => self::INSTANCE_URL . '/rest/api/2/',
+            'base_uri' => self::INSTANCE_URL . '/rest/api/3/',
             'auth' => [$params->get('jira_api_user'), $params->get('jira_api_token')]
         ]);
     }
@@ -46,10 +46,10 @@ class JiraService
     public function getIssuesByVersion(string $version): array
     {
         $jql = sprintf('project=%s AND fixVersion=%s', self::SOURCE_PROJECT_KEY, $version);
-        $response = $this->client->request('GET', 'search', [
-            'query' => [
+        $response = $this->client->request('POST', 'search/jql', [
+            'json' => [
                 'jql' => $jql,
-                'fields' => 'issuetype,status,summary,assignee'
+                'fields' => ['issuetype', 'status', 'summary', 'assignee']
             ]
         ]);
         $responseObject = json_decode($response->getBody()->getContents());
@@ -57,7 +57,7 @@ class JiraService
         return $responseObject->issues ?? [];
     }
 
-    public function createReleaseTicket(string $title, string $description, string $componentId): ?string
+    public function createReleaseTicket(string $title, array $description, string $componentId): ?string
     {
         $fields = [
             'summary' => $title,
@@ -84,12 +84,31 @@ class JiraService
         return $responseObject->key ?? null;
     }
 
-    public function createComment(string $ticketId, string $comment): bool
+    public function createComment(string $ticketId, $comment): bool
     {
         try {
+            if (is_string($comment)) {
+                $body = [
+                    'type' => 'doc',
+                    'version' => 1,
+                    'content' => [
+                        [
+                            'type' => 'paragraph',
+                            'content' => [
+                                [
+                                    'type' => 'text',
+                                    'text' => $comment
+                                ]
+                            ]
+                        ]
+                    ]
+                ];
+            } else {
+                $body = $comment;
+            }
             $response = $this->client->request('POST', "issue/{$ticketId}/comment", [
                 'json' => [
-                    'body' => $comment
+                    'body' => $body
                 ]
             ]);
             return $response && $response->getStatusCode() === 201;

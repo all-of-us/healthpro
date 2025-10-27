@@ -1,5 +1,0 @@
-{% macro mentionAccounts(ids) %}
-    {%- for id in ids %}[~accountid:{{ id }}]{% if not loop.last %} or {% endif %}{% endfor %}
-{% endmacro %}
-
-Requesting security approval from {{ _self.mentionAccounts(securityApprovals) }}, business approval from {{ _self.mentionAccounts(businessApprovals) }}
