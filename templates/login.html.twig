@@ -7,7 +7,6 @@
 {{ encore_entry_link_tags('login') }}
 </head>
 <body>
-{% form_theme loginForm 'custom_bootstrap_5_layout.html.twig' %}
     <div id="login-container" class="container">
         <div class="row">
             <div id="login-action-box" class="col-lg-5 col-md-10">
@@ -22,6 +21,7 @@
                             </a>
                         </div>
                     {% else %}
+                        {% form_theme loginForm 'custom_bootstrap_5_layout.html.twig' %}
                         <div class="text-start">
                             <h4><i class="fa fa-sign-in" aria-hidden="true"></i> Mock Login</h4>
                             {{ form_start(loginForm, { attr: { class: 'prevent-resubmit' } }) }}
