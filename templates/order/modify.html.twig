@@ -2,7 +2,6 @@
 {% block title %}Order - Cancel - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% block body %}
-    {% form_theme sampleModifyForm 'bootstrap_5_layout.html.twig' %}
     <h2 class="border-bottom {% if type == 'cancel' %} text-danger {% elseif type == 'restore' %} text-success {% endif %}">
         <i class="fa fa-medkit" aria-hidden="true"></i>
         {{ type|capitalize }} Biobank Order

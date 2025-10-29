@@ -1,7 +1,6 @@
 {% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
 {% block title %}Orders - {% endblock %}
 {% block body %}
-    {% form_theme idForm 'bootstrap_5_layout.html.twig' %}
     <div class="page-header border-bottom">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Biospecimen Lookup</h2>
     </div>
@@ -15,7 +14,6 @@
             <button type="submit" class="btn btn-primary">Go</button>
             {{ form_end(idForm) }}
             {% if sampleIdForm is defined %}
-                {% form_theme sampleIdForm 'bootstrap_5_layout.html.twig' %}
                 <hr>
                 <h3>Find by Collection Sample ID</h3>
                 <p class="fst-italic">Search for a collection sample ID to view the associated aliquot form.</p>
@@ -26,7 +24,6 @@
             {% endif %}
             {% if aliquotIdForm is defined %}
                 <hr>
-                {% form_theme aliquotIdForm 'bootstrap_5_layout.html.twig' %}
                 <h3>Find by Aliquot ID</h3>
                 <p class="fst-italic">Search for an aliquot ID to view the associated aliquot form.</p>
                 {{ form_start(aliquotIdForm, { attr: { class: 'disable-enter prevent-resubmit' } }) }}
