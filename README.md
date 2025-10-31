@@ -28,7 +28,7 @@ Prerequisites:
 * [Composer](https://getcomposer.org/doc/00-intro.md#globally)
 * [git-secrets](https://github.com/awslabs/git-secrets#installing-git-secrets)
 * [Symfony CLI](https://symfony.com/download)
-* [Docker](https://docs.docker.com/get-docker)
+* [Podman](https://podman.io/)
 
 Install PHP dependencies via Composer:
 
@@ -42,9 +42,13 @@ Compile assets using [Webpack Encore](https://symfony.com/doc/4.4/frontend.html)
 
 `npm run watch`
 
-Run Docker containers
+To build and start the containers
 
-`docker compose up`
+`podman compose up -d`
+
+To stop the containers
+
+`podman compose stop`
 
 ## Credentials and configuration
 
