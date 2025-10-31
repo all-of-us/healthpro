@@ -14,6 +14,7 @@ use Symfony\Component\Process\Process;
 
 class RotateCloudSqlPasswordCommand extends Command
 {
+    private const PASSWORD_LENGTH = 24;
     protected static $defaultName = 'app:rotate-cloudsql-password';
 
     private SymfonyStyle $io;
@@ -124,28 +125,34 @@ class RotateCloudSqlPasswordCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function generatePassword(int $length = 24): string
+    private function generatePassword(): string
     {
-        $lower = 'abcdefghijklmnopqrstuvwxyz';
-        $upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $numbers = '0123456789';
-        $symbols = '!@#$%^&*()_+-=';
+        $charSets = [
+            'lowercase' => 'abcdefghijklmnopqrstuvwxyz',
+            'uppercase' => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            'numbers' => '0123456789',
+            'symbols' => '!@#$%^&*()_+-='
+        ];
 
-        $password = '';
-        // Ensure at least one of each required character type
-        $password .= $lower[random_int(0, strlen($lower) - 1)];
-        $password .= $upper[random_int(0, strlen($upper) - 1)];
-        $password .= $numbers[random_int(0, strlen($numbers) - 1)];
-        $password .= $symbols[random_int(0, strlen($symbols) - 1)];
+        $passwordChars = [];
+        $allChars = '';
+
+        // Ensure at least one character from each set
+        foreach ($charSets as $set) {
+            $passwordChars[] = $set[random_int(0, strlen($set) - 1)];
+            $allChars .= $set;
+        }
 
         // Fill the rest of the password with random characters from all sets
-        $allChars = $lower . $upper . $numbers . $symbols;
-        for ($i = 4; $i < $length; $i++) {
-            $password .= $allChars[random_int(0, strlen($allChars) - 1)];
+        $remainingLength = self::PASSWORD_LENGTH - count($charSets);
+        for ($i = 0; $i < $remainingLength; $i++) {
+            $passwordChars[] = $allChars[random_int(0, strlen($allChars) - 1)];
         }
 
         // Shuffle the password to randomize character positions
-        return str_shuffle($password);
+        shuffle($passwordChars);
+
+        return implode('', $passwordChars);
     }
 
     private function updateCredentialsSecret(string $newPassword, string $project, bool $dryRun): string
