@@ -1,4 +1,3 @@
-{% form_theme incentiveForm 'bootstrap_5_layout.html.twig' %}
 {% set readOnlyView = readOnlyView|default(false) %}
 <div class="card incentive" id="incentive_{{ type is defined and type == 'edit' ? 'edit' : 'create' }}"
      data-has-incentives="{{ incentives is defined and incentives ? 1 : 0 }}">

@@ -1,4 +1,3 @@
-{% set bootstrapVersion = 5 %}
 {% extends biobankView ?? false ? 'program/nph/biobank/base.html.twig' : 'base.html.twig' %}
 {% import 'program/nph/order/macros/display-text.html.twig' as macros %}
 {% block title %}Orders - {% endblock %}
@@ -10,7 +9,6 @@
             <li class="breadcrumb-item active">Order Management</li>
         </ol>
     </nav>
-    {% form_theme idForm 'bootstrap_5_layout.html.twig' %}
     <div class="page-header border-bottom">
         <h2><i class="fa fa-medkit" aria-hidden="true"></i> Order Management</h2>
     </div>

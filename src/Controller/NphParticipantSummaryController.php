@@ -124,11 +124,10 @@ class NphParticipantSummaryController extends BaseController
         ]);
     }
 
-    #[Route(path: '/{participantId}/module/{module}/bootstrap/{bootstrapVersion}/view/', name: 'quickView')]
+    #[Route(path: '/{participantId}/module/{module}/bootstrap/view/', name: 'quickView')]
     public function quickViewAction(
         string $participantId,
         string $module,
-        string $bootstrapVersion,
         NphParticipantSummaryService $nphNphParticipantSummaryService,
         NphOrderService $nphOrderService
     ): Response {
@@ -138,7 +137,6 @@ class NphParticipantSummaryController extends BaseController
         return $this->render('program/nph/participant/quick-view.html.twig', [
             'orders' => $orders,
             'module' => $module,
-            'bootstrapVersion' => $bootstrapVersion,
             'participant' => $participant,
             'visitTimePointSamples' => $nphOrderService->getModuleVisitTimePointSamples($module, $participantId, $participant->biobankId),
             'timePointsInfo' => $nphOrderService->getModuleTimePoints($module, $participantId, $participant->biobankId)
