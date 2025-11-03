@@ -158,3 +158,6 @@ ehr_protocol_banner_message:
 # Biobank Id Prefix
 biobank_id_prefix: Y
 nph_biobank_id_prefix: T
+
+# Define Cloud SQl Users
+cloudsql_users:
