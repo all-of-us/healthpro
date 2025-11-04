@@ -56,6 +56,7 @@ Encore
     .addEntry("order-modify", "./web/assets/js/views/OrderModify.js")
     .addEntry("measurements", "./web/assets/js/views/Measurements.js")
     .addEntry("measurement-blood-donor-check", "./web/assets/js/views/MeasurementBloodDonorCheck.js")
+    .addEntry("measurement-pediatric-assent-check", "./web/assets/js/views/MeasurementPediatricAssentCheck.js")
     .addEntry("incentive", "./web/assets/js/views/Incentive.js")
     .addEntry("id-verification", "./web/assets/js/views/IdVerification.js")
     .addEntry("deceased-report", "./web/assets/js/views/DeceasedReport.js")
