@@ -1,0 +1,616 @@
+{
+  "version": "0.3.3-peds-5",
+  "template": "0.3-peds",
+  "description": "Pediatric participants 7 to 12 years (84 to 143 months) old",
+  "fields": [
+    {
+      "name": "wheelchair",
+      "label": "Is participant a wheelchair user?",
+      "options": {
+        "No": false,
+        "Yes": true
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": true,
+          "message": "Please record estimated participant height and weight in the \"Height\" and \"Weight\" fields. Do not measure the waist of wheelchair user participants."
+        }
+      ]
+    },
+    {
+      "name": "weight",
+      "label": "Weight",
+      "unit": "kg",
+      "decimals": 1,
+      "replicates": 3,
+      "max": 1000,
+      "warnings": [
+        {
+          "percentile": "weight-for-age",
+          "min": 3,
+          "message": "Multiple weight measurements indicate very low weight for age. Refer to your site's SOP for an urgent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "percentile": "bmi-for-age",
+          "min": 2.3,
+          "message": "Multiple height/length and weight measurements indicate very low BMI. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "percentile": "weight-for-age",
+          "min": 3,
+          "message": "This value may indicate very low weight for age if confirmed by repeat measure."
+        },
+        {
+          "percentile": "bmi-for-age",
+          "min": 2.3,
+          "message": "The height/length and weight values may indicate very low BMI if confirmed by repeat measure."
+        },
+        {
+          "min": 7,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select \"Weight is less than weight measuring range\" for Modification to Weight Protocol."
+
+        },
+        {
+          "max": 35,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol."
+        }
+      ],
+      "convert": "lb",
+      "alternateunits": true,
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "captureusersupplied": true
+    },
+    {
+      "name": "weight-user-entered",
+      "label": "Enter in pounds (value will be stored in kg)",
+      "alternatefor": "weight",
+      "alternateunitfield": true,
+      "unit": "lb",
+      "decimals": 1,
+      "replicates": 3
+    },
+    {
+      "name": "weight-protocol-modification",
+      "label": "Modification to Weight Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Weight is more than weight measuring range": "weight-out-of-range",
+        "Weight is less than weight measuring range": "weight-below-range",
+        "Can't balance on scale": "cannot-balance-on-scale",
+        "Uses a wheelchair": "wheelchair-user",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Clothing not removed": "clothing-not-removed",
+        "Dirty diaper": "dirty-diaper",
+        "Other": "other"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": "weight-out-of-range",
+          "message": "Deviation successfully captured. Please record the maximum value on the scale in the \"Weight\" field."
+        },
+        {
+          "val": "weight-below-range",
+          "message": "Deviation successfully captured. Please record the minimum value on the scale in the \"Weight\" field."
+        },
+        {
+          "val": "cannot-balance-on-scale",
+          "message": "Deviation successfully captured. Do not measure the weight of the participant."
+        },
+        {
+          "val": "wheelchair-user",
+          "message": "Deviation successfully captured. Please record estimated participant weight in the \"Weight\" field. "
+        },
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not measure the weight of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not measure the weight of the participant."
+        },
+        {
+          "val": "clothing-not-removed",
+          "message": "Deviation successfully captured. Weight measurement may be inaccurate due to clothing."
+        },
+        {
+          "val": "dirty-diaper",
+          "message": "Deviation successfully captured. Weight measurement may be inaccurate due to diaper."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation in the Additional Notes section."
+        }
+      ]
+    },
+    {
+      "name": "weight-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
+      "name": "height-or-length",
+      "label": "Indicate Height or Length Measurement",
+      "options": {
+        "Height": "height",
+        "Length": "length"
+      }
+    },
+    {
+      "name": "height",
+      "label": "Height/Length",
+      "unit": "cm",
+      "decimals": 1,
+      "replicates": 3,
+      "max": 300,
+      "convert": "ftin",
+      "alternateunits": true,
+      "help": {
+        "image": "height.png"
+      },
+      "warnings": [
+        {
+          "percentile": "bmi-for-age",
+          "min": 2.3,
+          "message": "Multiple height/length and weight measurements indicate very low BMI. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "percentile": "bmi-for-age",
+          "min": 2.3,
+          "message": "The height/length and weight values may indicate very low BMI if confirmed by repeat measure."
+        },
+        {
+          "between": [0, 2.3],
+          "message": "Please verify that this number has been entered in centimeters, and not feet (1ft = 30.48cm)"
+        },
+        {
+          "min": 80,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
+        },
+        {
+          "between": [134, 229],
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
+        },
+        {
+          "max": 228,
+          "message": "Please verify that the number entered is correct."
+        }
+      ],
+      "captureusersupplied": true
+    },
+    {
+      "name": "height-ft-user-entered",
+      "label": "Enter in feet & inches (value will be stored in cm)",
+      "alternatefor": "height",
+      "alternateunitfield": true,
+      "unit": "ft",
+      "decimals": 1,
+      "replicates": 3
+    },
+    {
+      "name": "height-in-user-entered",
+      "label": "Enter in feet & inches (value will be stored in cm)",
+      "alternatefor": "height",
+      "alternateunitfield": true,
+      "unit": "in",
+      "decimals": 1,
+      "replicates": 3
+    },
+    {
+      "name": "height-protocol-modification",
+      "label": "Modification to Height/Length Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Height is more than measuring device range": "height-out-of-range",
+        "Hair style": "hair-style",
+        "Uses a wheelchair": "wheelchair-user",
+        "Unable to stand in a straight position": "unable-to-stand-straight",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Other": "other"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": "height-out-of-range",
+          "message": "Deviation successfully captured. Please record the maximum value on the device in centimeters in the \"Height\" field."
+        },
+        {
+          "val": "hair-style",
+          "message": "Deviation successfully captured. Height measurement may be inaccurate due to hairstyle/headgear."
+        },
+        {
+          "val": "wheelchair-user",
+          "message": "Deviation successfully captured. Please record estimated participant height in the \"Height\" field. "
+        },
+        {
+          "val": "unable-to-stand-straight",
+          "message": "Deviation successfully captured. Height measurement may be inaccurate because the participant is unable to stand in a straight position."
+        },
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not measure the height or length of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not measure the height or length of the participant."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation in the Additional Notes section."
+        }
+      ]
+    },
+    {
+      "name": "height-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
+      "name": "waist-circumference",
+      "label": "Waist Circumference",
+      "unit": "cm",
+      "alternateunits": true,
+      "decimals": 1,
+      "replicates": 3,
+      "max": 300,
+      "warnings": [
+        {
+          "min": 38,
+          "max": 92,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
+        }
+      ],
+      "convert": "in",
+      "help": {
+        "image": "waist.png"
+      },
+      "captureusersupplied": true
+    },
+    {
+      "name": "waist-circumference-user-entered",
+      "label": "Enter in inches (value will be stored in cm)",
+      "alternatefor": "waist-circumference",
+      "alternateunitfield": true,
+      "unit": "in",
+      "decimals": 1,
+      "replicates": 3
+    },
+    {
+      "name": "waist-circumference-location",
+      "label": "Waist Circumference Location",
+      "options": {
+        "Umbilicus": "umbilicus",
+        "Smallest part (Natural indent) of the trunk": "smallest-part-of-trunk"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "waist-circumference-protocol-modification",
+      "label": "Modification to Waist Circumference Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Waist is more than waist measuring device range": "waist-circumference-out-of-range",
+        "Clothing not removed": "clothing-not-removed",
+        "Colostomy bag": "colostomy-bag",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Other": "other"
+      },
+      "help": {
+        "caption": "Help text placeholder."
+      },
+      "warnings": [
+        {
+          "val": "waist-circumference-out-of-range",
+          "message": "Deviation successfully captured. Please record the maximum value on the device in the \"waist circumference\" field"
+        },
+        {
+          "val": "clothing-not-removed",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "colostomy-bag",
+          "message": "Deviation successfully captured. Do not measure the waist circumference of the participant."
+        },
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not measure the waist circumference of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not measure the waist circumference of the participant."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation."
+        }
+      ]
+    },
+    {
+      "name": "waist-circumference-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
+      "name": "blood-pressure-position",
+      "label": "Blood Pressure Position",
+      "options": {
+        "Sitting": "sitting",
+        "Standing": "standing",
+        "Laying": "laying"
+      }
+    },
+    {
+      "name": "blood-pressure-location",
+      "label": "Blood Pressure Location",
+      "options": ["Right arm", "Left arm"],
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "blood-pressure-systolic",
+      "label": "Systolic",
+      "unit": "mmHg",
+      "replicates": 3,
+      "max": 300,
+      "inputType": "integer",
+      "warnings": [
+        {
+          "addValue": 30,
+          "customPercentile": "bp-systolic",
+          "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "maxValue": 140,
+          "addValue": 12,
+          "customPercentile": "bp-systolic",
+          "message": "Multiple high blood pressures indicate this participant may have very high blood pressure for age. Refer to your site's SOP for an urgent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "addValue": 30,
+          "customPercentile": "bp-systolic",
+          "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
+        },
+        {
+          "maxValue": 140,
+          "addValue": 12,
+          "customPercentile": "bp-systolic",
+          "message": "This value may indicate very high blood pressure for age if confirmed by repeat measure."
+        },
+        {
+          "min": 88,
+          "max": 126,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
+        }
+      ],
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "blood-pressure-diastolic",
+      "label": "Diastolic",
+      "unit": "mmHg",
+      "replicates": 3,
+      "max": 300,
+      "inputType": "integer",
+      "compare": {
+        "type": "less-than",
+        "field": "blood-pressure-systolic",
+        "message": "Diastolic pressure must be less than systolic pressure"
+      },
+      "warnings": [
+        {
+          "addValue": 30,
+          "customPercentile": "bp-diastolic",
+          "message": "Multiple high blood pressures indicate this participant may have extremely high blood pressure for age. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "maxValue": 90,
+          "addValue": 12,
+          "customPercentile": "bp-diastolic",
+          "message": "Multiple high blood pressures indicate this participant may have very high blood pressure for age. Refer to your site's SOP for an urgent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "addValue": 30,
+          "customPercentile": "bp-diastolic",
+          "message": "This value may indicate extremely high blood pressure for age if confirmed by repeat measure."
+        },
+        {
+          "maxValue": 90,
+          "addValue": 12,
+          "customPercentile": "bp-diastolic",
+          "message": "This value may indicate very high blood pressure for age if confirmed by repeat measure."
+        },
+        {
+          "min": 45,
+          "max": 86,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
+        }
+      ],
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "heart-rate-position",
+      "label": "Heart Rate Position",
+      "options": {
+        "Sitting": "sitting",
+        "Standing": "standing",
+        "Laying": "laying"
+      }
+    },
+    {
+      "name": "heart-rate-method",
+      "label": "Heart Rate Method",
+      "options": {
+        "Automated": "automated",
+        "Apical": "apical",
+        "Radial": "radial",
+        "Brachial": "brachial"
+      }
+    },
+    {
+      "name": "heart-rate",
+      "label": "Heart Rate",
+      "unit": "bpm",
+      "replicates": 3,
+      "max": 300,
+      "inputType": "integer",
+      "warnings": [
+        {
+          "age": [12, 72],
+          "max": 175,
+          "message": "Participant has very high heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an emergent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "customPercentile": "heart-rate",
+          "percentileType": "max",
+          "percentileField": "centile99",
+          "message": "Participant has very high heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an urgent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "customPercentile": "heart-rate",
+          "percentileType": "min",
+          "percentileField": "centile1",
+          "message": "Participant has very low heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an urgent referral.",
+          "alert": true,
+          "consecutive": 2
+        },
+        {
+          "customPercentile": "heart-rate",
+          "percentileType": "max",
+          "percentileField": "centile99",
+          "message": "This value indicates very high heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
+        },
+        {
+          "customPercentile": "heart-rate",
+          "percentileType": "min",
+          "percentileField": "centile1",
+          "message": "This value indicates very low heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
+        },
+        {
+          "age": [12, 72],
+          "max": 175,
+          "message": "This value indicates very high heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
+        },
+        {
+          "min": 60,
+          "max": 140,
+          "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
+        }
+      ],
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "irregular-heart-rate",
+      "label": "Irregular Heart Rate",
+      "type": "checkbox",
+      "replicates": 3,
+      "help": {
+        "caption": "Help text placeholder."
+      }
+    },
+    {
+      "name": "blood-pressure-protocol-modification",
+      "label": "Modification to Protocol",
+      "replicates": 3,
+      "options": {
+        "None": "",
+        "Parental refusal": "parental-refusal",
+        "Child dissenting behavior": "child-dissenting-behavior",
+        "Crying": "crying",
+        "Urgent/emergent event": "emergency",
+        "Other": "other"
+      },
+      "warnings": [
+        {
+          "val": "parental-refusal",
+          "message": "Deviation successfully captured. Do not record the Heart Rate or Blood Pressure of the participant."
+        },
+        {
+          "val": "child-dissenting-behavior",
+          "message": "Deviation successfully captured. Do not record the Heart Rate or Blood Pressure of the participant."
+        },
+        {
+          "val": "crying",
+          "message": "Deviation successfully captured. Do not record the Heart Rate or Blood Pressure of the participant."
+        },
+        {
+          "val": "emergency",
+          "message": "Deviation successfully captured."
+        },
+        {
+          "val": "other",
+          "message": "Please specify reason for protocol deviation."
+        }
+      ]
+    },
+    {
+      "name": "blood-pressure-protocol-modification-notes",
+      "label": "Reason",
+      "replicates": 3,
+      "type": "text"
+    },
+    {
+      "name": "manual-blood-pressure",
+      "label": "Blood pressure measured manually",
+      "type": "checkbox",
+      "replicates": 3
+    },
+    {
+      "name": "manual-heart-rate",
+      "label": "Heart rate measured manually",
+      "type": "checkbox",
+      "replicates": 3
+    },
+    {
+      "name": "notes",
+      "label": "Additional Notes",
+      "type": "textarea"
+    }
+  ],
+  "displayBmi": true,
+  "displayWeightForLength": false
+}

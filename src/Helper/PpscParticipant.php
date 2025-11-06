@@ -39,6 +39,7 @@ class PpscParticipant
         'peds-2' => [24, 35],
         'peds-3' => [36, 59],
         'peds-4' => [60, 83],
+        'peds-5' => [84, 143],
     ];
 
     public function __construct(?\stdClass $ppscParticipant = null)
