@@ -1,35 +1,44 @@
-<dl class="dl-horizontal">
-    <dt>Name</dt>
-    <dd>{{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }}</dd>
-    <dt>Participant ID</dt>
-    <dd>{{ participant.id }}</dd>
-    <dt>Biobank ID</dt>
-    <dd>{{ participant.biobankId }}</dd>
-    <dt>DOB</dt>
-    <dd>{{ participant.dob ? participant.dob|date('n/j/Y') : '--' }}</dd>
+<dl class="row">
+    <dt class="col-sm-5">Name</dt>
+    <dd class="col-sm-7">{{ participant.lastName }}, {{ participant.firstName }} {{ participant.middleName }}</dd>
+    <dt class="col-sm-5">Participant ID</dt>
+    <dd class="col-sm-7">{{ participant.id }}</dd>
+    <dt class="col-sm-5">Biobank ID</dt>
+    <dd class="col-sm-7">{{ participant.biobankId }}</dd>
+    <dt class="col-sm-5">DOB</dt>
+    <dd class="col-sm-7">{{ participant.dob ? participant.dob|date('n/j/Y') : '--' }}</dd>
     {% if participant.isPediatric %}
-        <dt>Age</dt>
-        <dd>{{ participant.ageInMonths <= 23 ? participant.ageInMonths ~ ' mo' : participant.age ~ ' y/o' }}</dd>
-        <dt>Sex</dt>
-        <dd>{{ participant.sex|default('--') }}</dd>
+        <dt class="col-sm-5">Age</dt>
+        <dd class="col-sm-7">{{ participant.ageInMonths <= 23 ? participant.ageInMonths ~ ' mo' : participant.age ~ ' y/o' }}</dd>
+        <dt class="col-sm-5">Sex</dt>
+        <dd class="col-sm-7">{{ participant.sex|default('--') }}</dd>
     {% else %}
-        <dt>Gender Identity</dt>
-        <dd>{{ participant.genderIdentity|default('--') }}</dd>
+        <dt class="col-sm-5">Gender Identity</dt>
+        <dd class="col-sm-7">{{ participant.genderIdentity|default('--') }}</dd>
     {% endif %}
     {% if app.session.get('siteType') == 'dv' or is_granted('ROLE_AWARDEE_SCRIPPS') %}
-        <dt>Participant Origination</dt>
-        <dd>{{ participant.participantOrigin|default('--') }}</dd>
+        <dt class="col-sm-5">Participant Origination</dt>
+        <dd class="col-sm-7">{{ participant.participantOrigin|default('--') }}</dd>
     {% endif %}
-    <dt>Paired Awardee</dt>
-    <dd>{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
+    <dt class="col-sm-5">Paired Awardee</dt>
+    <dd class="col-sm-7">{{ participant.awardee ? siteInfo.awardeeDisplayName(participant.awardee) : '(not paired)' }}</dd>
     {% if measurement is defined and measurement.id %}
-        <dt>Updated</dt>
-        <dd>{{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</dd>
+        <dt class="col-sm-5">Updated</dt>
+        <dd class="col-sm-7">{{ measurement.updatedTs|date('n/j/Y g:ia', app.user.timezone) }}</dd>
         {% if not measurement.isPediatricForm and measurement.version != latestVersion %}
             <dt>Version</dt>
-            <dd>{{ measurement.version }}
+            <dd class="col-sm-7">{{ measurement.version }}
                 <small class="text-muted">(latest version is {{ latestVersion }})</small>
             </dd>
         {% endif %}
     {% endif %}
 </dl>
+{% if participant.relatedParticipants and participant.relatedParticipants is iterable %}
+    <hr>
+    {% if participant.isPediatric %}<strong>Guardian</strong>{% else %}<strong>Child</strong>{% endif %}
+    {% for relatedParticipant in participant.relatedParticipants %}
+        <a class="link-primary text-decoration-none d-block" href="{{ path('participant', { id: relatedParticipant.participantId }) }}">
+            {{ relatedParticipant.lastName }}, {{ relatedParticipant.firstName }} ({{ relatedParticipant.participantId }})
+        </a>
+    {% endfor %}
+{% endif %}

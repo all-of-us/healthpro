@@ -1,8 +1,6 @@
-{% set bootstrapVersion = 5 %}
 {% extends app.session.get('ppscRequestId') is not empty ? 'program/hpo/ppsc/base.html.twig' : 'base.html.twig' %}
 {% block title %}Settings - {% endblock %}
 {% block body %}
-    {% form_theme settingsForm 'bootstrap_5_layout.html.twig' %}
     <div class="row">
         <div class="col-md-6 offset-md-3">
             <div class="page-header border-bottom mb-2">

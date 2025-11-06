@@ -11,16 +11,16 @@ body {
     font-family: 'Open Sans', sans-serif;
 }
 #login-action-box {
-    radius: 1rem;
-    margin-top: 4rem;
+    border-radius: 1rem;
+    margin-top: 2rem;
     padding: 3rem;
     background-color: rgba(255, 255, 255, 1);
     text-align: center;
     box-shadow: 10px 5px 5px rgba(255, 255, 255, 0.1);
 }
 #login-logo {
-    margin-top: 5rem;
-    margin-bottom: 5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
 }
 #login-logo img {
     margin: 0 auto;
@@ -28,7 +28,7 @@ body {
 }
 #login-action {
     min-height: 220px;
-    margin-top: 5rem;
+    margin-top: 2rem;
     margin-bottom: 1rem;
 }
 #login-action img {
@@ -47,7 +47,7 @@ body {
     position: absolute;
     width: 100%;
     bottom: 3rem;
-    text-align: right;
+    text-align: end;
     color: #fff;
     padding: 1rem;
 }
@@ -65,7 +65,13 @@ body {
     margin-left: 7rem;
     margin-right: 7rem;
 }
-@media (max-width: 970px){
+
+#login-help {
+    position: relative;
+    z-index: 10;
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
     #login-logo {
         margin-top: 2rem;
         margin-bottom: 2rem;

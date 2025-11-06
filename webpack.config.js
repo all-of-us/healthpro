@@ -21,7 +21,6 @@ Encore
      * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
      */
     .addEntry("app", "./web/assets/js/app.js")
-    .addEntry("app5", "./web/assets/js/app-bs5.js")
     .addEntry("login", "./web/assets/js/views/Login.js")
     .addEntry("admin-edit-site", "./web/assets/js/views/AdminEditSite.js")
     .addEntry("biobank-order-quanum", "./web/assets/js/views/BiobankOrderQuanum.js")

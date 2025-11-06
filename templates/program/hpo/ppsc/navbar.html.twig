@@ -1,15 +1,18 @@
-<nav class="navbar navbar-default navbar-inverse navbar">
+<nav class="navbar navbar-expand-sm navbar-inverse">
     <div class="container-fluid">
-        <ul class="nav navbar-nav navbar-header">
-            <a class="navbar-brand dropdown-toggle" href="#">
-                <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
-            </a>
-            <li>
-                <a class="navbar-brand " href="#">
-                    HealthPro
-                </a>
-            </li>
-        </ul>
-        {% include 'program/hpo/ppsc/partials/display-site-name.html.twig' with { 'bootstrapVersion' : bootstrapVersion } %}
+        <a class="navbar-brand" href="#" {% if siteInfo.canSwitchProgram %}
+            data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" {% endif %}>
+            <img src="{{ asset('img/all-of-us-logo-stacked-inverted.svg') }}" alt="All of Us logo"/>
+        </a>
+        <div class="navbar-collapse" id="pmi-navbar-collapse">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link navbar-brand" href="#">
+                        HealthPro
+                    </a>
+                </li>
+            </ul>
+            {% include 'program/hpo/ppsc/partials/display-site-name.html.twig' %}
+        </div>
     </div>
 </nav>

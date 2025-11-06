@@ -275,7 +275,7 @@
     {% endfor %}
 {% endmacro %}
 
-{% macro displayInactiveSiteBanner(type, bootstrapVersion = null) %}
+{% macro displayInactiveSiteBanner(type) %}
     {% if type == 'on_site' %}
         {% set message = 'You are currently logged into an inactive site. No additional On-Site Details records may be entered.' %}
     {% elseif type == 'in_person' %}
@@ -283,23 +283,12 @@
     {% elseif type == 'pmb' %}
         {% set message = 'You are currently logged into an inactive site. No additional PM&B orders may be entered. Cancellations and amendments are still permitted.' %}
     {% endif %}
-    {% if bootstrapVersion == 3 %}
-        <div class="panel panel-danger">
-            <div class="panel-heading">
-                <h6 class="panel-title"><i class="fa fa-times-circle" aria-hidden="true"></i> Inactive Site</h6>
-            </div>
-            <div class="panel-body">
-                {{ message }}
-            </div>
+    <div class="card border-danger-subtle mb-4">
+        <div class="card-header bg-danger-subtle">
+            <h6 class="text-danger"><i class="fa fa-times-circle" aria-hidden="true"></i> Inactive Site</h6>
         </div>
-    {% else %}
-        <div class="card border-danger-subtle mb-4">
-            <div class="card-header bg-danger-subtle">
-                <h6 class="text-danger"><i class="fa fa-times-circle" aria-hidden="true"></i> Inactive Site</h6>
-            </div>
-            <div class="card-body">
-                {{ message }}
-            </div>
+        <div class="card-body">
+            {{ message }}
         </div>
-    {% endif %}
+    </div>
 {% endmacro %}
