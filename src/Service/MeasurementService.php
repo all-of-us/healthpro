@@ -11,6 +11,7 @@ use App\Entity\MeasurementHistory;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Entity\ZScores;
+use App\Helper\PpscParticipant;
 use App\Service\Ppsc\PpscApiService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -113,6 +114,11 @@ class MeasurementService
     public function requireBloodDonorCheck()
     {
         return $this->requestStack->getSession()->get('siteType') === 'dv' && ($this->siteService->isDiversionPouchSite() || $this->siteService->isBloodDonorPmSite());
+    }
+
+    public function requirePediatricAssentCheck(PpscParticipant $participant): bool
+    {
+        return $participant->isPediatric && $participant->ageInMonths >= 84 && $participant->ageInMonths < 144;
     }
 
     public function getCurrentVersion($type)
@@ -290,6 +296,14 @@ class MeasurementService
             }
         }
         $this->em->flush();
+    }
+
+    public function getMeasurementUrl(PpscParticipant $participant): string
+    {
+        if ($this->requirePediatricAssentCheck($participant)) {
+            return 'measurement_pediatric_assent_check';
+        }
+        return $this->requireBloodDonorCheck() ? 'measurement_blood_donor_check' : 'measurement';
     }
 
     protected function getMeasurementUserSiteData($user, $site)

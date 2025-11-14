@@ -7,6 +7,7 @@ use App\Entity\Measurement;
 use App\Entity\User;
 use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
+use App\Form\MeasurementPediatricAssentCheckType;
 use App\Form\MeasurementRevertType;
 use App\Form\MeasurementType;
 use App\Form\PediatricMeasurementType;
@@ -441,6 +442,31 @@ class MeasurementsController extends BaseController
         return $this->render('measurement/blood-donor-check.html.twig', [
             'participant' => $participant,
             'bloodDonorCheckForm' => $bloodDonorCheckForm->createView()
+        ]);
+    }
+
+    #[Route(path: '/ppsc/participant/{participantId}/measurements/pediatric/assent/check', name: 'measurement_pediatric_assent_check')]
+    public function measurementPediatricAssentCheckAction($participantId, Request $request)
+    {
+        $participant = $this->ppscApiService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if (!$this->measurementService->requirePediatricAssentCheck($participant)) {
+            throw $this->createAccessDeniedException();
+        }
+        $assentCheckForm = $this->get('form.factory')->createNamed('form', MeasurementPediatricAssentCheckType::class);
+        $assentCheckForm->handleRequest($request);
+        if ($assentCheckForm->isSubmitted() && $assentCheckForm->isValid()) {
+            if ($assentCheckForm['assent']->getData() === 'yes') {
+                return $this->redirectToRoute('measurement', [
+                    'participantId' => $participant->id
+                ]);
+            }
+        }
+        return $this->render('measurement/pediatric-assent-check.html.twig', [
+            'participant' => $participant,
+            'pediatricAssentCheckForm' => $assentCheckForm->createView()
         ]);
     }
 
