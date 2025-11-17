@@ -297,10 +297,13 @@ let viewExtension = Backbone.View.extend({
             bmiElement.html("<strong>" + bmi + "</strong>");
             bmiElement.attr("data-bmi", bmi);
             this.calculatePercentileMaleFemale("bmi-for-age", parseFloat(bmi));
-            if (bmi < 10 || bmi > 31) {
-                this.$("#bmi-warning").text(
-                    "Please verify that the weight and height measurement are correct. The calculated value might be outside the expected range for this age group based on the provided weight and height."
-                );
+            const warningText =
+                "Please verify that the weight and height measurement are correct. The calculated value might be outside the expected range for this age group based on the provided weight and height.";
+            const isUnder7 = this.ageInMonths < 84;
+            const lowerLimit = isUnder7 ? 10 : 11;
+            const upperLimit = isUnder7 ? 31 : 40;
+            if (bmi < lowerLimit || bmi > upperLimit) {
+                this.$("#bmi-warning").text(warningText);
             }
         } else {
             this.$("#bmi").text("--");
