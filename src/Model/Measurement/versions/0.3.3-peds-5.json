@@ -486,7 +486,7 @@
       "warnings": [
         {
           "age": [84, 156],
-          "max": 175,
+          "max": 150,
           "message": "Participant has very high heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an emergent referral.",
           "alert": true,
           "consecutive": 2
@@ -521,7 +521,7 @@
         },
         {
           "age": [84, 156],
-          "max": 175,
+          "max": 150,
           "message": "This value indicates very high heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
         },
         {
