@@ -735,7 +735,7 @@ class Measurement
             ],
             'heightForAgeCharts' => [
                 HeightForAge0To23Months::class => [0, 23],
-                HeightForAge24MonthsTo6Years::class => [24, 72]
+                HeightForAge24MonthsTo6Years::class => [24, 240]
             ],
             'headCircumferenceForAgeCharts' => [
                 HeadCircumferenceForAge0To36Months::class => [0, 36]
