@@ -53,12 +53,12 @@
           "message": "The height and weight values may indicate very low BMI if confirmed by repeat measure."
         },
         {
-          "min": 7,
+          "min": 15,
           "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the minimum value on the scale. Then, select \"Weight is less than weight measuring range\" for Modification to Weight Protocol."
 
         },
         {
-          "max": 35,
+          "max": 99,
           "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group. If participant weight is outside of the scale measuring range, please record the maximum value on the scale. Then, select 'Weight is more than weight measuring range' for Modification to Weight Protocol."
         }
       ],
@@ -91,7 +91,6 @@
         "Parental refusal": "parental-refusal",
         "Child dissenting behavior": "child-dissenting-behavior",
         "Clothing not removed": "clothing-not-removed",
-        "Dirty diaper": "dirty-diaper",
         "Other": "other"
       },
       "help": {
@@ -172,11 +171,11 @@
           "message": "Please verify that this number has been entered in centimeters, and not feet (1ft = 30.48cm)"
         },
         {
-          "min": 80,
+          "min": 105,
           "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         },
         {
-          "between": [134, 229],
+          "between": [173, 229],
           "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         },
         {
@@ -268,8 +267,8 @@
       "max": 300,
       "warnings": [
         {
-          "min": 38,
-          "max": 92,
+          "min": 46,
+          "max": 111,
           "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         }
       ],
@@ -401,7 +400,7 @@
         },
         {
           "min": 88,
-          "max": 126,
+          "max": 140,
           "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         }
       ],
@@ -450,7 +449,7 @@
         },
         {
           "min": 45,
-          "max": 86,
+          "max": 91,
           "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         }
       ],
@@ -486,8 +485,8 @@
       "inputType": "integer",
       "warnings": [
         {
-          "age": [12, 72],
-          "max": 175,
+          "age": [84, 156],
+          "max": 150,
           "message": "Participant has very high heart rate. Assess for any symptoms of medical instability such as difficulty breathing or changes in mental status. Refer to your site's SOP for an emergent referral.",
           "alert": true,
           "consecutive": 2
@@ -521,13 +520,13 @@
           "message": "This value indicates very low heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
         },
         {
-          "age": [12, 72],
-          "max": 175,
+          "age": [84, 156],
+          "max": 150,
           "message": "This value indicates very high heart rate. If confirmed by repeat measure, assess for symptoms of medical instability."
         },
         {
-          "min": 60,
-          "max": 140,
+          "min": 55,
+          "max": 120,
           "message": "Please verify that the number entered is correct. This value might be outside of the expected range for this age group."
         }
       ],
