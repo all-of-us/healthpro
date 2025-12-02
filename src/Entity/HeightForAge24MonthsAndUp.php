@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\HeightForAge24MonthsTo6YearsRepository;
+use App\Repository\HeightForAge24MonthsAndUpRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: HeightForAge24MonthsTo6YearsRepository::class)]
-#[ORM\Table(name: 'height_for_age_24months_to_6years')]
-class HeightForAge24MonthsTo6Years
+#[ORM\Entity(repositoryClass: HeightForAge24MonthsAndUpRepository::class)]
+#[ORM\Table(name: 'height_for_age_24months_and_up')]
+class HeightForAge24MonthsAndUp
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
