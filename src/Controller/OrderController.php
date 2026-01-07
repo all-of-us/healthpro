@@ -66,6 +66,19 @@ class OrderController extends BaseController
         return $order;
     }
 
+    #[Route(path: '/ppsc/participant/{participantId}/order/pediatric/assent', name: 'order_assent_pediatric')]
+    public function orderAssentPediatric($participantId, RequestStack $requestStack): Response
+    {
+        $participant = $this->ppscApiService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        return $this->render('order/assent-pediatric.html.twig', [
+            'participant' => $participant,
+            'siteType' => $requestStack->getSession()->get('siteType'),
+        ]);
+    }
+
     #[Route(path: '/ppsc/participant/{participantId}/order/check', name: 'order_check')]
     public function orderCheck($participantId, RequestStack $requestStack): Response
     {
