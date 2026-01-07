@@ -8,36 +8,35 @@
                 <i class="fa fa-clipboard" aria-hidden="true"></i> New Physical Measurements
             </h2>
         </div>
-        <div class="card">
+        <div class="card border-success mt-4">
             <div class="card-header bg-success text-white">
-                <h3 class="card-title h5 mb-0">
-                    Pediatric Assent
-                </h3>
+                Pediatric Assent
             </div>
             <div class="card-body">
-                {{ form_start(pediatricAssentCheckForm, { attr: {
-                    class: 'disable-enter prevent-resubmit',
-                    novalidate: 'novalidate'
-                } }) }}
-                {{ form_errors(pediatricAssentCheckForm) }}
-
-                {{ form_row(pediatricAssentCheckForm.assent) }}
-
-                <p id="assent_message" class="text-danger d-none">
-                    <i class="fa fa-exclamation-circle"></i> The participant has not assented. You may not proceed with physical measurements.
-                </p>
                 <div>
-                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary blood-donor-cancel" type="button">Cancel</a>
-                    <button type="submit" class="btn btn-primary d-none" id="assent_continue">
-                        Continue
-                        <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
-                    </button>
+                    <label class="form-label" for="pediatricAssent">
+                        Does the pediatric participant assent to physical measurements during this visit?
+                    </label>
+                    <select class="form-select" id="pediatricAssent">
+                        <option value="" selected>Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                    <div id="assentErrorMessage" class="text-danger mt-2 d-none">
+                        <i class="fa fa-exclamation-circle"></i> The participant has not assented. You may not proceed with physical measurements.
+                    </div>
                 </div>
-                {{ form_end(pediatricAssentCheckForm) }}
             </div>
+        </div>
+        <div class="mt-4">
+            <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
+            <a href="{{ path('measurement', { participantId: participant.id }) }}" class="btn btn-primary d-none" id="continueBtn">
+                Continue
+                <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+            </a>
         </div>
     </div>
 {% endblock %}
 {% block pagejs %}
-    {{ encore_entry_script_tags('measurement-pediatric-assent-check') }}
+    {{ encore_entry_script_tags('pediatric-assent') }}
 {% endblock %}

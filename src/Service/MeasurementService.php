@@ -116,11 +116,6 @@ class MeasurementService
         return $this->requestStack->getSession()->get('siteType') === 'dv' && ($this->siteService->isDiversionPouchSite() || $this->siteService->isBloodDonorPmSite());
     }
 
-    public function requirePediatricAssentCheck(PpscParticipant $participant): bool
-    {
-        return $participant->isPediatric && $participant->ageInMonths >= 84 && $participant->ageInMonths < 144;
-    }
-
     public function getCurrentVersion($type)
     {
         if ($type === Measurement::BLOOD_DONOR && $this->requireBloodDonorCheck()) {
@@ -300,7 +295,7 @@ class MeasurementService
 
     public function getMeasurementUrl(PpscParticipant $participant): string
     {
-        if ($this->requirePediatricAssentCheck($participant)) {
+        if ($participant->requirePediatricAssentCheck()) {
             return 'measurement_pediatric_assent_check';
         }
         return $this->requireBloodDonorCheck() ? 'measurement_blood_donor_check' : 'measurement';

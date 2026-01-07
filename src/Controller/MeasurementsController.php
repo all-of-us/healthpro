@@ -7,7 +7,6 @@ use App\Entity\Measurement;
 use App\Entity\User;
 use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
-use App\Form\MeasurementPediatricAssentCheckType;
 use App\Form\MeasurementRevertType;
 use App\Form\MeasurementType;
 use App\Form\PediatricMeasurementType;
@@ -23,6 +22,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MeasurementsController extends BaseController
@@ -446,27 +446,17 @@ class MeasurementsController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/pediatric/assent/check', name: 'measurement_pediatric_assent_check')]
-    public function measurementPediatricAssentCheckAction($participantId, Request $request)
+    public function measurementPediatricAssentCheckAction($participantId, Request $request): Response
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        if (!$this->measurementService->requirePediatricAssentCheck($participant)) {
+        if (!$participant->requirePediatricAssentCheck()) {
             throw $this->createAccessDeniedException();
         }
-        $assentCheckForm = $this->get('form.factory')->createNamed('form', MeasurementPediatricAssentCheckType::class);
-        $assentCheckForm->handleRequest($request);
-        if ($assentCheckForm->isSubmitted() && $assentCheckForm->isValid()) {
-            if ($assentCheckForm['assent']->getData() === 'yes') {
-                return $this->redirectToRoute('measurement', [
-                    'participantId' => $participant->id
-                ]);
-            }
-        }
         return $this->render('measurement/pediatric-assent-check.html.twig', [
-            'participant' => $participant,
-            'pediatricAssentCheckForm' => $assentCheckForm->createView()
+            'participant' => $participant
         ]);
     }
 

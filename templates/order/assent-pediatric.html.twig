@@ -41,9 +41,12 @@
     </div>
     <div class="mt-4">
         <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
-        <a href="{{ path('order_check_pediatric', { participantId: participant.id }) }}" class="btn btn-primary d-none" id="continueBtn">Continue</a>
+        <a href="{{ path('order_check_pediatric', { participantId: participant.id }) }}" class="btn btn-primary d-none" id="continueBtn">
+            Continue
+            <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+        </a>
     </div>
 {% endblock %}
 {% block pagejs %}
-    {{ encore_entry_script_tags('order-assent-pediatric') }}
+    {{ encore_entry_script_tags('pediatric-assent') }}
 {% endblock %}

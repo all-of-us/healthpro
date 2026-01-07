@@ -73,6 +73,9 @@ class OrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
+        if (!$participant->requirePediatricAssentCheck()) {
+            throw $this->createAccessDeniedException();
+        }
         return $this->render('order/assent-pediatric.html.twig', [
             'participant' => $participant,
             'siteType' => $requestStack->getSession()->get('siteType'),

@@ -135,6 +135,11 @@ class PpscParticipant
         return $breakpoint;
     }
 
+    public function requirePediatricAssentCheck(): bool
+    {
+        return $this->isPediatric && $this->ageInMonths >= 84 && $this->ageInMonths < 144;
+    }
+
     private function parsePPscParticipant(\stdClass $participant): void
     {
         if (!is_object($participant)) {
