@@ -13,7 +13,11 @@
         {% if isActiveSite and type is not defined %}
             {% set orderCheckRoute = 'order_check' %}
             {% if participant.isPediatric %}
-                {% set orderCheckRoute = 'order_check_pediatric' %}
+                {% if participant.requirePediatricAssentCheck %}
+                    {% set orderCheckRoute = 'order_assent_pediatric' %}
+                {% else %}
+                    {% set orderCheckRoute = 'order_check_pediatric' %}
+                {% endif %}
             {% endif %}
             {% if not (isDVType and participant.isPediatric) %}
                 <a href="{{ path(orderCheckRoute, { participantId: participant.id }) }}" class="btn btn-primary btn-sm float-end"><i class="fa fa-plus-circle" aria-hidden="true"></i> New Biobank Order</a>
