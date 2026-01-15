@@ -1,5 +1,5 @@
 {
-  "version": "5",
+  "version": "4",
   "notes": "Pediatric Updated Saliva Tubes, 16.4 < 25 Kg",
   "samplesInformation": {
     "1ED04": {
@@ -39,13 +39,6 @@
       "specimen": "PMI Saliva, FDA Kit",
       "color": "Clear",
       "identifier": "OGD-500"
-    },
-    "2SAL0": {
-      "label": "Saliva [2SAL0]",
-      "temperature": "Refrigerated",
-      "specimen": "PMI Saliva, FDA Kit",
-      "color": "Clear",
-      "identifier": "OCD-100 Sponge Assisted Device"
     }
   },
   "salivaInstructions": "Order a saliva biospecimen only if the participant is unable to provide both the 4 mL EDTA tube and the 10 mL EDTA tube."
