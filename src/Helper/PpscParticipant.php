@@ -29,6 +29,7 @@ class PpscParticipant
 
     private static array $pediatricWeightBreakpoints = [
         9999,
+        50,
         25,
         16.4,
         5,
