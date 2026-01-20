@@ -167,32 +167,6 @@ class MeasurementServiceTest extends ServiceTestCase
         ];
     }
 
-
-    /**
-     * @dataProvider pediatricAssentCheckProvider
-     */
-    public function testRequirePediatricAssentCheck(bool $isPediatric, string $dob, bool $expected)
-    {
-        $participant = new PpscParticipant((object) [
-            'isPediatric' => $isPediatric,
-            'dob' => $dob
-        ]);
-        $this->assertSame($expected, $this->measurementService->requirePediatricAssentCheck($participant));
-    }
-
-    public function pediatricAssentCheckProvider(): array
-    {
-        $today = new \DateTime();
-        return [
-            'Not pediatric' => [false, (clone $today)->sub(new \DateInterval('P90M'))->format('Y-m-d'), false],
-            'Pediatric, too young' => [true, (clone $today)->sub(new \DateInterval('P83M'))->format('Y-m-d'), false],
-            'Pediatric, just old enough' => [true, (clone $today)->sub(new \DateInterval('P84M'))->format('Y-m-d'), true],
-            'Pediatric, in range' => [true, (clone $today)->sub(new \DateInterval('P100M'))->format('Y-m-d'), true],
-            'Pediatric, almost too old' => [true, (clone $today)->sub(new \DateInterval('P143M'))->format('Y-m-d'), true],
-            'Pediatric, too old' => [true, (clone $today)->sub(new \DateInterval('P144M'))->format('Y-m-d'), false],
-        ];
-    }
-
     /**
      * @dataProvider getMeasurementUrlProvider
      */

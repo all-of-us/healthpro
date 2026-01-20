@@ -1,0 +1,52 @@
+{% extends 'program/hpo/ppsc/base.html.twig' %}
+{% block title %}Order Assent - {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
+{% block body %}
+    <div class="page-header mb-4 border-bottom">
+        <h2>
+            <i class="fa fa-medkit" aria-hidden="true"></i>
+            New Biobank order
+        </h2>
+    </div>
+    <ul class="nav nav-tabs">
+        <li role="presentation" class="nav-item"><a class="nav-link active" href="#">Assent</a></li>
+        {% if siteType == 'dv' %}
+            {% set steps = ['Safety Check', 'Create', 'Collect', 'Process', 'Finalize'] %}
+        {% else %}
+            {% set steps = ['Safety Check', 'Create', 'Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
+        {% endif %}
+        {% for step in steps %}
+            <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#">{{ step }}</a></li>
+        {% endfor %}
+    </ul>
+    <div class="card border-success mt-4">
+        <div class="card-header bg-success text-white">
+            Pediatric Assent
+        </div>
+        <div class="card-body">
+            <div>
+                <label class="form-label" for="pediatricAssent">
+                    Does the pediatric participant assent to the collection of biospecimens during this visit?
+                </label>
+                <select class="form-select" id="pediatricAssent">
+                    <option value="" selected>Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                </select>
+                <div id="assentErrorMessage" class="text-danger mt-2 d-none">
+                    <i class="fa fa-exclamation-circle"></i> The participant has not assented. You may not proceed with biospecimen collections.
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
+        <a href="{{ path('order_check_pediatric', { participantId: participant.id }) }}" class="btn btn-primary d-none" id="continueBtn">
+            Continue
+            <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+        </a>
+    </div>
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('pediatric-assent') }}
+{% endblock %}
