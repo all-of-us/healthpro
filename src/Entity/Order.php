@@ -27,7 +27,7 @@ class Order
     public const ORDER_TYPE_DIVERSION = 'diversion';
     public const ORDER_TYPE_SALIVA = 'saliva';
     public const PEDIATRIC_ORDER_STRING = 'ped';
-    public const PEDIATRIC_BLOOD_SAMPLES = ['1ED04', '2ED02', '2ED04', '1ED10', '1PXR2', '1ED02'];
+    public const PEDIATRIC_BLOOD_SAMPLES = ['1SS08', '1ED04', '2ED02', '2ED04', '1ED10', '1PXR2', '1ED02'];
     public const PEDIATRIC_URINE_SAMPLES = ['1UR10'];
     public const PEDIATRIC_SALIVA_SAMPLES = ['1SAL2', '2SAL0'];
     public const TUBE_SELECTION_TYPE = 'tubeSelect';
@@ -1252,7 +1252,9 @@ class Order
             unset($columns['process']);
         }
         if ($this->isPediatricOrder()) {
-            unset($columns['process']);
+            if (!$this->hasProcessingSamples()) {
+                unset($columns['process']);
+            }
         }
         $step = 'finalize';
         foreach ($columns as $name => $column) {
@@ -1285,7 +1287,9 @@ class Order
             unset($columns['process']);
         }
         if ($this->isPediatricOrder()) {
-            unset($columns['process']);
+            if (!$this->hasProcessingSamples()) {
+                unset($columns['process']);
+            }
         }
         $steps = [];
         foreach ($columns as $name => $column) {
@@ -1605,6 +1609,19 @@ class Order
             return str_contains($this->getCurrentVersion(), self::PEDIATRIC_ORDER_STRING);
         }
         return false;
+    }
+
+    public function hasProcessingSamples(): bool
+    {
+        $requestedSamples = $this->getRequestedSamples();
+        if (empty($requestedSamples)) {
+            return false;
+        }
+        $decodedSamples = json_decode($requestedSamples, true);
+        if (!is_array($decodedSamples)) {
+            return false;
+        }
+        return !empty(array_intersect($decodedSamples, self::$samplesRequiringProcessing));
     }
 
     protected function getSampleTime($set, $sample)

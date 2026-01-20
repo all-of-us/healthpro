@@ -72,7 +72,7 @@
         finalize: ['finalize', 'finalized'],
         print_requisition: ['print requisition', 'finalized']
     } %}
-    {% if order.type == 'saliva' or isPediatricOrder %}
+    {% if order.type == 'saliva' or (isPediatricOrder and not order.hasProcessingSamples) %}
         {% set steps = steps|filter((label,step) => step != 'process') %}
     {% endif %}
 {% endif %}
