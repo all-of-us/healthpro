@@ -28,7 +28,7 @@ class PpscParticipant
     public int|null $sexAtBirth;
 
     private static array $pediatricWeightBreakpoints = [
-        9999,
+        1000,
         50,
         25,
         16.4,
