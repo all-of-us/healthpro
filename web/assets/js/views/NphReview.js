@@ -2,7 +2,6 @@ $(document).ready(function () {
     const reviewTable = $(".table-review");
     const nameLookupUrl = reviewTable.data("name-lookup-url");
     const missingName = reviewTable.data("missing-name");
-    const missingId = reviewTable.data("missing-id");
 
     let participantIds = [];
     $(".load-name").each(function () {
@@ -31,6 +30,13 @@ $(document).ready(function () {
         }).fail(function () {
             td.html("<em>Error loading name</em>");
             td.siblings(".load-biobankid").html("<em>Error loading ID</em>");
+        });
+    });
+
+    $("#search").on("keyup", function () {
+        const value = $(this).val().toLowerCase();
+        $("#table-today tbody tr").filter(function () {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
         });
     });
 });
