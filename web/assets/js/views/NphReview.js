@@ -35,8 +35,15 @@ $(document).ready(function () {
 
     $("#search").on("keyup", function () {
         const value = $(this).val().toLowerCase();
-        $("#table-today tbody tr").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-        });
+        const table = $("#table-today");
+        if (table.find("thead th[rowspan]").length > 0) {
+            table.find("tbody").each(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        } else {
+            table.find("tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        }
     });
 });
