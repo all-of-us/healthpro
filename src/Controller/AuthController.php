@@ -31,7 +31,7 @@ class AuthController extends BaseController
             return $this->redirectToRoute('home');
         }
 
-        if (!$env->isProd()) {
+        if (!$env->isProd() && !$env->isLocal()) {
             return $this->redirectToRoute('login_start');
         }
 
