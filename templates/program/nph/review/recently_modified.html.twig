@@ -1,10 +1,16 @@
 {% extends 'base.html.twig' %}
-{% block title %}Unfinalized - Daily Review - {% endblock %}
+{% block title %}Recently Modified - Daily Review - {% endblock %}
 {% block bodycontainer %}container-fluid{% endblock %}
 {% set missingName = '' %}
 
 {% block body %}
     {% include 'program/nph/review/page_heading.html.twig' %}
+    <div class="row justify-content-end mb-2">
+        <div class="col-auto d-flex align-items-center">
+            <label for="search" class="me-2">Search:</label>
+            <input type="text" id="search" class="form-control">
+        </div>
+    </div>
     <table class="table table-bordered table-small table-review" id="table-today" data-name-lookup-url="{{ path('nph_review_participant_lookup', { csrf_token: csrf_token('review'), id: '' }) }}" data-missing-name="{{ missingName }}">
         <thead>
         <tr>

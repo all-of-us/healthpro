@@ -2,7 +2,6 @@ $(document).ready(function () {
     const reviewTable = $(".table-review");
     const nameLookupUrl = reviewTable.data("name-lookup-url");
     const missingName = reviewTable.data("missing-name");
-    const missingId = reviewTable.data("missing-id");
 
     let participantIds = [];
     $(".load-name").each(function () {
@@ -32,5 +31,19 @@ $(document).ready(function () {
             td.html("<em>Error loading name</em>");
             td.siblings(".load-biobankid").html("<em>Error loading ID</em>");
         });
+    });
+
+    $("#search").on("keyup", function () {
+        const value = $(this).val().toLowerCase();
+        const table = $("#table-today");
+        if (table.find("thead th[rowspan]").length > 0) {
+            table.find("tbody").each(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        } else {
+            table.find("tbody tr").filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        }
     });
 });
