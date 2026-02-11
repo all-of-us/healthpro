@@ -55,7 +55,7 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
      */
     public function getCredentials(Request $request)
     {
-        if (!$request->query->has('state') || !$request->query->has('state')) {
+        if (!$request->query->has('state') || !$request->query->has('code')) {
             return null;
         }
         return [
