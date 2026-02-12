@@ -31,6 +31,10 @@ class AuthController extends BaseController
             return $this->redirectToRoute('home');
         }
 
+        if (!$env->isProd() && !$env->isLocal()) {
+            return $this->redirectToRoute('login_start');
+        }
+
         $dashboardUrl = $params->has('dashboard_url') ? $params->get('dashboard_url') : null;
         $displaySalesForceBtn = $params->has('show_salesforce_login_btn') ? $params->get('show_salesforce_login_btn') : true;
         if ($env->isLocal() && $userService->canMockLogin()) {
