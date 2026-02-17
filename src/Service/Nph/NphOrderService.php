@@ -1000,7 +1000,7 @@ class NphOrderService
         return in_array($moduleDietStatus[$visitDiet], [NphParticipant::DIET_STARTED, NphParticipant::DIET_COMPLETED]);
     }
 
-    public function saveDlwCollection(NphDlw $formData, $participantId, $module, $visit, bool $updateModifiedTs = true): NphDlw
+    public function saveDlwCollection(?NphDlw $formData, $participantId, $module, $visit, bool $updateModifiedTs = true): NphDlw
     {
         $connection = $this->em->getConnection();
         $connection->beginTransaction();

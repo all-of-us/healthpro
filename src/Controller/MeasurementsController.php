@@ -188,7 +188,7 @@ class MeasurementsController extends BaseController
 
                             // If finalization failed, new physical measurements are created, but
                             // show errors and auto-modification options on subsequent display
-                            if (!$measurementsForm->isValid()) { // @phpstan-ignore-line
+                            if (!$measurementsForm->isValid()) {
                                 return $this->redirectToRoute('measurement', [
                                     'participantId' => $participant->id,
                                     'measurementId' => $measurementId,
@@ -226,7 +226,7 @@ class MeasurementsController extends BaseController
                         }
                         // If finalization failed, values are still saved, but do not redirect
                         // so that errors can be displayed
-                        if ($measurementsForm->isValid()) { // @phpstan-ignore-line
+                        if ($measurementsForm->isValid()) {
                             return $this->redirectToRoute('measurement', [
                                 'participantId' => $participant->id,
                                 'measurementId' => $measurementId
