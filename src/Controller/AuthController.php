@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class AuthController extends BaseController
@@ -92,7 +93,8 @@ class AuthController extends BaseController
         SalesforceAuthService $auth,
         ContainerBagInterface $params,
         Request $request,
-        SessionInterface $session
+        SessionInterface $session,
+        TokenStorageInterface $tokenStorage
     ): Response {
         if (empty($request->query->get('requestId'))) {
             return $this->render('error-auth-salesforce-request-id.html.twig');
@@ -100,7 +102,7 @@ class AuthController extends BaseController
         if (empty($request->query->get('page'))) {
             return $this->render('error-auth-salesforce-landing-page.html.twig');
         }
-        $this->get('security.token_storage')->setToken(null);
+        $tokenStorage->setToken(null);
         $session->invalidate();
         $session->set('ppscRequestId', $request->query->get('requestId'));
         $session->set('ppscLandingPage', $request->query->get('page'));

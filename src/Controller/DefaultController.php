@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class DefaultController extends BaseController
 {
@@ -147,7 +147,7 @@ class DefaultController extends BaseController
     #[Route(path: '/hide-tz-warning', name: 'hide_tz_warning')]
     public function hideTZWarningAction(Request $request)
     {
-        if (!$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken('hideTZWarning', $request->request->get('csrf_token')))) {
+        if (!$this->isCsrfTokenValid('hideTZWarning', $request->request->get('csrf_token'))) {
             throw $this->createAccessDeniedException();
         }
         $request->getSession()->set('hideTZWarning', true);
@@ -165,13 +165,14 @@ class DefaultController extends BaseController
         Request $request,
         LoggerService $loggerService,
         SessionInterface $session,
-        AuthService $authService
+        AuthService $authService,
+        TokenStorageInterface $tokenStorage
     ) {
         $timeout = $request->get('timeout');
         $source = $request->get('source');
         $loggerService->log(Log::LOGOUT);
         $isSalesforceUser = $session->get('loginType') === User::SALESFORCE;
-        $this->get('security.token_storage')->setToken(null);
+        $tokenStorage->setToken(null);
         $session->invalidate();
         // Redirects based on source and timeout conditions
         if ($source === 'aou') {
