@@ -511,9 +511,6 @@
     "symfony/polyfill-intl-icu": {
         "version": "v1.15.0"
     },
-    "symfony/polyfill-intl-idn": {
-        "version": "v1.15.0"
-    },
     "symfony/polyfill-intl-normalizer": {
         "version": "v1.18.1"
     },
