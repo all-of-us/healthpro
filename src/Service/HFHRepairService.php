@@ -34,8 +34,7 @@ class HFHRepairService
             $stmt->bindParam('repairLimit', $repairLimit, ParameterType::INTEGER);
             $stmt->bindParam('participantId', $pariticpantId, ParameterType::STRING);
         }
-        $stmt->executeQuery();
-        $results = $stmt->fetchAll();
+        $results = $stmt->executeQuery()->fetchAllAssociative();
         $deleteSql = 'DELETE FROM henry_ford_repair where id = :id';
         foreach ($results as $result) {
             $count++;

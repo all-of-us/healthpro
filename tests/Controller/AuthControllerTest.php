@@ -30,7 +30,9 @@ class AuthControllerTest extends AppWebTestCase
         $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on initial page load.');
         $crawler = $this->client->reload();
         $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on reload.');
-        $csrfToken = static::getContainer()->get('security.csrf.token_manager')->getToken('agreeUsage')->getValue();
+        $csrfToken = 'test-agree-usage-token';
+        $this->session->set('_csrf/agreeUsage', $csrfToken);
+        $this->session->save();
 
         $this->client->request('POST', '/agree', ['csrf_token' => $csrfToken]);
         $this->assertResponseIsSuccessful();
