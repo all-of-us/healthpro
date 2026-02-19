@@ -26,8 +26,8 @@ class MeasurementServiceTest extends ServiceTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->siteService = static::$container->get(SiteService::class);
-        $this->measurementService = static::$container->get(MeasurementService::class);
+        $this->siteService = static::getContainer()->get(SiteService::class);
+        $this->measurementService = static::getContainer()->get(MeasurementService::class);
     }
 
     public function testRequireBloodDonorCheck(): void
@@ -48,7 +48,7 @@ class MeasurementServiceTest extends ServiceTestCase
 
     private function createSite($hybrid = null): void
     {
-        $em = static::$container->get(EntityManagerInterface::class);
+        $em = static::getContainer()->get(EntityManagerInterface::class);
         $orgId = 'TEST_ORG_' . $hybrid . $this->id;
         $siteId = 'test' . $hybrid . $this->id;
         $site = new Site();

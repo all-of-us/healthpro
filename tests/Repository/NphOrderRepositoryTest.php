@@ -14,7 +14,7 @@ class NphOrderRepositoryTest extends RepositoryTestCase
     public function setup(): void
     {
         parent::setUp();
-        $this->repo = static::$container->get(NphOrderRepository::class);
+        $this->repo = static::getContainer()->get(NphOrderRepository::class);
         $this->nphOrder = $this->createTestOrder();
     }
 

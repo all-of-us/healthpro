@@ -17,8 +17,8 @@ class IncentiveImportRowRepositoryTest extends KernelTestCase
     public function setup(): void
     {
         self::bootKernel();
-        $this->em = static::$container->get(EntityManagerInterface::class);
-        $this->repo = static::$container->get(IncentiveImportRowRepository::class);
+        $this->em = static::getContainer()->get(EntityManagerInterface::class);
+        $this->repo = static::getContainer()->get(IncentiveImportRowRepository::class);
 
     }
 

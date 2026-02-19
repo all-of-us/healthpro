@@ -16,7 +16,7 @@ class NphTestCase extends KernelTestCase
     public function setup(): void
     {
         self::bootKernel();
-        $this->em = static::$container->get(EntityManagerInterface::class);
+        $this->em = static::getContainer()->get(EntityManagerInterface::class);
 
     }
 

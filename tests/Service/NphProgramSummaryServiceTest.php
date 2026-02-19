@@ -25,11 +25,11 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
         parent::setUp();
         $this->program = 'nph';
         $this->login('test-nph-user1@example.com', ['nph-site-test'], 'America/Chicago');
-        $siteService = static::$container->get(SiteService::class);
+        $siteService = static::getContainer()->get(SiteService::class);
         $siteService->switchSite('nph-site-test' . '@' . self::GROUP_DOMAIN);
         $this->service = new NphProgramSummaryService();
         $this->module1data = json_decode(file_get_contents(__DIR__ . '/data/order_module_1.json'), true);
-        $this->userService = static::$container->get(UserService::class);
+        $this->userService = static::getContainer()->get(UserService::class);
         $this->siteService = $siteService;
         $this->testSetup = new TestSetup(static::getContainer()->get(EntityManagerInterface::class));
         $this->nphOrderService = new NphOrderService(

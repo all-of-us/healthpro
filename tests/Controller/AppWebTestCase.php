@@ -8,7 +8,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -24,9 +23,10 @@ class AppWebTestCase extends WebTestCase
 
     public function setUp(): void
     {
+        static::ensureKernelShutdown();
         $this->client = static::createClient();
-        $this->session = self::$container->get(SessionInterface::class);
-        $this->requestStack = self::$container->get(RequestStack::class);
+        $this->session = static::getContainer()->get('session.factory')->createSession();
+        $this->requestStack = static::getContainer()->get(RequestStack::class);
         $this->request = new Request();
         $this->request->setSession($this->session);
         $this->requestStack->push($this->request);
@@ -34,9 +34,9 @@ class AppWebTestCase extends WebTestCase
 
     protected function login(string $email, array $groups = ['hpo-site-test'])
     {
-        $userService = self::$container->get(UserService::class);
-        $tokenStorage = self::$container->get(TokenStorageInterface::class);
-        $userProvider = self::$container->get(UserProviderInterface::class);
+        $userService = static::getContainer()->get(UserService::class);
+        $tokenStorage = static::getContainer()->get(TokenStorageInterface::class);
+        $userProvider = static::getContainer()->get(UserProviderInterface::class);
 
         $userService->setMockUser($email);
         if (count($groups) > 0) {

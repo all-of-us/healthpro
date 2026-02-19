@@ -16,8 +16,8 @@ class IdVerificationRepositoryTest extends KernelTestCase
     public function setup(): void
     {
         self::bootKernel();
-        $this->em = static::$container->get(EntityManagerInterface::class);
-        $this->repo = static::$container->get(IdVerificationRepository::class);
+        $this->em = static::getContainer()->get(EntityManagerInterface::class);
+        $this->repo = static::getContainer()->get(IdVerificationRepository::class);
 
     }
 

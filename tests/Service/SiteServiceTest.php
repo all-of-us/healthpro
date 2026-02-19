@@ -23,8 +23,8 @@ class SiteServiceTest extends ServiceTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->service = static::$container->get(SiteService::class);
-        $this->userService = static::$container->get(UserService::class);
+        $this->service = static::getContainer()->get(SiteService::class);
+        $this->userService = static::getContainer()->get(UserService::class);
     }
 
     public function testCaborConsentDisplay(): void
@@ -45,7 +45,7 @@ class SiteServiceTest extends ServiceTestCase
 
     private function createSite($params = []): void
     {
-        $em = static::$container->get(EntityManagerInterface::class);
+        $em = static::getContainer()->get(EntityManagerInterface::class);
         $state = $params['state'] ?? null;
         $orgId = 'TEST_ORG_' . $state . $this->id;
         $siteId = 'test' . $state . $this->id;
@@ -75,7 +75,7 @@ class SiteServiceTest extends ServiceTestCase
 
     private function createNphSite($params = []): void
     {
-        $em = static::$container->get(EntityManagerInterface::class);
+        $em = static::getContainer()->get(EntityManagerInterface::class);
         $googleGroup = 'test' . $this->id;
         $site = new NphSite();
         $site->setStatus(true)
