@@ -44,12 +44,17 @@ class UserProvider implements UserProviderInterface
         $this->ppscApiService = $ppscApiService;
     }
 
-    public function loadUserByUsername($username): UserInterface
+    public function loadUserByIdentifier(string $identifier): UserInterface
     {
         if ($this->requestStack->getSession()->get('loginType') === \App\Entity\User::SALESFORCE) {
-            return $this->loadSalesforceUser($username);
+            return $this->loadSalesforceUser($identifier);
         }
-        return $this->loadGoogleUser($username);
+        return $this->loadGoogleUser($identifier);
+    }
+
+    public function loadUserByUsername(string $username): UserInterface
+    {
+        return $this->loadUserByIdentifier($username);
     }
 
     public function refreshUser(UserInterface $user): UserInterface
@@ -58,15 +63,15 @@ class UserProvider implements UserProviderInterface
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
         }
 
-        return $this->loadUserByUsername($user->getUsername());
+        return $this->loadUserByIdentifier($user->getUserIdentifier());
     }
 
-    public function supportsClass($class): bool
+    public function supportsClass(string $class): bool
     {
         return User::class === $class;
     }
 
-    private function loadGoogleUser($username): UserInterface
+    private function loadGoogleUser(string $username): UserInterface
     {
         $googleUser = $this->userService->getGoogleUser();
         if (!$googleUser || strcasecmp($googleUser->getEmail(), $username) !== 0) {
@@ -122,7 +127,7 @@ class UserProvider implements UserProviderInterface
         return new User($googleUser, $groups, $userInfo, null, $sessionInfo);
     }
 
-    private function loadSalesforceUser($username): UserInterface
+    private function loadSalesforceUser(string $username): UserInterface
     {
         $salesforceUser = $this->userService->getSalesforceUser();
         if (!$salesforceUser || strcasecmp($salesforceUser->getEmail(), $username) !== 0) {
