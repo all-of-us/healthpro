@@ -47,6 +47,11 @@ class HttpClient implements ClientInterface
         $this->client = new Client($config);
     }
 
+    public function __call(string $name, array $arguments)
+    {
+        return $this->client->{$name}(...$arguments);
+    }
+
     public function send(RequestInterface $request, array $options = []): ResponseInterface
     {
         return $this->client->send($request, $options);
@@ -70,11 +75,6 @@ class HttpClient implements ClientInterface
     public function getConfig(?string $option = null)
     {
         return $this->client->getConfig($option);
-    }
-
-    public function __call(string $name, array $arguments)
-    {
-        return $this->client->{$name}(...$arguments);
     }
 
     protected function removeHeader(string $header): callable
