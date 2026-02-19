@@ -6,8 +6,8 @@ use Google\Cloud\Logging\LoggingClient;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
-use Monolog\LogRecord;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class StackdriverHandler extends AbstractProcessingHandler
