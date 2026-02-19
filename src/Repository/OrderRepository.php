@@ -75,7 +75,7 @@ class OrderRepository extends ServiceEntityRepository
               OR oh.type IS NULL)
             ORDER BY o.created_ts DESC
         ';
-        $orders = $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
+        $orders = $this->getEntityManager()->getConnection()->fetchAllAssociative($ordersQuery, [
             'site' => $siteId,
             'type1' => Order::ORDER_CANCEL,
             'type2' => Order::ORDER_EDIT,
@@ -110,7 +110,7 @@ class OrderRepository extends ServiceEntityRepository
               AND oh.type = :type
             ORDER BY o.created_ts DESC
         ";
-        return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
+        return $this->getEntityManager()->getConnection()->fetchAllAssociative($ordersQuery, [
             'site' => $siteId,
             'type' => Order::ORDER_UNLOCK
         ]);
@@ -136,7 +136,7 @@ class OrderRepository extends ServiceEntityRepository
               AND oh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
             ORDER BY oh.created_ts DESC
         ';
-        return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
+        return $this->getEntityManager()->getConnection()->fetchAllAssociative($ordersQuery, [
             'site' => $siteId,
             'type1' => Order::ORDER_ACTIVE,
             'type2' => Order::ORDER_RESTORE
@@ -167,7 +167,7 @@ class OrderRepository extends ServiceEntityRepository
               OR oh.type IS NULL)
             ORDER BY o.created_ts DESC
         ';
-        $orders = $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
+        $orders = $this->getEntityManager()->getConnection()->fetchAllAssociative($ordersQuery, [
             'type1' => Order::ORDER_CANCEL,
             'type2' => Order::ORDER_EDIT,
             'biobankFinalized' => 1,
@@ -205,7 +205,7 @@ class OrderRepository extends ServiceEntityRepository
             WHERE oh.type = :type
             ORDER BY o.created_ts DESC
         ';
-        return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
+        return $this->getEntityManager()->getConnection()->fetchAllAssociative($ordersQuery, [
             'type' => Order::ORDER_UNLOCK,
             'deleted' => 0
         ]);
@@ -236,7 +236,7 @@ class OrderRepository extends ServiceEntityRepository
               AND oh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY
             ORDER BY oh.created_ts DESC
         ';
-        return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
+        return $this->getEntityManager()->getConnection()->fetchAllAssociative($ordersQuery, [
             'type1' => Order::ORDER_ACTIVE,
             'type2' => Order::ORDER_RESTORE,
             'deleted' => 0
@@ -247,7 +247,7 @@ class OrderRepository extends ServiceEntityRepository
     public function getUnloggedMissingOrders(): array
     {
         $ordersQuery = 'SELECT id FROM orders WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND mayo_id IS NOT NULL AND rdr_id IS NULL';
-        return $this->getEntityManager()->getConnection()->fetchAll($ordersQuery, [
+        return $this->getEntityManager()->getConnection()->fetchAllAssociative($ordersQuery, [
             'type' => MissingNotificationLog::ORDER_TYPE
         ]);
     }

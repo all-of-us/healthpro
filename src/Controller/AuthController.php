@@ -48,7 +48,7 @@ class AuthController extends BaseController
                 $email = $loginForm->get('userName')->getData();
                 $userService->setMockUser($email);
                 /** @var User $user */
-                $user = $userProvider->loadUserByUsername($email);
+                $user = $userProvider->loadUserByIdentifier($email);
                 if (empty($user->getGroups())) {
                     $session->invalidate();
                     return $this->render('error-auth.html.twig', [

@@ -59,7 +59,7 @@ class MeasurementRepository extends ServiceEntityRepository
               OR eh.type IS NULL)
             ORDER BY e.created_ts DESC
         ';
-        return $this->getEntityManager()->getConnection()->fetchAll($evaluationsQuery, [
+        return $this->getEntityManager()->getConnection()->fetchAllAssociative($evaluationsQuery, [
             'site' => $siteId,
             'type' => Measurement::EVALUATION_CANCEL
         ]);
@@ -88,7 +88,7 @@ class MeasurementRepository extends ServiceEntityRepository
               AND (eh.created_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY OR e.updated_ts >= UTC_TIMESTAMP() - INTERVAL 7 DAY)
             ORDER BY modified_ts DESC
         ';
-        return $this->getEntityManager()->getConnection()->fetchAll($evaluationsQuery, [
+        return $this->getEntityManager()->getConnection()->fetchAllAssociative($evaluationsQuery, [
             'site' => $siteId,
             'type' => Measurement::EVALUATION_CANCEL
         ]);
@@ -97,7 +97,7 @@ class MeasurementRepository extends ServiceEntityRepository
     public function getUnloggedMissingMeasurements(): array
     {
         $evaluationsQuery = 'SELECT id FROM evaluations WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND rdr_id IS NULL';
-        return $this->getEntityManager()->getConnection()->fetchAll($evaluationsQuery, [
+        return $this->getEntityManager()->getConnection()->fetchAllAssociative($evaluationsQuery, [
             'type' => MissingNotificationLog::MEASUREMENT_TYPE
         ]);
     }
