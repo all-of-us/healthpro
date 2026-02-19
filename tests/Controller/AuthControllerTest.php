@@ -25,15 +25,15 @@ class AuthControllerTest extends AppWebTestCase
     public function testUsageAgreement()
     {
         $this->login('testUsageAgreement@example.com');
-        // Should set this immediately after login to prevent token mismatch issues
-        $csrfToken = static::getContainer()->get('security.csrf.token_manager')->getToken('agreeUsage');
         $this->client->followRedirects();
         $crawler = $this->client->request('GET', '/');
         $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on initial page load.');
         $crawler = $this->client->reload();
         $this->assertEquals(1, count($crawler->filter('#pmiSystemUsageTpl')), 'See usage modal on reload.');
+        $csrfToken = static::getContainer()->get('security.csrf.token_manager')->getToken('agreeUsage')->getValue();
 
         $this->client->request('POST', '/agree', ['csrf_token' => $csrfToken]);
+        $this->assertResponseIsSuccessful();
         $crawler = $this->client->request('GET', '/');
         $this->assertEquals(0, count($crawler->filter('#pmiSystemUsageTpl')), 'Do not see usage modal after confirmation.');
     }
