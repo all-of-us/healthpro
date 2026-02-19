@@ -6,6 +6,7 @@ use Google\Cloud\Logging\LoggingClient;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\LogRecord;
 use Monolog\Logger;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -58,11 +59,15 @@ class StackdriverHandler extends AbstractProcessingHandler
             if (!$this->isHandling($record)) {
                 continue;
             }
-            $record = $this->processRecord($record);
-            $record['formatted'] = $this->getFormatter()->format($record);
+            if (count($this->processors) > 0) {
+                $record = $this->processRecord($record);
+            }
+            $record->formatted = $this->getFormatter()->format($record);
             $entries[] = $this->getEntryFromRecord($record);
         }
-        $this->stackdriverLogger->writeBatch($entries);
+        if (!empty($entries)) {
+            $this->stackdriverLogger->writeBatch($entries);
+        }
     }
 
     protected function getDefaultFormatter(): FormatterInterface
@@ -74,22 +79,24 @@ class StackdriverHandler extends AbstractProcessingHandler
         return $formatter;
     }
 
-    protected function write(array $record): void
+    protected function write(LogRecord $record): void
     {
         $request = $this->requestStack->getCurrentRequest();
         $siteMetaData = $this->logger->getLogMetaData();
-        $record['extra']['labels'] = [
+        $extra = $record->extra;
+        $extra['labels'] = [
             'user' => $siteMetaData['user'],
             'site' => $siteMetaData['site'],
             'ip' => $siteMetaData['ip']
         ];
         if ($request) {
-            $record['extra']['labels']['requestMethod'] = $request->getMethod();
-            $record['extra']['labels']['requestUrl'] = $request->getPathInfo();
+            $extra['labels']['requestMethod'] = $request->getMethod();
+            $extra['labels']['requestUrl'] = $request->getPathInfo();
             if ($traceHeader = $request->headers->get('X-Cloud-Trace-Context')) {
-                $record['extra']['trace_header'] = $traceHeader;
+                $extra['trace_header'] = $traceHeader;
             }
         }
+        $record = $record->with(extra: $extra);
         $entry = $this->getEntryFromRecord($record);
         $this->stackdriverLogger->write($entry);
     }
@@ -106,21 +113,21 @@ class StackdriverHandler extends AbstractProcessingHandler
         return false;
     }
 
-    private function getEntryFromRecord(array $record)
+    private function getEntryFromRecord(LogRecord $record)
     {
         $entryOptions = [
-            'severity' => $record['level_name'],
-            'timestamp' => $record['datetime']
+            'severity' => $record->level->getName(),
+            'timestamp' => $record->datetime
         ];
-        if (isset($record['extra']['labels'])) {
-            $entryOptions['labels'] = $record['extra']['labels'];
+        if (isset($record->extra['labels'])) {
+            $entryOptions['labels'] = $record->extra['labels'];
         }
-        if (isset($record['extra']['trace_header'])) {
-            if ($trace = $this->getTraceFromHeader($record['extra']['trace_header'])) {
+        if (isset($record->extra['trace_header'])) {
+            if ($trace = $this->getTraceFromHeader($record->extra['trace_header'])) {
                 $entryOptions['trace'] = $trace;
             }
         }
 
-        return $this->stackdriverLogger->entry((string) $record['formatted'], $entryOptions);
+        return $this->stackdriverLogger->entry((string) $record->formatted, $entryOptions);
     }
 }
