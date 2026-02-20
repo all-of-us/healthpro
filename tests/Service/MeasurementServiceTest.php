@@ -2,6 +2,7 @@
 
 namespace App\Tests\Service;
 
+use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\Site;
 use App\Form\SiteType;
@@ -10,7 +11,6 @@ use App\Repository\MeasurementRepository;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\Ppsc\PpscApiService;
-use App\Service\RdrApiService;
 use App\Service\SiteService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -44,24 +44,6 @@ class MeasurementServiceTest extends ServiceTestCase
         $this->createSite(SiteType::DV_HYBRID);
         $this->siteService->switchSite($hybridSite . '@' . self::GROUP_DOMAIN);
         self::assertTrue($this->measurementService->requireBloodDonorCheck());
-    }
-
-    private function createSite($hybrid = null): void
-    {
-        $em = static::getContainer()->get(EntityManagerInterface::class);
-        $orgId = 'TEST_ORG_' . $hybrid . $this->id;
-        $siteId = 'test' . $hybrid . $this->id;
-        $site = new Site();
-        $site->setStatus(true)
-            ->setName('Test Site ' . $hybrid . $this->id)
-            ->setOrganizationId($orgId)
-            ->setSiteId($siteId)
-            ->setGoogleGroup($siteId)
-            ->setWorkqueueDownload('')
-            ->setType('DV')
-            ->setDvModule($hybrid);
-        $em->persist($site);
-        $em->flush();
     }
 
     /**
@@ -110,7 +92,7 @@ class MeasurementServiceTest extends ServiceTestCase
     /**
      * @dataProvider backfillMeasurementsProvider
      */
-    public function testBackfillMeasurementsSexAtBirth($participantData, $expectsSetSexAtBirth, $expectsPersist)
+    public function testBackfillMeasurementsSexAtBirth($participantData, $expectsSetSexAtBirth, $expectsPersist, $expectsApiErrorLog)
     {
         $measurement = $this->createMock(Measurement::class);
         $measurement->method('getParticipantId')->willReturn('123');
@@ -123,6 +105,7 @@ class MeasurementServiceTest extends ServiceTestCase
 
         $ppscApiService = $this->createMock(PpscApiService::class);
         $ppscApiService->method('getParticipantById')->willReturn($participantData);
+        $loggerService = $this->createMock(LoggerService::class);
 
         if ($expectsSetSexAtBirth) {
             $measurement->expects($this->once())->method('setSexAtBirth')->with($participantData->sexAtBirth);
@@ -135,6 +118,14 @@ class MeasurementServiceTest extends ServiceTestCase
         } else {
             $entityManager->expects($this->never())->method('persist');
         }
+        if ($expectsApiErrorLog) {
+            $loggerService->expects($this->once())
+                ->method('log')
+                ->with(Log::PPSC_API_ERROR, $this->stringContains('participant ID: 123'));
+        } else {
+            $loggerService->expects($this->never())
+                ->method('log');
+        }
 
         $entityManager->expects($this->once())->method('flush');
 
@@ -145,7 +136,7 @@ class MeasurementServiceTest extends ServiceTestCase
             $ppscApiService,
             static::getContainer()->get(SiteService::class),
             static::getContainer()->get(ParameterBagInterface::class),
-            static::getContainer()->get(LoggerService::class)
+            $loggerService
         );
 
         $measurementService->backfillMeasurementsSexAtBirth();
@@ -157,13 +148,33 @@ class MeasurementServiceTest extends ServiceTestCase
             'Valid sexAtBirth data' => [
                 new PpscParticipant((object) ['sexAtBirth' => 1]),
                 true,  // Expects setSexAtBirth
-                true   // Expects persist
+                true,  // Expects persist
+                false  // Expects API error log
             ],
             'Null participant data' => [
                 null,
                 false,
-                false
+                false,
+                true
             ],
         ];
+    }
+
+    private function createSite($hybrid = null): void
+    {
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $orgId = 'TEST_ORG_' . $hybrid . $this->id;
+        $siteId = 'test' . $hybrid . $this->id;
+        $site = new Site();
+        $site->setStatus(true)
+            ->setName('Test Site ' . $hybrid . $this->id)
+            ->setOrganizationId($orgId)
+            ->setSiteId($siteId)
+            ->setGoogleGroup($siteId)
+            ->setWorkqueueDownload('')
+            ->setType('DV')
+            ->setDvModule($hybrid);
+        $em->persist($site);
+        $em->flush();
     }
 }
