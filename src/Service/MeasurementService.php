@@ -280,7 +280,10 @@ class MeasurementService
             try {
                 $participant = $this->ppscApiService->getParticipantById($participantId);
                 if ($participant === null || !isset($participant->sexAtBirth)) {
-                    error_log('API error: Could not retrieve participant sexAtBirth for participant ID: ' . $participantId);
+                    $this->loggerService->log(
+                        Log::PPSC_API_ERROR,
+                        'API error: Could not retrieve participant sexAtBirth for participant ID: ' . $participantId
+                    );
                     continue;
                 }
                 $measurement->setSexAtBirth($participant->sexAtBirth);
