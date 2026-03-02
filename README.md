@@ -2,7 +2,7 @@
 
 ![Build Status of develop](https://circleci.com/gh/all-of-us/healthpro.png)
 
-## Contributions
+## Contributions1
 
 HealthPro is a web application established in support of the All of Us Research Program. It serves as an interface for Program health professionals, including Health Provider Organizations (HPOs), Federally Qualified Health Centers (FQHCs), and Direct Volunteer (DV) providers for the collection of physical measurements and biospecimen samples. It has since expanded to support ancillary studies like Nutrition for Precision Health (NPH), incorporating expanded biospecimen collections (e.g., stool, hair, nail samples), and pediatric workflows with growth chart percentiles.
 
