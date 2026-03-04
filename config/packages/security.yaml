@@ -9,19 +9,17 @@ security:
             pattern: ^/(s\/)?(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            anonymous: true
             lazy: true
             provider: app_user_provider
-            guard:
-                authenticators:
-                    - App\Security\GoogleGroupsAuthenticator
-                    - App\Security\SalesforceAuthenticator
-                entry_point: App\Security\GoogleGroupsAuthenticator
+            custom_authenticators:
+                - App\Security\GoogleGroupsAuthenticator
+                - App\Security\SalesforceAuthenticator
+            entry_point: App\Security\GoogleGroupsAuthenticator
 
     # Note: The *first* access control that matches will be used
     access_control:
-        - { path: ^/(login|logout|keepalive|client-timeout|agree|timeout|salesforce), roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/cron/.*, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/(login|logout|keepalive|client-timeout|agree|timeout|salesforce), roles: PUBLIC_ACCESS }
+        - { path: ^/cron/.*, roles: PUBLIC_ACCESS }
         - { path: ^/admin($|\/).*, roles: ROLE_ADMIN }
         - { path: ^/nph($|\/)$, roles: [ROLE_NPH_USER, ROLE_NPH_BIOBANK, ROLE_NPH_ADMIN] }
         - { path: ^/nph/biobank($|\/), roles: ROLE_NPH_BIOBANK }

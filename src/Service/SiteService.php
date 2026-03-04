@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Guard\Token\PostAuthenticationGuardToken;
+use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 
 class SiteService
 {
@@ -385,7 +385,7 @@ class SiteService
         $this->requestStack->getSession()->remove('site');
         $this->requestStack->getSession()->remove('awardee');
         $user = $this->userService->getUser();
-        $token = new PostAuthenticationGuardToken($user, 'main', $user->getAllRoles());
+        $token = new PostAuthenticationToken($user, 'main', $user->getAllRoles());
         $this->tokenStorage->setToken($token);
     }
 
@@ -399,7 +399,7 @@ class SiteService
     {
         $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
         if ($user->getAllRoles() != $userRoles) {
-            $token = new PostAuthenticationGuardToken($user, 'main', $userRoles);
+            $token = new PostAuthenticationToken($user, 'main', $userRoles);
             $this->tokenStorage->setToken($token);
         }
     }

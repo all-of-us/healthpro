@@ -3,45 +3,55 @@
 namespace App\Service;
 
 use App\Entity\User;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\RuntimeExtensionInterface;
 
 class ContextTemplateService implements RuntimeExtensionInterface
 {
-    private SessionInterface $session;
+    private RequestStack $requestStack;
 
-    public function __construct(SessionInterface $session)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->session = $session;
+        $this->requestStack = $requestStack;
     }
 
     public function getProgramTemplate(string $RelativePath): string
     {
-        return 'program/' . $this->session->get('program', User::PROGRAM_HPO) . '/' . $RelativePath;
+        return 'program/' . $this->getProgram() . '/' . $RelativePath;
     }
 
     public function isCurrentProgram(string $program): bool
     {
-        return $this->session->get('program', User::PROGRAM_HPO) === $program;
+        return $this->getProgram() === $program;
     }
 
     public function getCurrentProgram(): string
     {
-        return $this->session->get('program', User::PROGRAM_HPO);
+        return $this->getProgram();
     }
 
     public function isCurrentProgramHpo(): bool
     {
-        return $this->session->get('program', User::PROGRAM_HPO) === User::PROGRAM_HPO;
+        return $this->getProgram() === User::PROGRAM_HPO;
     }
 
     public function isCurrentProgramNph(): bool
     {
-        return $this->session->get('program', User::PROGRAM_HPO) === User::PROGRAM_NPH;
+        return $this->getProgram() === User::PROGRAM_NPH;
     }
 
     public function getCurrentProgramDisplayText(): string
     {
-        return $this->session->get('program') === User::PROGRAM_NPH ? 'NPH' : 'All of Us';
+        return $this->getProgram() === User::PROGRAM_NPH ? 'NPH' : 'All of Us';
+    }
+
+    private function getProgram(): string
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request && $request->hasSession()) {
+            return $request->getSession()->get('program', User::PROGRAM_HPO);
+        }
+
+        return User::PROGRAM_HPO;
     }
 }

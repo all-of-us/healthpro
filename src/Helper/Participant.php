@@ -245,7 +245,7 @@ class Participant
         }
 
         // Detect phone number
-        $phone = preg_replace('/\D/', '', $this->phoneNumber);
+        $phone = $this->phoneNumber ? preg_replace('/\D/', '', $this->phoneNumber) : '';
         if ($phone) {
             $identifiers['phone'] = [$phone];
             if (strlen($phone) === 10) {

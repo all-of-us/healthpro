@@ -19,6 +19,7 @@ use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +28,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Csrf\CsrfToken;
 
 class OrderController extends BaseController
 {
@@ -35,6 +35,7 @@ class OrderController extends BaseController
     protected $loggerService;
     protected $siteService;
     protected PpscApiService $ppscApiService;
+    protected FormFactoryInterface $formFactory;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -42,12 +43,14 @@ class OrderController extends BaseController
         LoggerService $loggerService,
         SiteService $siteService,
         PpscApiService $ppscApiService,
+        FormFactoryInterface $formFactory,
     ) {
         parent::__construct($em);
         $this->orderService = $orderService;
         $this->loggerService = $loggerService;
         $this->siteService = $siteService;
         $this->ppscApiService = $ppscApiService;
+        $this->formFactory = $formFactory;
     }
 
     public function loadOrder($participantId, $orderId)
@@ -107,10 +110,7 @@ class OrderController extends BaseController
         ]);
         $showCustom = false;
         $createForm->handleRequest($request);
-        if (!$createForm->isSubmitted() && !$this->get('security.csrf.token_manager')->isTokenValid(new CsrfToken(
-            'orderCheck',
-            $request->request->get('csrf_token')
-        ))) {
+        if (!$createForm->isSubmitted() && !$this->isCsrfTokenValid('orderCheck', $request->request->get('csrf_token'))) {
             throw $this->createAccessDeniedException('Participant ineligible for order create.');
         }
         if ($createForm->isSubmitted() && $createForm->isValid()) {
@@ -655,7 +655,7 @@ class OrderController extends BaseController
             throw $this->createAccessDeniedException();
         }
         $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $participantId], ['id' => 'desc']);
-        $orderModifyForm = $this->get('form.factory')->createNamed('form', OrderModifyType::class, null, [
+        $orderModifyForm = $this->formFactory->createNamed('form', OrderModifyType::class, null, [
             'type' => $type,
             'orderType' => $order->getType()
         ]);

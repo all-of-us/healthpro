@@ -9,7 +9,7 @@ use GuzzleHttp\Exception\ClientException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class PpscApiService
 {
@@ -21,7 +21,7 @@ class PpscApiService
     protected $lastError;
     protected $lastErrorCode;
     private ParameterBagInterface $params;
-    private SessionInterface $session;
+    private RequestStack $requestStack;
     private EnvironmentService $env;
     private string|null $tokenUrl;
     private string|null $clientId;
@@ -31,10 +31,10 @@ class PpscApiService
     private string|null $accessToken = null;
     private string|null $endpoint;
 
-    public function __construct(ParameterBagInterface $params, SessionInterface $session, EnvironmentService $env, LoggerInterface $logger)
+    public function __construct(ParameterBagInterface $params, RequestStack $requestStack, EnvironmentService $env, LoggerInterface $logger)
     {
         $this->params = $params;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
         $this->env = $env;
         $this->logger = $logger;
         $this->client = new HttpClient(['cookies' => true]);
@@ -81,7 +81,7 @@ class PpscApiService
         $cacheKey = 'ppsc_participant_' . $participantId;
         $cacheEnabled = $this->params->has('ppsc_disable_cache') ? !$this->params->get('ppsc_disable_cache') : true;
         $cacheTime = $this->params->has('ppsc_cache_time') ? intval($this->params->get('ppsc_cache_time')) : self::CACHE_TIME;
-        $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? $this->params->has('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
+        $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? (int) $this->params->get('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
         $cache = new \App\Cache\DatastoreAdapter($dsCleanUpLimit);
         if ($cacheEnabled && !$refresh) {
             try {
@@ -327,7 +327,17 @@ class PpscApiService
 
     private function getParams($field): string|null
     {
-        $ppscEnv = $this->env->getPpscEnv($this->session->get('ppscEnv'));
+        $ppscEnv = $this->env->getPpscEnv($this->getSessionValue('ppscEnv'));
         return $this->params->has($ppscEnv . '_' . $field) ? $this->params->get($ppscEnv . '_' . $field) : null;
+    }
+
+    private function getSessionValue(string $key)
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request && $request->hasSession()) {
+            return $request->getSession()->get($key);
+        }
+
+        return null;
     }
 }

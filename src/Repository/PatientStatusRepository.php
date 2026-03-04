@@ -44,7 +44,7 @@ class PatientStatusRepository extends ServiceEntityRepository
               AND ps.organization = :organization
             ORDER BY ps.id DESC
         ';
-        $data = $this->getEntityManager()->getConnection()->fetchAll($query, [
+        $data = $this->getEntityManager()->getConnection()->fetchAllAssociative($query, [
             'participantId' => $participantId,
             'organization' => $organizationId
         ]);
@@ -78,7 +78,7 @@ class PatientStatusRepository extends ServiceEntityRepository
               AND ps.organization = :organization
             ORDER BY psh.id DESC
         ';
-        $results = $this->getEntityManager()->getConnection()->fetchAll($query, [
+        $results = $this->getEntityManager()->getConnection()->fetchAllAssociative($query, [
             'participantId' => $participantId,
             'organization' => $organization
         ]);
@@ -116,7 +116,7 @@ class PatientStatusRepository extends ServiceEntityRepository
               AND ps.organization != :organization
             ORDER BY ps.id DESC
         ';
-        $results = $this->getEntityManager()->getConnection()->fetchAll($query, [
+        $results = $this->getEntityManager()->getConnection()->fetchAllAssociative($query, [
             'participantId' => $participantId,
             'organization' => $organization
         ]);

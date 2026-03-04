@@ -3,7 +3,6 @@ namespace App\Tests\Service;
 
 use App\Entity\User;
 use App\Service\ContextTemplateService;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class ContextTemplateServiceTest extends ServiceTestCase
 {
@@ -11,8 +10,8 @@ class ContextTemplateServiceTest extends ServiceTestCase
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->contextTemplateService = static::getContainer()->get(ContextTemplateService::class);
-        $this->session = static::getContainer()->get(SessionInterface::class);
     }
 
     public function testGetDocumentTitlesList(): void

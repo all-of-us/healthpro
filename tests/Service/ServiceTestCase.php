@@ -7,7 +7,6 @@ use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -24,8 +23,8 @@ abstract class ServiceTestCase extends KernelTestCase
     public function setUp(): void
     {
         self::bootKernel();
-        $this->session = self::$container->get(SessionInterface::class);
-        $this->requestStack = self::$container->get(RequestStack::class);
+        $this->session = static::getContainer()->get('session.factory')->createSession();
+        $this->requestStack = static::getContainer()->get(RequestStack::class);
         $this->request = new Request();
         $this->request->setSession($this->session);
         $this->requestStack->push($this->request);
@@ -33,9 +32,9 @@ abstract class ServiceTestCase extends KernelTestCase
 
     protected function login(string $email, array $groups = ['hpo-site-test'], string $timezone = null)
     {
-        $userService = self::$container->get(UserService::class);
-        $tokenStorage = self::$container->get(TokenStorageInterface::class);
-        $userProvider = self::$container->get(UserProviderInterface::class);
+        $userService = static::getContainer()->get(UserService::class);
+        $tokenStorage = static::getContainer()->get(TokenStorageInterface::class);
+        $userProvider = static::getContainer()->get(UserProviderInterface::class);
 
         $userService->setMockUser($email);
         if (count($groups) > 0) {

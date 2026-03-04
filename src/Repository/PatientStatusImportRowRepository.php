@@ -48,7 +48,7 @@ class PatientStatusImportRowRepository extends ServiceEntityRepository
         if ($limit > 0) {
             $query .= ' LIMIT ' . $limit;
         }
-        return $this->getEntityManager()->getConnection()->fetchAll($query, [
+        return $this->getEntityManager()->getConnection()->fetchAllAssociative($query, [
             'confirm' => 1,
             'rdrStatus' => 0
         ]);
