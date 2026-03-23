@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use Google\Cloud\Logging\LoggingClient;
 use Google\Cloud\Logging\Logger as StackdriverLogger;
+use Google\Cloud\Logging\LoggingClient;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Formatter\NormalizerFormatter;
@@ -41,6 +41,24 @@ class StackdriverHandler extends AbstractProcessingHandler
         $this->normalizer = new NormalizerFormatter();
     }
 
+    public function handleBatch(array $records): void
+    {
+        $entries = [];
+        foreach ($records as $record) {
+            if (!$this->isHandling($record)) {
+                continue;
+            }
+            if (count($this->processors) > 0) {
+                $record = $this->processRecord($record);
+            }
+            $record = $this->prepareRecord($record);
+            $entries[] = $this->getEntryFromRecord($record);
+        }
+        if (!empty($entries)) {
+            $this->stackdriverLogger->writeBatch($entries);
+        }
+    }
+
     protected function createStackdriverLogger(array $clientConfig): StackdriverLogger
     {
         $stackdriverClient = new LoggingClient($clientConfig);
@@ -60,24 +78,6 @@ class StackdriverHandler extends AbstractProcessingHandler
         ];
 
         return $stackdriverClient->logger($logName, $logOptions);
-    }
-
-    public function handleBatch(array $records): void
-    {
-        $entries = [];
-        foreach ($records as $record) {
-            if (!$this->isHandling($record)) {
-                continue;
-            }
-            if (count($this->processors) > 0) {
-                $record = $this->processRecord($record);
-            }
-            $record = $this->prepareRecord($record);
-            $entries[] = $this->getEntryFromRecord($record);
-        }
-        if (!empty($entries)) {
-            $this->stackdriverLogger->writeBatch($entries);
-        }
     }
 
     protected function getDefaultFormatter(): FormatterInterface
