@@ -3,8 +3,10 @@
 namespace App\Service;
 
 use Google\Cloud\Logging\LoggingClient;
+use Google\Cloud\Logging\Logger as StackdriverLogger;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Formatter\NormalizerFormatter;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Logger;
 use Monolog\LogRecord;
@@ -15,7 +17,8 @@ class StackdriverHandler extends AbstractProcessingHandler
     private $env;
     private $requestStack;
     private $logger;
-    private $stackdriverLogger;
+    private StackdriverLogger $stackdriverLogger;
+    private NormalizerFormatter $normalizer;
 
     public function __construct(EnvironmentService $env, RequestStack $requestStack, LoggerService $logger)
     {
@@ -34,6 +37,12 @@ class StackdriverHandler extends AbstractProcessingHandler
             ];
         }
 
+        $this->stackdriverLogger = $this->createStackdriverLogger($clientConfig);
+        $this->normalizer = new NormalizerFormatter();
+    }
+
+    protected function createStackdriverLogger(array $clientConfig): StackdriverLogger
+    {
         $stackdriverClient = new LoggingClient($clientConfig);
 
         /*
@@ -49,7 +58,8 @@ class StackdriverHandler extends AbstractProcessingHandler
                 'type' => 'gae_app'
             ]
         ];
-        $this->stackdriverLogger = $stackdriverClient->logger($logName, $logOptions);
+
+        return $stackdriverClient->logger($logName, $logOptions);
     }
 
     public function handleBatch(array $records): void
@@ -62,7 +72,7 @@ class StackdriverHandler extends AbstractProcessingHandler
             if (count($this->processors) > 0) {
                 $record = $this->processRecord($record);
             }
-            $record->formatted = $this->getFormatter()->format($record);
+            $record = $this->prepareRecord($record);
             $entries[] = $this->getEntryFromRecord($record);
         }
         if (!empty($entries)) {
@@ -81,6 +91,13 @@ class StackdriverHandler extends AbstractProcessingHandler
 
     protected function write(LogRecord $record): void
     {
+        $record = $this->prepareRecord($record);
+        $entry = $this->getEntryFromRecord($record);
+        $this->stackdriverLogger->write($entry);
+    }
+
+    private function prepareRecord(LogRecord $record): LogRecord
+    {
         $request = $this->requestStack->getCurrentRequest();
         $siteMetaData = $this->logger->getLogMetaData();
         $extra = $record->extra;
@@ -97,8 +114,12 @@ class StackdriverHandler extends AbstractProcessingHandler
             }
         }
         $record = $record->with(extra: $extra);
-        $entry = $this->getEntryFromRecord($record);
-        $this->stackdriverLogger->write($entry);
+
+        // Recompute the formatted output after mutating the record because LogRecord::with()
+        // does not preserve the previous formatted value in Monolog 3.
+        $record->formatted = $this->getFormatter()->format($record);
+
+        return $record;
     }
 
 
@@ -128,6 +149,41 @@ class StackdriverHandler extends AbstractProcessingHandler
             }
         }
 
-        return $this->stackdriverLogger->entry((string) $record->formatted, $entryOptions);
+        return $this->stackdriverLogger->entry($this->getPayloadFromRecord($record), $entryOptions);
+    }
+
+    private function getPayloadFromRecord(LogRecord $record): array
+    {
+        $payload = [
+            'message' => $record->message,
+            'formatted' => trim((string) $record->formatted),
+            'channel' => $record->channel,
+            'level' => $record->level->getName()
+        ];
+
+        $context = $this->normalizeData($record->context);
+        if (isset($context['exception'])) {
+            $payload['exception'] = $context['exception'];
+            unset($context['exception']);
+        }
+        if (!empty($context)) {
+            $payload['context'] = $context;
+        }
+
+        $extra = $record->extra;
+        unset($extra['labels'], $extra['trace_header']);
+        $extra = $this->normalizeData($extra);
+        if (!empty($extra)) {
+            $payload['extra'] = $extra;
+        }
+
+        return $payload;
+    }
+
+    private function normalizeData(array $data): array
+    {
+        $normalized = $this->normalizer->normalizeValue($data);
+
+        return is_array($normalized) ? $normalized : [];
     }
 }
