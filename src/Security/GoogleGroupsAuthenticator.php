@@ -15,11 +15,14 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Twig\Environment;
 
-class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
+class GoogleGroupsAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface
 {
     private $auth;
     private $urlGenerator;
@@ -42,57 +45,48 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         $this->requestStack = $requestStack;
     }
 
-    public function supports(Request $request): bool
+    public function supports(Request $request): ?bool
     {
-        if ($request->attributes->get('_route') === 'login_callback' && !$this->userService->canMockLogin()) {
-            return true;
-        }
-        return false;
+        return $request->attributes->get('_route') === 'login_callback' && !$this->userService->canMockLogin();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getCredentials(Request $request)
+    public function authenticate(Request $request): Passport
     {
         if (!$request->query->has('state') || !$request->query->has('code')) {
-            return null;
+            throw new AuthenticationException('Missing authentication callback parameters.');
         }
-        return [
-            'state' => $request->query->get('state'),
-            'code' => $request->query->get('code')
-        ];
-    }
 
-    public function getUser($credentials, UserProviderInterface $userProvider): UserInterface
-    {
         try {
-            $user = $this->auth->processAuth($credentials['state'], $credentials['code']);
+            $user = $this->auth->processAuth(
+                (string) $request->query->get('state'),
+                (string) $request->query->get('code')
+            );
             $this->requestStack->getSession()->set('loginType', null);
         } catch (Exception $e) {
-            throw new AuthenticationException();
+            throw new AuthenticationException('Failed to process Google authentication callback.', 0, $e);
         }
 
-        return $userProvider->loadUserByUsername($user->getEmail());
-    }
+        return new Passport(
+            new UserBadge($user->getEmail()),
+            new CustomCredentials(function ($credentials, UserInterface $user): bool {
+                if (!$this->env->isProd() && $this->params->has('gaBypass') && $this->params->get('gaBypass')) {
+                    return true; // Bypass groups auth
+                }
+                if (!($user instanceof User)) {
+                    throw new AuthenticationException('Invalid user type');
+                }
 
-    public function checkCredentials($credentials, UserInterface $user): bool
-    {
-        if (!$this->env->isProd() && $this->params->has('gaBypass') && $this->params->get('gaBypass')) {
-            return true; // Bypass groups auth
-        }
-        if (!($user instanceof User)) {
-            throw new Exception('Invalid user type');
-        }
+                $valid2fa = !($this->params->has('enforce2fa') && $this->params->get('enforce2fa')) || $user->hasTwoFactorAuth();
+                $this->authEmail = $user->getUserIdentifier();
+                if (!$valid2fa) {
+                    $this->authFailureReason = '2fa';
+                } elseif (empty($user->getGroups())) {
+                    $this->authFailureReason = 'groups';
+                }
 
-        $valid2fa = !($this->params->has('enforce2fa') && $this->params->get('enforce2fa')) || $user->hasTwoFactorAuth();
-        $this->authEmail = $user->getUsername();
-        if (!$valid2fa) {
-            $this->authFailureReason = '2fa';
-        } elseif (empty($user->getGroups())) {
-            $this->authFailureReason = 'groups';
-        }
-        return count($user->getGroups()) > 0 && $valid2fa;
+                return count($user->getGroups()) > 0 && $valid2fa;
+            }, null)
+        );
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
@@ -108,10 +102,11 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
             'logoutUrl' => $this->auth->getGoogleLogoutUrl()
         ]));
         $this->requestStack->getSession()->invalidate();
+
         return $response;
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         $this->userService->updateLastLogin();
         // Instead of using a service, the token should eventually contain the User entity (not App\Security\User)
@@ -119,17 +114,12 @@ class GoogleGroupsAuthenticator extends AbstractGuardAuthenticator
         return $this->redirectToRoute('home');
     }
 
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         return $this->redirectToRoute('login');
     }
 
-    public function supportsRememberMe(): bool
-    {
-        return false;
-    }
-
-    private function redirectToRoute(string $route)
+    private function redirectToRoute(string $route): Response
     {
         return new RedirectResponse(
             $this->urlGenerator->generate($route)

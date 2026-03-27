@@ -28,7 +28,7 @@ class NphOrderServiceTest extends ServiceTestCase
         parent::setUp();
         $this->program = 'nph';
         $this->login('test-nph-user1@example.com', ['nph-site-test'], 'America/Chicago');
-        $siteService = static::$container->get(SiteService::class);
+        $siteService = static::getContainer()->get(SiteService::class);
         $siteService->switchSite('nph-site-test' . '@' . self::GROUP_DOMAIN);
         $mockRdrApiService = $this->createMock(RdrApiService::class);
         $mockRdrApiService->method('post')->willReturn($this->returnCallback(
@@ -55,7 +55,7 @@ class NphOrderServiceTest extends ServiceTestCase
             $mockRdrApiService
         );
         $this->testSetup = new testSetup(static::getContainer()->get(EntityManagerInterface::class));
-        $this->em = static::$container->get(EntityManagerInterface::class);
+        $this->em = static::getContainer()->get(EntityManagerInterface::class);
         // Module 1
         $this->module1Data = json_decode(file_get_contents(__DIR__ . '/data/order_module_1.json'), true);
         $this->module1Data['formData']['createdTs'] = new \DateTime($this->module1Data['formData']['createdTs']);
