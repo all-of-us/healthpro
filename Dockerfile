@@ -1,4 +1,4 @@
-FROM php:8.2-bullseye
+FROM php:8.3-bullseye
 
 # Fix for issue with OpenJDK install
 RUN mkdir -p /usr/share/man/man1

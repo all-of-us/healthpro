@@ -20,6 +20,7 @@ use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,6 +34,7 @@ class MeasurementsController extends BaseController
     protected $params;
     protected $helpService;
     protected PpscApiService $ppscApiService;
+    protected FormFactoryInterface $formFactory;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -42,6 +44,7 @@ class MeasurementsController extends BaseController
         ParameterBagInterface $params,
         HelpService $helpService,
         PpscApiService $ppscApiService,
+        FormFactoryInterface $formFactory,
     ) {
         parent::__construct($em);
         $this->measurementService = $measurementService;
@@ -50,6 +53,7 @@ class MeasurementsController extends BaseController
         $this->params = $params;
         $this->helpService = $helpService;
         $this->ppscApiService = $ppscApiService;
+        $this->formFactory = $formFactory;
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}', name: 'measurement', defaults: ['measurementId' => null])]
@@ -90,7 +94,7 @@ class MeasurementsController extends BaseController
         }
         $showAutoModification = false;
         $formType = $measurement->isPediatricForm() ? PediatricMeasurementType::class : MeasurementType::class;
-        $measurementsForm = $this->get('form.factory')->createNamed('form', $formType, $measurement->getFieldData(), [
+        $measurementsForm = $this->formFactory->createNamed('form', $formType, $measurement->getFieldData(), [
             'schema' => $measurement->getSchema(),
             'locked' => $measurement->getFinalizedTs() || $this->isReadOnly() ||
                 $this->measurementService->inactiveSiteFormDisabled() || $measurement->isEvaluationCancelled()
@@ -189,7 +193,7 @@ class MeasurementsController extends BaseController
 
                             // If finalization failed, new physical measurements are created, but
                             // show errors and auto-modification options on subsequent display
-                            if (!$measurementsForm->isValid()) { // @phpstan-ignore-line
+                            if (!$measurementsForm->isValid()) {
                                 return $this->redirectToRoute('measurement', [
                                     'participantId' => $participant->id,
                                     'measurementId' => $measurementId,
@@ -227,7 +231,7 @@ class MeasurementsController extends BaseController
                         }
                         // If finalization failed, values are still saved, but do not redirect
                         // so that errors can be displayed
-                        if ($measurementsForm->isValid()) { // @phpstan-ignore-line
+                        if ($measurementsForm->isValid()) {
                             return $this->redirectToRoute('measurement', [
                                 'participantId' => $participant->id,
                                 'measurementId' => $measurementId
@@ -317,7 +321,7 @@ class MeasurementsController extends BaseController
             || ($type === $measurement::EVALUATION_RESTORE && !$measurement->canRestore())) {
             throw $this->createAccessDeniedException();
         }
-        $measurementModifyForm = $this->get('form.factory')->createNamed('form', MeasurementModifyType::class, null, [
+        $measurementModifyForm = $this->formFactory->createNamed('form', MeasurementModifyType::class, null, [
             'type' => $type
         ]);
         $measurementModifyForm->handleRequest($request);
@@ -425,7 +429,7 @@ class MeasurementsController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
-        $bloodDonorCheckForm = $this->get('form.factory')->createNamed('form', MeasurementBloodDonorCheckType::class);
+        $bloodDonorCheckForm = $this->formFactory->createNamed('form', MeasurementBloodDonorCheckType::class);
         $bloodDonorCheckForm->handleRequest($request);
         if ($bloodDonorCheckForm->isSubmitted() && $bloodDonorCheckForm->isValid()) {
             if ($bloodDonorCheckForm['bloodDonor']->getData() === 'yes') {

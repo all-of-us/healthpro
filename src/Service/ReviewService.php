@@ -179,7 +179,7 @@ class ReviewService
             'OR (eh.created_ts >= :startTime AND eh.created_ts < :endTime)) ';
         $query = "($ordersQuery) UNION ($measurementsQuery) ORDER BY latest_ts DESC";
 
-        return $this->em->getConnection()->fetchAll($query, [
+        return $this->em->getConnection()->fetchAllAssociative($query, [
             'startTime' => $startTime,
             'incentiveStartTime' => $incentiveStartTime,
             'endTime' => $endTime,
@@ -205,7 +205,7 @@ class ReviewService
             '(o.created_ts >= :today OR o.collected_ts >= :today OR o.processed_ts >= :today OR o.finalized_ts >= :today OR oh.created_ts >= :today) ' .
             'ORDER BY o.created_ts DESC';
 
-        return $this->em->getConnection()->fetchAll($ordersQuery, [
+        return $this->em->getConnection()->fetchAllAssociative($ordersQuery, [
             'today' => $today
         ]);
     }

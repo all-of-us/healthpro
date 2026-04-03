@@ -21,7 +21,7 @@ class PDFServiceTest extends ServiceTestCase
         parent::setUp();
         $this->program = 'nph';
         $this->login('test-nph-user1@example.com', ['nph-site-test'], 'America/Chicago');
-        $siteService = static::$container->get(SiteService::class);
+        $siteService = static::getContainer()->get(SiteService::class);
         $siteService->switchSite('nph-site-test' . '@' . self::GROUP_DOMAIN);
         $this->service = static::getContainer()->get(PDFService::class);
         $this->testSetup = new testSetup(static::getContainer()->get(EntityManagerInterface::class));

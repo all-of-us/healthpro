@@ -572,12 +572,13 @@ class NphOrderService
     {
         $metadata = [];
         if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
-            $metadata = json_decode($order->getMetadata(), true);
+            $metadata = json_decode($order->getMetadata() ?? '{}', true) ?: [];
             $metadata['bowelType'] = $this->mapMetadata($metadata, 'bowelType', NphOrderForm::$bowelMovements);
             $metadata['bowelQuality'] = $this->mapMetadata($metadata, 'bowelQuality', NphOrderForm::$bowelMovementQuality);
             $metadata['freezedTs'] = $metadata['freezedTs'] ?? null;
         } elseif ($order->getOrderType() === NPHOrder::TYPE_URINE || $order->getOrderType() === NPHOrder::TYPE_24URINE) {
-            $metadata = json_decode($order->getNphSamples()[0]->getSampleMetadata(), true);
+            $sampleMetadata = $order->getNphSamples()[0]->getSampleMetadata() ?? '{}';
+            $metadata = json_decode($sampleMetadata, true) ?: [];
             $metadata['urineColor'] = $this->mapMetadata($metadata, 'urineColor', NphOrderForm::$urineColors);
             $metadata['urineClarity'] = $this->mapMetadata($metadata, 'urineClarity', NphOrderForm::$urineClarity);
             if ($order->getOrderType() === NPHOrder::TYPE_24URINE) {
@@ -1000,7 +1001,7 @@ class NphOrderService
         return in_array($moduleDietStatus[$visitDiet], [NphParticipant::DIET_STARTED, NphParticipant::DIET_COMPLETED]);
     }
 
-    public function saveDlwCollection(NphDlw $formData, $participantId, $module, $visit, bool $updateModifiedTs = true): NphDlw
+    public function saveDlwCollection(?NphDlw $formData, $participantId, $module, $visit, bool $updateModifiedTs = true): NphDlw
     {
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
@@ -1586,8 +1587,11 @@ class NphOrderService
                                 $nphAliquot->setVolume($formData["{$aliquotCode}Volume"][$key]);
                             }
                         }
-                        if (!empty($formData["${aliquotCode}glycerolAdditiveVolume"])) {
-                            $nphAliquot->setAliquotMetadata(array_merge($nphAliquot->getAliquotMetadata(), ["${aliquotCode}glycerolAdditiveVolume" => $formData["${aliquotCode}glycerolAdditiveVolume"][$key]]));
+                        if (!empty($formData["{$aliquotCode}glycerolAdditiveVolume"])) {
+                            $nphAliquot->setAliquotMetadata(array_merge(
+                                $nphAliquot->getAliquotMetadata(),
+                                ["{$aliquotCode}glycerolAdditiveVolume" => $formData["{$aliquotCode}glycerolAdditiveVolume"][$key]]
+                            ));
                         }
                         $this->em->persist($nphAliquot);
                         $this->em->flush();

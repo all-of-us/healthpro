@@ -45,7 +45,7 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
         return $values;
     }
 
-    protected function doHave($id): bool
+    protected function doHave(string $id): bool
     {
         return (bool) $this->doFetch([$id]);
     }
@@ -60,7 +60,7 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
         return true;
     }
 
-    protected function doSave(array $values, $lifetime)
+    protected function doSave(array $values, int $lifetime): array|bool
     {
         $failed = []; // Overwritten in method below (passed by reference)
         $values = $this->marshaller->marshall($values, $failed);
@@ -83,7 +83,7 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
         return $failed;
     }
 
-    protected function doClear($namespace): bool
+    protected function doClear(string $namespace): bool
     {
         $cache = new Cache();
         $results = $cache->getBatch(null, null, null, $this->limit);
