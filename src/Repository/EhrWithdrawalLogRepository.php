@@ -21,7 +21,7 @@ class EhrWithdrawalLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return EhrWithdrawalLog[] Returns an array of EhrWithdrawalLog objects
+     * @return array<int, array<string, string|null>>
      */
     public function getLatestAwardees()
     {

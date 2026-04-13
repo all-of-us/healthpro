@@ -22,7 +22,7 @@ class SiteRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Site[] Returns an array of Site objects
+     * @return array<int, array<string, mixed>>
      */
     public function getOrganizations()
     {
@@ -37,7 +37,7 @@ class SiteRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Site[] Returns an array of Site objects
+     * @return array<int, array<string, mixed>>
      */
     public function getAwardees()
     {
@@ -52,7 +52,7 @@ class SiteRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Site[] Returns an array of Site objects
+     * @return array<int, array<string, int>>
      */
     public function getDuplicateSiteGoogleGroup($googleGroup, $id)
     {
@@ -68,7 +68,7 @@ class SiteRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Site[] Returns an array of Site objects
+     * @return array<int, array<string, int>>
      */
     public function getDuplicateGoogleGroup($googleGroup)
     {

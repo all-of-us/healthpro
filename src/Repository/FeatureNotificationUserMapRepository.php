@@ -21,7 +21,7 @@ class FeatureNotificationUserMapRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return FeatureNotificationUserMap[] Returns an array of FeatureNotificationUserMap objects
+     * @return list<int>
      */
     public function getUserNotificationIds($user)
     {

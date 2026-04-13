@@ -21,7 +21,7 @@ class DeceasedLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return DeceasedLog[] Returns an array of DeceasedLog objects
+     * @return array<int, array<string, string|null>>
      */
     public function getLatestOrganizations($status)
     {

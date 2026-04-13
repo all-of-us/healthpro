@@ -21,7 +21,7 @@ class NphSiteRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return NphSite[] Returns an array of NphSite objects
+     * @return array<int, array<string, int>>
      */
     public function getDuplicateGoogleGroup($googleGroup, $id = null)
     {
