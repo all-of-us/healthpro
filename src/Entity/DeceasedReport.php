@@ -33,57 +33,57 @@ class DeceasedReport
         'OTHER' => 'Other'
     ];
 
-    private $id;
+    private ?string $id = null;
 
-    private $participantId;
+    private ?string $participantId = null;
 
-    private $dateOfDeath;
+    private ?\DateTime $dateOfDeath = null;
 
-    private $causeOfDeath;
+    private ?string $causeOfDeath = null;
 
-    private $reportMechanism;
+    private ?string $reportMechanism = null;
 
-    private $reportMechanismOtherDescription;
+    private ?string $reportMechanismOtherDescription = null;
 
-    private $reportStatus;
+    private ?string $reportStatus = null;
 
-    private $submittedBy;
+    private ?string $submittedBy = null;
 
-    private $submittedOn;
+    private ?\DateTime $submittedOn = null;
 
-    private $nextOfKinName;
+    private ?string $nextOfKinName = null;
 
-    private $nextOfKinRelationship;
+    private ?string $nextOfKinRelationship = null;
 
-    private $nextOfKinTelephoneNumber;
+    private ?string $nextOfKinTelephoneNumber = null;
 
-    private $nextOfKinEmail;
+    private ?string $nextOfKinEmail = null;
 
-    private $reviewedBy;
+    private ?string $reviewedBy = null;
 
-    private $reviewedOn;
+    private ?\DateTime $reviewedOn = null;
 
-    private $denialReason;
+    private ?string $denialReason = null;
 
-    private $denialReasonOtherDescription;
+    private ?string $denialReasonOtherDescription = null;
 
-    public function getId()
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId(string $id): self
     {
         $this->id = $id;
         return $this;
     }
 
-    public function getParticipantId()
+    public function getParticipantId(): ?string
     {
         return $this->participantId;
     }
 
-    public function setParticipantId($participantId)
+    public function setParticipantId(string $participantId): self
     {
         $this->participantId = $participantId;
         return $this;
@@ -94,128 +94,128 @@ class DeceasedReport
         return $this->dateOfDeath;
     }
 
-    public function setDateOfDeath(?\DateTime $dateOfDeath)
+    public function setDateOfDeath(?\DateTime $dateOfDeath): self
     {
         $this->dateOfDeath = $dateOfDeath;
         return $this;
     }
 
-    public function getCauseOfDeath()
+    public function getCauseOfDeath(): ?string
     {
         return $this->causeOfDeath;
     }
 
-    public function setCauseOfDeath($causeOfDeath)
+    public function setCauseOfDeath(?string $causeOfDeath): self
     {
         $this->causeOfDeath = $causeOfDeath;
         return $this;
     }
 
-    public function getReportMechanism()
+    public function getReportMechanism(): ?string
     {
         return $this->reportMechanism;
     }
 
-    public function setReportMechanism($reportMechanism)
+    public function setReportMechanism(?string $reportMechanism): self
     {
         $this->reportMechanism = $reportMechanism;
         return $this;
     }
 
-    public function getReportMechanismOtherDescription()
+    public function getReportMechanismOtherDescription(): ?string
     {
         return $this->reportMechanismOtherDescription;
     }
 
-    public function setReportMechanismOtherDescription($reportMechanismOtherDescription)
+    public function setReportMechanismOtherDescription(?string $reportMechanismOtherDescription): self
     {
         $this->reportMechanismOtherDescription = $reportMechanismOtherDescription;
         return $this;
     }
 
-    public function getReportStatus()
+    public function getReportStatus(): ?string
     {
         return $this->reportStatus;
     }
 
-    public function setReportStatus($reportStatus)
+    public function setReportStatus(?string $reportStatus): self
     {
         $this->reportStatus = $reportStatus;
         return $this;
     }
 
-    public function getSubmittedBy()
+    public function getSubmittedBy(): ?string
     {
         return $this->submittedBy;
     }
 
-    public function setSubmittedBy($submittedBy)
+    public function setSubmittedBy(?string $submittedBy): self
     {
         $this->submittedBy = $submittedBy;
         return $this;
     }
 
-    public function getSubmittedOn(): \DateTime
+    public function getSubmittedOn(): ?\DateTime
     {
         return $this->submittedOn;
     }
 
-    public function setSubmittedOn(\DateTime $submittedOn)
+    public function setSubmittedOn(?\DateTime $submittedOn): self
     {
         $this->submittedOn = $submittedOn;
         return $this;
     }
 
-    public function getNextOfKinName()
+    public function getNextOfKinName(): ?string
     {
         return $this->nextOfKinName;
     }
 
-    public function setNextOfKinName($nextOfKinName)
+    public function setNextOfKinName(?string $nextOfKinName): self
     {
         $this->nextOfKinName = $nextOfKinName;
         return $this;
     }
 
-    public function getNextOfKinRelationship()
+    public function getNextOfKinRelationship(): ?string
     {
         return $this->nextOfKinRelationship;
     }
 
-    public function setNextOfKinRelationship($nextOfKinRelationship)
+    public function setNextOfKinRelationship(?string $nextOfKinRelationship): self
     {
         $this->nextOfKinRelationship = $nextOfKinRelationship;
         return $this;
     }
 
-    public function getNextOfKinTelephoneNumber()
+    public function getNextOfKinTelephoneNumber(): ?string
     {
         return $this->nextOfKinTelephoneNumber;
     }
 
-    public function setNextOfKinTelephoneNumber($nextOfKinTelephoneNumber)
+    public function setNextOfKinTelephoneNumber(?string $nextOfKinTelephoneNumber): self
     {
         $this->nextOfKinTelephoneNumber = $nextOfKinTelephoneNumber;
         return $this;
     }
 
-    public function getNextOfKinEmail()
+    public function getNextOfKinEmail(): ?string
     {
         return $this->nextOfKinEmail;
     }
 
-    public function setNextOfKinEmail($nextOfKinEmail)
+    public function setNextOfKinEmail(?string $nextOfKinEmail): self
     {
         $this->nextOfKinEmail = $nextOfKinEmail;
         return $this;
     }
 
-    public function getReviewedBy()
+    public function getReviewedBy(): ?string
     {
         return $this->reviewedBy;
     }
 
-    public function setReviewedBy($reviewedBy)
+    public function setReviewedBy(?string $reviewedBy): self
     {
         $this->reviewedBy = $reviewedBy;
         return $this;
@@ -226,29 +226,29 @@ class DeceasedReport
         return $this->reviewedOn;
     }
 
-    public function setReviewedOn(\DateTime $reviewedOn)
+    public function setReviewedOn(?\DateTime $reviewedOn): self
     {
         $this->reviewedOn = $reviewedOn;
         return $this;
     }
 
-    public function getDenialReason()
+    public function getDenialReason(): ?string
     {
         return $this->denialReason;
     }
 
-    public function setDenialReason($denialReason)
+    public function setDenialReason(?string $denialReason): self
     {
         $this->denialReason = $denialReason;
         return $this;
     }
 
-    public function getDenialReasonOtherDescription()
+    public function getDenialReasonOtherDescription(): ?string
     {
         return $this->denialReasonOtherDescription;
     }
 
-    public function setDenialReasonOtherDescription($denialReasonOtherDescription)
+    public function setDenialReasonOtherDescription(?string $denialReasonOtherDescription): self
     {
         $this->denialReasonOtherDescription = $denialReasonOtherDescription;
         return $this;
@@ -288,7 +288,7 @@ class DeceasedReport
         return $this->denialReason;
     }
 
-    public function loadFromFhirObservation($report)
+    public function loadFromFhirObservation(\stdClass $report): self
     {
         $this->setId($report->identifier[0]->value);
         $this->setParticipantId($report->subject->reference);

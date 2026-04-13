@@ -26,20 +26,34 @@ use Doctrine\ORM\PersistentCollection;
 
 class NphOrderService
 {
-    private $em;
-    private $userService;
-    private $siteService;
-    private $loggerService;
-    private $rdrApiService;
+    private EntityManagerInterface $em;
+    private UserService $userService;
+    private SiteService $siteService;
+    private LoggerService $loggerService;
+    private RdrApiService $rdrApiService;
 
+    /** @var string */
     private $module;
+
+    /** @var string */
     private $visit;
+
+    /** @var mixed */
     private $moduleObj;
+
+    /** @var string */
     private $participantId;
+
+    /** @var string */
     private $biobankId;
+
+    /** @var User */
     private $user;
+
+    /** @var string */
     private $site;
 
+    /** @var list<string> */
     private static $placeholderSamples = ['STOOL', 'STOOL2'];
 
     public function __construct(
@@ -74,26 +88,41 @@ class NphOrderService
         return $this->moduleObj->getVisitDiet($this->visit);
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     public function getTimePointSamples(): array
     {
         return $this->moduleObj->getTimePointSamples();
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getTimePoints(): array
     {
         return $this->moduleObj->getTimePoints();
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getRdrTimePoints(): array
     {
         return $this->moduleObj->getRdrTimePoints();
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getSamples(): array
     {
         return $this->moduleObj->getSamples();
     }
 
+    /**
+     * @return list<string>
+     */
     public function getSamplesByType(string $type): array
     {
         return $this->moduleObj->getSamplesByType($type);
@@ -104,6 +133,9 @@ class NphOrderService
         return $this->moduleObj->getSampleType($sampleCode);
     }
 
+    /**
+     * @return array<string, array<string, mixed>>|null
+     */
     public function getAliquots(string $sampleCode): ?array
     {
         return $this->moduleObj->getAliquots($sampleCode);
@@ -114,6 +146,11 @@ class NphOrderService
         return $this->moduleObj->getSampleIdentifierFromCode($sampleCode);
     }
 
+    /**
+     * @param PersistentCollection<int, NphSample> $samplesObj
+     *
+     * @return array<string, string>
+     */
     public function getSamplesWithLabels(PersistentCollection $samplesObj): array
     {
         $samples = $this->getSamples();
@@ -124,6 +161,11 @@ class NphOrderService
         return $sampleLabels;
     }
 
+    /**
+     * @param PersistentCollection<int, NphSample> $samplesObj
+     *
+     * @return array<string, array{label: string, id: ?string, disabled: bool, cancelled: int, finalized: int}>
+     */
     public function getSamplesWithLabelsAndIds(PersistentCollection $samplesObj): array
     {
         $samples = $this->getSamples();
@@ -140,6 +182,9 @@ class NphOrderService
         return $sampleLabels;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getExistingOrdersData(): array
     {
         $ordersData = [];
@@ -176,6 +221,9 @@ class NphOrderService
         return $ordersData;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getExistingOrdersDataWithOutStoolSamples(): array
     {
         $ordersData = $this->getExistingOrdersData();
@@ -194,6 +242,9 @@ class NphOrderService
         return $ordersData;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getExistingOrdersDataWithOnlyStoolSamples(): array
     {
         $ordersData = $this->getExistingOrdersData();
@@ -213,6 +264,9 @@ class NphOrderService
         return $stoolData;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSamplesWithOrderIds(): array
     {
         $samplesData = [];
@@ -290,6 +344,9 @@ class NphOrderService
         return $id;
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     public function createOrdersAndSamples(array $formData): string
     {
         $sampleGroup = $this->generateSampleGroup();
@@ -381,6 +438,9 @@ class NphOrderService
         return $nphSample;
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     public function isAtLeastOneSampleChecked(array $formData, NphOrder $order): bool
     {
         foreach ($order->getNphSamples() as $nphSample) {
@@ -391,6 +451,9 @@ class NphOrderService
         return false;
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     public function saveOrderCollection(array $formData, NphOrder $order): ?NphOrder
     {
         try {
@@ -438,6 +501,9 @@ class NphOrderService
         }
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     public function saveAdminOrderEdits(array $formData, NphOrder $order): bool
     {
         $connection = $this->em->getConnection();
@@ -505,6 +571,9 @@ class NphOrderService
         }
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getExistingOrderCollectionData(NphOrder $order, bool $setOrderGenerationTs = false): array
     {
         $orderCollectionData = [];
@@ -553,6 +622,10 @@ class NphOrderService
         return $orderCollectionData;
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     * @param list<string>         $metaDataTypes
+     */
     public function jsonEncodeMetadata(array $formData, array $metaDataTypes): ?string
     {
         $metadata = [];
@@ -568,6 +641,9 @@ class NphOrderService
         return !empty($metadata) ? json_encode($metadata) : null;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSamplesMetadata(NphOrder $order): array
     {
         $metadata = [];
@@ -588,6 +664,9 @@ class NphOrderService
         return $metadata;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getParticipantOrderSummary(string $participantid): array
     {
         $OrderRepository = $this->em->getRepository(NphOrder::class);
@@ -595,6 +674,9 @@ class NphOrderService
         return $this->generateOrderSummaryArray($orderInfo);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getParticipantOrderSummaryByModuleAndVisit(string $participantid, string $module, string $visit): array
     {
         $OrderRepository = $this->em->getRepository(NphOrder::class);
@@ -606,6 +688,9 @@ class NphOrderService
     }
 
     //TODO: Update these summary methods to return some sort of data object instead of arrays.
+    /**
+     * @return array<string, mixed>
+     */
     public function getParticipantOrderSummaryByModuleVisitAndSampleGroup(
         string $participantid,
         string $module,
@@ -618,9 +703,15 @@ class NphOrderService
         return $orderSummary;
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     public function hasAtLeastOneAliquotSample(array $formData, string $sampleCode): bool
     {
         $aliquots = $this->getAliquots($sampleCode);
+        if ($aliquots === null) {
+            return false;
+        }
         foreach (array_keys($aliquots) as $aliquotCode) {
             if (isset($formData[$aliquotCode])) {
                 foreach ($formData[$aliquotCode] as $aliquotId) {
@@ -633,7 +724,10 @@ class NphOrderService
         return false;
     }
 
-    public function saveFinalization(array $formData, NphSample $sample, $biobankFinalization = false): bool
+    /**
+     * @param array<string, mixed> $formData
+     */
+    public function saveFinalization(array $formData, NphSample $sample, bool $biobankFinalization = false): bool
     {
         $order = $sample->getNphOrder();
         if ($order->getOrderType() === NphOrder::TYPE_STOOL || $order->getOrderType() === NphOrder::TYPE_STOOL_2) {
@@ -647,6 +741,9 @@ class NphOrderService
         return $this->saveSampleReFinalization($notes, $sample);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getExistingSampleData(NphSample $sample): array
     {
         $sampleData = [];
@@ -706,6 +803,9 @@ class NphOrderService
         return $sampleData;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSamplesWithStatus(): array
     {
         $samplesData = [];
@@ -723,6 +823,9 @@ class NphOrderService
         return $samplesData;
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     public function saveSamplesModification(array $formData, string $type, NphOrder $order): bool
     {
         $status = true;
@@ -748,6 +851,9 @@ class NphOrderService
         return $status;
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     public function updateSampleModificationBulk(array $formData, string $type): bool
     {
         $status = true;
@@ -776,15 +882,27 @@ class NphOrderService
         return $status;
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     public function saveSampleModification(array $formData, string $type, NphSample $sample): NphSample
     {
         $this->saveSampleModificationsData($sample, $type, $formData);
         return $sample;
     }
 
+    /**
+     * @param array<string, mixed>     $formData
+     * @param array<int, string|null>  $existingAliquotIds
+     *
+     * @return array{key?: int|string, aliquotCode?: string}
+     */
     public function checkDuplicateAliquotId(array $formData, string $sampleCode, array $existingAliquotIds = []): array
     {
         $aliquots = $this->getAliquots($sampleCode);
+        if ($aliquots === null) {
+            return [];
+        }
         foreach (array_keys($aliquots) as $aliquotCode) {
             if (isset($formData[$aliquotCode])) {
                 foreach ($formData[$aliquotCode] as $key => $aliquotId) {
@@ -800,9 +918,15 @@ class NphOrderService
         return [];
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     public function hasDuplicateAliquotsInForm(array $formData, string $sampleCode): bool
     {
         $aliquots = $this->getAliquots($sampleCode);
+        if ($aliquots === null) {
+            return false;
+        }
         $totalAliquotCodes = [];
         foreach (array_keys($aliquots) as $aliquotCode) {
             if (isset($formData[$aliquotCode])) {
@@ -919,11 +1043,19 @@ class NphOrderService
         return false;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getVisitTypes(): array
     {
         return $this->moduleObj->getVisitTypes();
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     *
+     * @return list<array{field: string, message: string}>
+     */
     public function validateGenerateOrdersData(array $formData): array
     {
         $formErrors = [];
@@ -983,6 +1115,9 @@ class NphOrderService
         return $formErrors;
     }
 
+    /**
+     * @param array<string, string> $moduleDietStatus
+     */
     public function isDietStarted(array $moduleDietStatus): bool
     {
         $visitDiet = $this->getVisitDiet();
@@ -992,6 +1127,9 @@ class NphOrderService
         return $moduleDietStatus[$visitDiet] === NphParticipant::DIET_STARTED;
     }
 
+    /**
+     * @param array<string, string> $moduleDietStatus
+     */
     public function isDietStartedOrCompleted(array $moduleDietStatus): bool
     {
         $visitDiet = $this->getVisitDiet();
@@ -1001,7 +1139,7 @@ class NphOrderService
         return in_array($moduleDietStatus[$visitDiet], [NphParticipant::DIET_STARTED, NphParticipant::DIET_COMPLETED]);
     }
 
-    public function saveDlwCollection(?NphDlw $formData, $participantId, $module, $visit, bool $updateModifiedTs = true): NphDlw
+    public function saveDlwCollection(?NphDlw $formData, string $participantId, string $module, string $visit, bool $updateModifiedTs = true): NphDlw
     {
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
@@ -1030,6 +1168,11 @@ class NphOrderService
         return $formData;
     }
 
+    /**
+     * @param array<int, NphDlw> $dlwRepository
+     *
+     * @return array<string, array<string, mixed>>
+     */
     public function generateDlwSummary(array $dlwRepository): array
     {
         $dlwSummary = [];
@@ -1039,6 +1182,9 @@ class NphOrderService
         return $dlwSummary;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getDowntimeOrderSummary(): array
     {
         $orders = $this->getDowntimeGeneratedOrdersByModuleAndVisit($this->participantId, $this->module, $this->visit);
@@ -1069,6 +1215,11 @@ class NphOrderService
         return $downtimeGenerated;
     }
 
+    /**
+     * @param array<string, mixed> $nphOrderInfo
+     *
+     * @return array<string, array<string, int>>
+     */
     public function getSampleStatusCounts(array $nphOrderInfo): array
     {
         $moduleStatusCount = [];
@@ -1088,6 +1239,10 @@ class NphOrderService
         return $moduleStatusCount;
     }
 
+    /**
+     * @param array<string, mixed>             $formData
+     * @param array<string, array<string, int>> $sampleStatusCounts
+     */
     public function saveSampleProcessingStatus(string $participantId, string $biobankId, array $formData, array $sampleStatusCounts): void
     {
         $nphSampleProcessingStatus = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatus($participantId, $formData['module'], $formData['period']);
@@ -1113,6 +1268,9 @@ class NphOrderService
         $this->em->flush();
     }
 
+    /**
+     * @return array<int, array<string, string>>
+     */
     public function getModuleDietPeriodsStatus(string $participantId, string $participantModule): array
     {
         $moduleDietPeriodsStatus = [
@@ -1191,6 +1349,9 @@ class NphOrderService
         return $moduleDietPeriodsStatus;
     }
 
+    /**
+     * @param array<int|string, array<string, string>> $moduleDietPeriodStatus
+     */
     public function getActiveDietPeriod(array $moduleDietPeriodStatus, string $currentModule): string
     {
         $completedCount = 0;
@@ -1209,6 +1370,9 @@ class NphOrderService
         return NphDietPeriodStatus::PERIOD1;
     }
 
+    /**
+     * @param array<int|string, array<string, string>> $moduleDietPeriodStatus
+     */
     public function getActiveModule(array $moduleDietPeriodStatus, string $currentModule): string
     {
         $module1DietStatus = $moduleDietPeriodStatus[1]['LMT'];
@@ -1234,6 +1398,10 @@ class NphOrderService
         return $isPreviousDietPeriodStarted && !$isSampleProcessingComplete;
     }
 
+    /**
+     * @param array<string, mixed>              $formData
+     * @param array<string, array<string, int>> $sampleStatusCounts
+     */
     public function saveGenerateOrderWarningLog(string $participantId, string $biobankId, array $formData, array $sampleStatusCounts): void
     {
         $nphGenerateOrderWarningLog = $this->em->getRepository(NphGenerateOrderWarningLog::class)->getGenerateOrderWarningLog($participantId, $formData['module'], $formData['period']);
@@ -1255,6 +1423,9 @@ class NphOrderService
         $this->em->flush();
     }
 
+    /**
+     * @return array<string, array<string, array<string, string>>>
+     */
     public function getModuleVisitTimePointSamples(string $module, string $participantId, string $biobankId): array
     {
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
@@ -1267,6 +1438,9 @@ class NphOrderService
         return $visitTimePointSamples;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getModuleTimePoints(string $module, string $participantId, string $biobankId): array
     {
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;
@@ -1285,6 +1459,9 @@ class NphOrderService
         return $uniqueTimePoints;
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     public function getStoolSamples(): array
     {
         $timePointSamples = $this->getTimePointSamples();
@@ -1301,6 +1478,9 @@ class NphOrderService
         return $stoolTimePointSamples;
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     public function getNonStoolSamples(): array
     {
         $timePointSamples = $this->getTimePointSamples();
@@ -1317,6 +1497,11 @@ class NphOrderService
     }
 
 
+    /**
+     * @param array<int, NphOrder> $nphOrder
+     *
+     * @return array{order: array<string, mixed>, sampleCount: int, sampleStatusCount: array<string, mixed>}
+     */
     private function generateOrderSummaryArray(array $nphOrder): array
     {
         $sampleCount = 0;
@@ -1366,6 +1551,9 @@ class NphOrderService
         return $returnArray;
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     private function getStoolTimePoint(array $formData, string $sampleStool): ?string
     {
         foreach (array_keys($this->getTimePoints()) as $timePoint) {
@@ -1387,6 +1575,9 @@ class NphOrderService
         return $id;
     }
 
+    /**
+     * @param list<string> $samples
+     */
     private function createOrderWithSamples(string $timePoint, string $orderType, array $samples, string $sampleGroup, bool $downtimeGenerated = false, ?DateTime $downtimeGeneratedCreatedTs = null): void
     {
         $nphOrder = $this->createOrder($timePoint, $orderType, null, $downtimeGenerated, $downtimeGeneratedCreatedTs);
@@ -1395,12 +1586,23 @@ class NphOrderService
         }
     }
 
-    private function mapMetadata($metadata, $type, $values): string
+    /**
+     * @param array<string, mixed>      $metadata
+     * @param array<string, int|string> $values
+     */
+    private function mapMetadata(array $metadata, string $type, array $values): string
     {
-        return isset($metadata[$type]) ? array_search($metadata[$type], $values) : '';
+        if (!isset($metadata[$type])) {
+            return '';
+        }
+        $mappedValue = array_search($metadata[$type], $values, true);
+        return is_string($mappedValue) ? $mappedValue : '';
     }
 
-    private function saveSampleFinalization(array $formData, NphSample $sample, $biobankFinalization = false): bool
+    /**
+     * @param array<string, mixed> $formData
+     */
+    private function saveSampleFinalization(array $formData, NphSample $sample, bool $biobankFinalization = false): bool
     {
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
@@ -1440,7 +1642,10 @@ class NphOrderService
         }
     }
 
-    private function saveStoolSampleFinalization(array $formData, NphSample $sample, $biobankFinalization = false): bool
+    /**
+     * @param array<string, mixed> $formData
+     */
+    private function saveStoolSampleFinalization(array $formData, NphSample $sample, bool $biobankFinalization = false): bool
     {
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
@@ -1500,6 +1705,9 @@ class NphOrderService
         return false;
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     private function saveSampleFinalizationData(array $formData, NphSample $sample, bool $biobankFinalization = false): void
     {
         $sampleModifyType = $sample->getModifyType();
@@ -1530,7 +1738,7 @@ class NphOrderService
         $this->loggerService->log(Log::NPH_SAMPLE_UPDATE, $sample->getId());
     }
 
-    private function saveNphSampleFinalizedInfo(NphSample $sample, DateTime $collectedTs, ?string $notes, ?string $sampleMetadata = null, $biobankFinalization = false): void
+    private function saveNphSampleFinalizedInfo(NphSample $sample, DateTime $collectedTs, ?string $notes, ?string $sampleMetadata = null, bool $biobankFinalization = false): void
     {
         $sample->setCollectedTs($collectedTs);
         $sample->setCollectedTimezoneId($this->getTimezoneid());
@@ -1565,6 +1773,10 @@ class NphOrderService
         $this->em->flush();
     }
 
+    /**
+     * @param array<string, array<string, mixed>> $aliquots
+     * @param array<string, mixed>                $formData
+     */
     private function saveNphAliquotFinalizedInfo(NphSample $sample, array $aliquots, array $formData): void
     {
         foreach ($aliquots as $aliquotCode => $aliquot) {
@@ -1602,6 +1814,9 @@ class NphOrderService
         }
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     private function saveSampleModificationsData(NphSample $sample, string $type, array $formData): void
     {
         if ($formData['reason'] === 'OTHER') {
@@ -1638,7 +1853,7 @@ class NphOrderService
                     $sample->setModifiedSite($sample->getFinalizedSite());
                     $sample->setModifyReason(NphSample::NPH_ADMIN_MODIFY_REASON);
                 } else {
-                    $sample->setModifiedSite($this->site ?? $sample->getFinalizedSite());
+                    $sample->setModifiedSite($this->site);
                 }
                 $sample->setModifiedTs(new DateTime());
                 $sample->setModifiedTimezoneId($this->getTimezoneid());
@@ -1693,7 +1908,7 @@ class NphOrderService
         return null;
     }
 
-    private function editRDRDlw(string $participantId, string $rdrId, \stdClass $rdrDlwObject)
+    private function editRDRDlw(string $participantId, string $rdrId, \stdClass $rdrDlwObject): bool
     {
         try {
             $response = $this->rdrApiService->put(
@@ -1760,6 +1975,12 @@ class NphOrderService
         return false;
     }
 
+    /**
+     * @return array{
+     *     author: array{system: string, value: string},
+     *     site: array{system: string, value: string}
+     * }
+     */
     private function getUserSiteData(string $user, string $site): array
     {
         return [
@@ -1774,6 +1995,9 @@ class NphOrderService
         ];
     }
 
+    /**
+     * @param array<int, string|null> $totalIds
+     */
     private function hasDuplicateIds(array $totalIds): bool
     {
         $totalIds = array_filter($totalIds, function ($value) {
@@ -1788,6 +2012,9 @@ class NphOrderService
         return $this->userService->getUserEntity()->getTimezoneId();
     }
 
+    /**
+     * @return array<int, NphOrder>
+     */
     private function getDowntimeGeneratedOrdersByModuleAndVisit(string $ParticipantId, string $Module, string $Visit): array
     {
         $orders = $this->em->getRepository(NphOrder::class)->getDownTimeGeneratedOrdersByModuleAndVisit($ParticipantId, $Module, $Visit);
