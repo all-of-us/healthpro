@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\FeatureNotificationUserMap;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -23,7 +24,7 @@ class FeatureNotificationUserMapRepository extends ServiceEntityRepository
     /**
      * @return list<int>
      */
-    public function getUserNotificationIds($user)
+    public function getUserNotificationIds(User $user): array
     {
         $userNotificationIds = $this->createQueryBuilder('fum')
             ->select('identity(fum.featureNotification)')

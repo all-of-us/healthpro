@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\NphOrder;
 use App\Entity\NphSample;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Connection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,7 +22,10 @@ class NphSampleRepository extends ServiceEntityRepository
         parent::__construct($registry, NphSample::class);
     }
 
-    public function findActiveSampleCodes(NphOrder $order, $site)
+    /**
+     * @return list<string>
+     */
+    public function findActiveSampleCodes(NphOrder $order, string $site): array
     {
         return $this->createQueryBuilder('s')
             ->select('s.sampleCode')
@@ -45,6 +49,9 @@ class NphSampleRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @return array<int, NphSample>
+     */
     public function findActiveSamplesByParticipantId(string $participantId, string $module): array
     {
         $qb = $this->createQueryBuilder('s');
@@ -82,7 +89,10 @@ class NphSampleRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    private function buildCaseExpression($connection, string $field, array $orderList): string
+    /**
+     * @param array<int, string> $orderList
+     */
+    private function buildCaseExpression(Connection $connection, string $field, array $orderList): string
     {
         $cases = [];
         foreach ($orderList as $index => $value) {

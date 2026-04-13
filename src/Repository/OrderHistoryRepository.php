@@ -21,7 +21,7 @@ class OrderHistoryRepository extends ServiceEntityRepository
         parent::__construct($registry, OrderHistory::class);
     }
 
-    public function getLastOrderHistoryUnlocked($orderId)
+    public function getLastOrderHistoryUnlocked(int $orderId): ?OrderHistory
     {
         return $this->createQueryBuilder('oh')
             ->andWhere('oh.order = :orderId')

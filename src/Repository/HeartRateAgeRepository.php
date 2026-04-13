@@ -39,7 +39,10 @@ class HeartRateAgeRepository extends ServiceEntityRepository
         }
     }
 
-    public function getChartsData(): ?array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getChartsData(): array
     {
         return $this->createQueryBuilder('hra')
             ->getQuery()

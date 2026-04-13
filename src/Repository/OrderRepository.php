@@ -45,7 +45,7 @@ class OrderRepository extends ServiceEntityRepository
     /**
      * @return Order[] Returns an array of Order objects
      */
-    public function getDuplicateFedexTracking($fedexTracking, $orderId)
+    public function getDuplicateFedexTracking(string $fedexTracking, int $orderId): array
     {
         return $this->createQueryBuilder('o')
             ->where('o.fedexTracking = :fedexTracking')
@@ -57,9 +57,9 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
-    public function getSiteUnfinalizedOrders($siteId)
+    public function getSiteUnfinalizedOrders(string $siteId): array
     {
         $ordersQuery = '
             SELECT o.*,
@@ -93,9 +93,9 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
-    public function getSiteUnlockedOrders($siteId)
+    public function getSiteUnlockedOrders(string $siteId): array
     {
         $ordersQuery = "
             SELECT o.*,
@@ -118,9 +118,9 @@ class OrderRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
-    public function getSiteRecentModifiedOrders($siteId)
+    public function getSiteRecentModifiedOrders(string $siteId): array
     {
         $ordersQuery = '
             SELECT o.*,
@@ -144,6 +144,9 @@ class OrderRepository extends ServiceEntityRepository
         ]);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getUnfinalizedOrders(): array
     {
         $ordersQuery = '
@@ -184,6 +187,9 @@ class OrderRepository extends ServiceEntityRepository
         return $orders;
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getUnlockedOrders(): array
     {
         $ordersQuery = '
@@ -212,6 +218,9 @@ class OrderRepository extends ServiceEntityRepository
         ]);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getRecentModifiedOrders(): array
     {
         $ordersQuery = '
@@ -244,7 +253,9 @@ class OrderRepository extends ServiceEntityRepository
         ]);
     }
 
-
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getUnloggedMissingOrders(): array
     {
         $ordersQuery = 'SELECT id FROM orders WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND mayo_id IS NOT NULL AND rdr_id IS NULL';
@@ -253,7 +264,10 @@ class OrderRepository extends ServiceEntityRepository
         ]);
     }
 
-    public function getSiteRecentOrders($site): array
+    /**
+     * @return array<int, Order>
+     */
+    public function getSiteRecentOrders(string $site): array
     {
         return $this->createQueryBuilder('o')
             ->where('o.site = :site')
@@ -266,7 +280,10 @@ class OrderRepository extends ServiceEntityRepository
         ;
     }
 
-    public function getBackfillOrders($limit)
+    /**
+     * @return array<int, Order>
+     */
+    public function getBackfillOrders(int $limit): array
     {
         return $this->createQueryBuilder('o')
             ->where('o.processedTs < o.collectedTs')
@@ -277,6 +294,9 @@ class OrderRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getNightlyReportOrders(): array
     {
         return $this->createQueryBuilder('o')

@@ -39,7 +39,10 @@ class ZScoresRepository extends ServiceEntityRepository
         }
     }
 
-    public function getChartsData(): ?array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getChartsData(): array
     {
         return $this->createQueryBuilder('z')
             ->orderBy('z.Z', 'ASC')

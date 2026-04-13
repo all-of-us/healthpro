@@ -21,6 +21,9 @@ class IncentiveImportRowRepository extends ServiceEntityRepository
         parent::__construct($registry, IncentiveImportRow::class);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getIncentiveImportRows(int $limit): array
     {
         return $this->createQueryBuilder('iir')
@@ -36,7 +39,7 @@ class IncentiveImportRowRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function deleteUnconfirmedImportData($date): void
+    public function deleteUnconfirmedImportData(string $date): void
     {
         $query = 'DELETE iir FROM incentive_import_row iir inner join incentive_import ii on iir.import_id = ii.id where ii.created_ts < :date and ii.confirm = :confirm';
         $params = ['date' => $date, 'confirm' => 0];

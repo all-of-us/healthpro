@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\WorkqueueView;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -22,7 +23,7 @@ class WorkqueueViewRepository extends ServiceEntityRepository
 
 
     // Sets default view to 0 for all user views except one
-    public function updateDefaultView($id, $user)
+    public function updateDefaultView(int $id, User $user): void
     {
         $query = $this->createQueryBuilder('w')
             ->update('App\Entity\WorkqueueView', 'w')
@@ -35,7 +36,7 @@ class WorkqueueViewRepository extends ServiceEntityRepository
         $query->execute();
     }
 
-    public function checkDuplicateName($id, $name, $user): int
+    public function checkDuplicateName(?int $id, string $name, User $user): int
     {
         $queryBuilder = $this->createQueryBuilder('w')
             ->select('count(w.id)')

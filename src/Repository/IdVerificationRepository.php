@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\IdVerification;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -20,9 +21,17 @@ class IdVerificationRepository extends ServiceEntityRepository
         parent::__construct($registry, IdVerification::class);
     }
 
-    public function getOnsiteIdVerifications($site, $params): array
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getOnsiteIdVerifications(string $site, array $params): array
     {
         $queryBuilder = $this->createQueryBuilder('idv')
+            ->leftJoin('idv.user', 'u')
+            ->leftJoin('idv.import', 'idvi')
+            ->where('idv.site = :site')
             ->select('idv.createdTs, idv.participantId, idv.verificationType, idv.visitType,
                 u.email, idvi.id as importId, idv.GuardianVerified as guardianVerified');
 
@@ -46,7 +55,10 @@ class IdVerificationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getOnsiteIdVerificationsCount($site, $params): int
+    /**
+     * @param array<string, mixed> $params
+     */
+    public function getOnsiteIdVerificationsCount(string $site, array $params): int
     {
         $queryBuilder = $this->createQueryBuilder('idv')
             ->select('count(idv.id)');
@@ -58,12 +70,11 @@ class IdVerificationRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    private function setQueryBuilder(&$queryBuilder, $params, $site): void
+    /**
+     * @param array<string, mixed> $params
+     */
+    private function setQueryBuilder(QueryBuilder $queryBuilder, array $params, string $site): void
     {
-        $queryBuilder->leftJoin('idv.user', 'u')
-            ->leftJoin('idv.import', 'idvi')
-            ->where('idv.site =:site');
-
         if (!empty($params['participantId'])) {
             $queryBuilder->andWhere('idv.participantId = :participantId')
                 ->setParameter('participantId', $params['participantId']);

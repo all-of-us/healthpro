@@ -20,7 +20,7 @@ class OrganizationRepository extends ServiceEntityRepository
         parent::__construct($registry, Organization::class);
     }
 
-    public function deleteOrganizations()
+    public function deleteOrganizations(): int
     {
         return $this->createQueryBuilder('o')
             ->delete()

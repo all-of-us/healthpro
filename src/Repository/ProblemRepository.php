@@ -20,7 +20,10 @@ class ProblemRepository extends ServiceEntityRepository
         parent::__construct($registry, Problem::class);
     }
 
-    public function getProblemsWithCommentsCount($participantId = null)
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getProblemsWithCommentsCount(?string $participantId = null): array
     {
         $qb = $this->createQueryBuilder('p')
             ->leftJoin('p.problemComments', 'pc')

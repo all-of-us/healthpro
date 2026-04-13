@@ -23,7 +23,7 @@ class NphSiteRepository extends ServiceEntityRepository
     /**
      * @return array<int, array<string, int>>
      */
-    public function getDuplicateGoogleGroup($googleGroup, $id = null)
+    public function getDuplicateGoogleGroup(string $googleGroup, ?int $id = null): array
     {
         $queryBuilder = $this->createQueryBuilder('ns')
             ->select('ns.id');

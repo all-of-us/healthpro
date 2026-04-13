@@ -16,6 +16,9 @@ class DeactivateLogRepository extends ServiceEntityRepository
         parent::__construct($registry, DeactivateLog::class);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getDeactivatedNotifications(): array
     {
         return $this->createQueryBuilder('d')
@@ -27,6 +30,9 @@ class DeactivateLogRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getLatestAwardees(): array
     {
         return $this->createQueryBuilder('d')

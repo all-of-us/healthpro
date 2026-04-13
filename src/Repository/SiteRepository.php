@@ -54,7 +54,7 @@ class SiteRepository extends ServiceEntityRepository
     /**
      * @return array<int, array<string, int>>
      */
-    public function getDuplicateSiteGoogleGroup($googleGroup, $id)
+    public function getDuplicateSiteGoogleGroup(string $googleGroup, int $id): array
     {
         return $this->createQueryBuilder('s')
             ->select('s.id')
@@ -70,7 +70,7 @@ class SiteRepository extends ServiceEntityRepository
     /**
      * @return array<int, array<string, int>>
      */
-    public function getDuplicateGoogleGroup($googleGroup)
+    public function getDuplicateGoogleGroup(string $googleGroup): array
     {
         return $this->createQueryBuilder('s')
             ->select('s.id')
@@ -119,7 +119,7 @@ class SiteRepository extends ServiceEntityRepository
         }
     }
 
-    public function getActiveSiteCount($siteId): int
+    public function getActiveSiteCount(string $siteId): int
     {
         return $this->createQueryBuilder('s')
             ->select('COUNT(s.id)')

@@ -16,6 +16,9 @@ class WithdrawalLogRepository extends ServiceEntityRepository
         parent::__construct($registry, WithdrawalLog::class);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getWithdrawalNotifications(): array
     {
         return $this->createQueryBuilder('w')
@@ -27,6 +30,9 @@ class WithdrawalLogRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getLatestAwardees(): array
     {
         return $this->createQueryBuilder('w')

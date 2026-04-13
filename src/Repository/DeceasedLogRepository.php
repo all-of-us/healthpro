@@ -23,7 +23,7 @@ class DeceasedLogRepository extends ServiceEntityRepository
     /**
      * @return array<int, array<string, string|null>>
      */
-    public function getLatestOrganizations($status)
+    public function getLatestOrganizations(?string $status): array
     {
         return $this->createQueryBuilder('d')
             ->select('d.organizationId, max(d.deceasedTs) as ts')
