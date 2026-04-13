@@ -12,6 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Incentive|null findOneBy(array $criteria, array $orderBy = null)
  * @method Incentive[]    findAll()
  * @method Incentive[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<Incentive>
  */
 class IncentiveRepository extends ServiceEntityRepository
 {

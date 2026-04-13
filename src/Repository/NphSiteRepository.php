@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method NphSite|null findOneBy(array $criteria, array $orderBy = null)
  * @method NphSite[]    findAll()
  * @method NphSite[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<NphSite>
  */
 class NphSiteRepository extends ServiceEntityRepository
 {

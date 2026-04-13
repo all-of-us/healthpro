@@ -6,6 +6,9 @@ use App\Entity\WithdrawalLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<WithdrawalLog>
+ */
 class WithdrawalLogRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)

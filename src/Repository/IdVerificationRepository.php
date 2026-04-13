@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method IdVerification|null findOneBy(array $criteria, array $orderBy = null)
  * @method IdVerification[]    findAll()
  * @method IdVerification[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<IdVerification>
  */
 class IdVerificationRepository extends ServiceEntityRepository
 {

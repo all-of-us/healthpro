@@ -12,6 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method IdVerificationImportRow|null findOneBy(array $criteria, array $orderBy = null)
  * @method IdVerificationImportRow[]    findAll()
  * @method IdVerificationImportRow[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<IdVerificationImportRow>
  */
 class IdVerificationImportRowRepository extends ServiceEntityRepository
 {

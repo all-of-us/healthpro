@@ -14,6 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method PatientStatus|null findOneBy(array $criteria, array $orderBy = null)
  * @method PatientStatus[]    findAll()
  * @method PatientStatus[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<PatientStatus>
  */
 class PatientStatusRepository extends ServiceEntityRepository
 {

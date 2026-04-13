@@ -12,6 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method OrderHistory|null findOneBy(array $criteria, array $orderBy = null)
  * @method OrderHistory[]    findAll()
  * @method OrderHistory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<OrderHistory>
  */
 class OrderHistoryRepository extends ServiceEntityRepository
 {

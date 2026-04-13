@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method WorkqueueView|null findOneBy(array $criteria, array $orderBy = null)
  * @method WorkqueueView[]    findAll()
  * @method WorkqueueView[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<WorkqueueView>
  */
 class WorkqueueViewRepository extends ServiceEntityRepository
 {

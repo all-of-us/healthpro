@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method EhrWithdrawalLog|null findOneBy(array $criteria, array $orderBy = null)
  * @method EhrWithdrawalLog[]    findAll()
  * @method EhrWithdrawalLog[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<EhrWithdrawalLog>
  */
 class EhrWithdrawalLogRepository extends ServiceEntityRepository
 {

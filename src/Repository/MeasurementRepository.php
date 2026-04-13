@@ -13,6 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Measurement|null findOneBy(array $criteria, array $orderBy = null)
  * @method Measurement[]    findAll()
  * @method Measurement[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<Measurement>
  */
 class MeasurementRepository extends ServiceEntityRepository
 {
