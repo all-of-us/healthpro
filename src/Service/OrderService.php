@@ -19,15 +19,14 @@ use Symfony\Component\Form\FormInterface;
 class OrderService
 {
     protected PpscApiService $ppscApiService;
-    protected $params;
-    protected $em;
-    protected $mayolinkOrderService;
-    protected $env;
-    protected $userService;
-    protected $siteService;
-    protected $loggerService;
+    protected ParameterBagInterface $params;
+    protected EntityManagerInterface $em;
+    protected MayolinkOrderService $mayolinkOrderService;
+    protected UserService $userService;
+    protected SiteService $siteService;
+    protected LoggerService $loggerService;
     protected Order $order;
-    protected $participant;
+    protected mixed $participant = null;
 
     public function __construct(
         PpscApiService $ppscApiService,
@@ -47,19 +46,19 @@ class OrderService
         $this->loggerService = $loggerService;
     }
 
-    public function loadSamplesSchema($order, PpscParticipant $participant = null, Measurement $physicalMeasurement = null)
+    public function loadSamplesSchema(Order $order, ?PpscParticipant $participant = null, ?Measurement $physicalMeasurement = null): void
     {
         $params = $this->getOrderParams(['order_samples_version', 'ml_mock_order', 'pediatric_order_samples_version']);
         $this->order = $order;
         $this->order->loadSamplesSchema($params, $participant, $physicalMeasurement);
     }
 
-    public function setParticipant($participant)
+    public function setParticipant(mixed $participant): void
     {
         $this->participant = $participant;
     }
 
-    public function getParticipant()
+    public function getParticipant(): mixed
     {
         return $this->participant;
     }
@@ -79,7 +78,7 @@ class OrderService
         return false;
     }
 
-    public function editOrder($orderObject)
+    public function editOrder(stdClass $orderObject): bool
     {
         try {
             $response = $this->ppscApiService->put("participants/{$this->participant->id}/biobank-orders/{$this->order->getRdrId()}", $orderObject);
@@ -93,7 +92,10 @@ class OrderService
         return false;
     }
 
-    public function getOrdersByParticipant($participantId)
+    /**
+     * @return list<stdClass>
+     */
+    public function getOrdersByParticipant(string $participantId): array
     {
         try {
             // Currently, PPSC API doesn't support this
@@ -112,6 +114,11 @@ class OrderService
         return [];
     }
 
+    /**
+     * @param array<string, mixed> $query
+     *
+     * @return list<stdClass>
+     */
     public function getOrders(array $query = []): array
     {
         try {
@@ -133,7 +140,7 @@ class OrderService
         return [];
     }
 
-    public function cancelRestoreOrder($orderObject)
+    public function cancelRestoreOrder(stdClass $orderObject): bool
     {
         try {
             $response = $this->ppscApiService->patch("participants/{$this->participant->id}/biobank-orders/{$this->order->getRdrId()}", $orderObject);
@@ -147,7 +154,7 @@ class OrderService
         return false;
     }
 
-    public function getOrder($participantId, $orderId)
+    public function getOrder(string $participantId, string $orderId): stdClass|bool
     {
         try {
             $response = $this->ppscApiService->get("participants/{$participantId}/biobank-orders/{$orderId}");
@@ -165,7 +172,10 @@ class OrderService
         return false;
     }
 
-    public function getLabelsPdf()
+    /**
+     * @return array{status: string, pdf?: mixed, errorMessage?: string}
+     */
+    public function getLabelsPdf(): array
     {
         // Always return true for mock orders
         if ($this->params->has('ml_mock_order')) {
@@ -210,13 +220,13 @@ class OrderService
         return $result;
     }
 
-    public function cancelRestoreRdrOrder($type, $reason)
+    public function cancelRestoreRdrOrder(string $type, string $reason): bool
     {
         $order = $this->getCancelRestoreRdrObject($type, $reason);
         return $this->cancelRestoreOrder($order);
     }
 
-    public function getCancelRestoreRdrObject($type, $reason)
+    public function getCancelRestoreRdrObject(string $type, string $reason): stdClass
     {
         $obj = new \StdClass();
         $statusType = $type === Order::ORDER_CANCEL ? 'cancelled' : 'restored';
@@ -228,7 +238,7 @@ class OrderService
         return $obj;
     }
 
-    public function generateId()
+    public function generateId(): string
     {
         $attempts = 0;
         $orderRepository = $this->em->getRepository(Order::class);
@@ -246,7 +256,7 @@ class OrderService
         return $id;
     }
 
-    public function setOrderUpdateFromForm($step, $form)
+    public function setOrderUpdateFromForm(string $step, FormInterface $form): void
     {
         $formData = $form->getData();
         if ($formData["{$step}Notes"]) {
@@ -313,7 +323,12 @@ class OrderService
         }
     }
 
-    public function getNewProcessedSamples($samples)
+    /**
+     * @param list<string> $samples
+     *
+     * @return array{samples: string, timeStamps: string}
+     */
+    public function getNewProcessedSamples(array $samples): array
     {
         $processedSamplesTs = json_decode($this->order->getProcessedSamplesTs(), true);
         $newProcessedSamples = [];
@@ -331,7 +346,10 @@ class OrderService
         ];
     }
 
-    public function getNewFinalizedSamples($type, $samples)
+    /**
+     * @param list<string> $samples
+     */
+    public function getNewFinalizedSamples(string $type, array $samples): string
     {
         $finalizedSamples = json_decode($this->order->getFinalizedSamples(), true);
         $newFinalizedSamples = [];
@@ -364,7 +382,10 @@ class OrderService
         return json_encode($newFinalizedSamples);
     }
 
-    public function getOrderFormData($step)
+    /**
+     * @return array<string, mixed>
+     */
+    public function getOrderFormData(string $step): array
     {
         $formData = [];
         if ($this->order->{'get' . ucfirst($step) . 'Notes'}()) {
@@ -410,7 +431,10 @@ class OrderService
         return $formData;
     }
 
-    public function sendOrderToMayo($mayoClientId)
+    /**
+     * @return array{status: string, mayoId?: mixed, errorMessage?: string}
+     */
+    public function sendOrderToMayo(?string $mayoClientId): array
     {
         // Return mock id for mock orders
         if ($this->params->has('ml_mock_order')) {
@@ -453,7 +477,7 @@ class OrderService
         return $result;
     }
 
-    public function sendToRdr()
+    public function sendToRdr(): bool
     {
         if ($this->order->getStatus() === Order::ORDER_UNLOCK) {
             return $this->editRdrOrder();
@@ -461,7 +485,7 @@ class OrderService
         return $this->createRdrOrder();
     }
 
-    public function createRdrOrder()
+    public function createRdrOrder(): bool
     {
         $orderRdrObject = $this->order->getRdrObject();
         $rdrId = $this->createOrder($this->order->getParticipantId(), $orderRdrObject);
@@ -485,7 +509,7 @@ class OrderService
         return false;
     }
 
-    public function editRdrOrder()
+    public function editRdrOrder(): bool
     {
         $orderRdrObject = $this->order->getEditRdrObject();
         $status = $this->editOrder($orderRdrObject);
@@ -495,13 +519,16 @@ class OrderService
         return false;
     }
 
-    public function getRequisitionPdf()
+    public function getRequisitionPdf(): mixed
     {
         return $this->mayolinkOrderService->getRequisitionPdf($this->order->getMayoId());
     }
 
     // Returns sample's display text and color
-    public function getCustomSamplesInfo()
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function getCustomSamplesInfo(): array
     {
         $samples = [];
         $samplesInfo = $this->order->getType() === 'saliva' ? $this->order->getSalivaSamplesInformation() : $this->order->getSamplesInformation();
@@ -552,7 +579,7 @@ class OrderService
         return $samples;
     }
 
-    public function createOrderHistory($type, $reason = '')
+    public function createOrderHistory(string $type, string $reason = ''): bool
     {
         $status = false;
         $connection = $this->em->getConnection();
@@ -588,7 +615,7 @@ class OrderService
     /**
      * Revert collected, processed, finalized samples and timestamps
      */
-    public function revertOrder()
+    public function revertOrder(): bool
     {
         // Get order object from RDR
         $object = $this->getOrder($this->participant->id, $this->order->getRdrId());
@@ -669,13 +696,13 @@ class OrderService
         return $status;
     }
 
-    public function canEdit()
+    public function canEdit(): bool
     {
         // Allow cohort 1 and 2 participants to edit existing orders even if status is false
         return !$this->participant->status && !empty($this->order->getId()) ? $this->participant->editExistingOnly : $this->participant->status;
     }
 
-    public function loadFromJsonObject(stdClass $object)
+    public function loadFromJsonObject(stdClass $object): Order
     {
         if (!empty($object->samples)) {
             foreach ($object->samples as $sample) {
@@ -861,7 +888,12 @@ class OrderService
         return !$this->siteService->isActiveSite();
     }
 
-    protected function getOrderParams($fields)
+    /**
+     * @param list<string> $fields
+     *
+     * @return array<string, mixed>
+     */
+    protected function getOrderParams(array $fields): array
     {
         $params = [];
         foreach ($fields as $field) {
@@ -872,7 +904,7 @@ class OrderService
         return $params;
     }
 
-    private function getNumericId()
+    private function getNumericId(): string
     {
         $length = 10;
         // Avoid leading 0s
