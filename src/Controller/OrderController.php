@@ -31,9 +31,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OrderController extends BaseController
 {
-    protected $orderService;
-    protected $loggerService;
-    protected $siteService;
+    protected OrderService $orderService;
+    protected LoggerService $loggerService;
+    protected SiteService $siteService;
     protected PpscApiService $ppscApiService;
     protected FormFactoryInterface $formFactory;
 
@@ -53,7 +53,7 @@ class OrderController extends BaseController
         $this->formFactory = $formFactory;
     }
 
-    public function loadOrder($participantId, $orderId)
+    public function loadOrder(string $participantId, string $orderId): Order
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
@@ -70,7 +70,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/order/check', name: 'order_check')]
-    public function orderCheck($participantId, RequestStack $requestStack): Response
+    public function orderCheck(string $participantId, RequestStack $requestStack): Response
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
@@ -83,7 +83,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/order/create', name: 'order_create')]
-    public function orderCreateAction($participantId, Request $request, SessionInterface $session, MeasurementService $measurementService, ParameterBagInterface $params)
+    public function orderCreateAction(string $participantId, Request $request, SessionInterface $session, MeasurementService $measurementService, ParameterBagInterface $params): Response
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
@@ -210,7 +210,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/print/labels', name: 'order_print_labels')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/print/labels', name: 'read_order_print_labels')]
-    public function orderPrintLabelsAction($participantId, $orderId): Response
+    public function orderPrintLabelsAction(string $participantId, string $orderId): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         if ($order->isDisabled() || $order->isUnlocked()) {
@@ -240,7 +240,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/labels/pdf', name: 'order_labels_pdf')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/labels/pdf', name: 'read_order_labels_pdf')]
-    public function orderLabelsPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
+    public function orderLabelsPdfAction(string $participantId, string $orderId, Request $request, ParameterBagInterface $params): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         if ($order->isDisabled() || $order->isUnlocked()) {
@@ -263,7 +263,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/collect', name: 'order_collect')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/collect', name: 'read_order_collect', methods: ['GET'])]
-    public function orderCollectAction($participantId, $orderId, Request $request, Session $session, ParameterBagInterface $params)
+    public function orderCollectAction(string $participantId, string $orderId, Request $request, Session $session, ParameterBagInterface $params): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         $nextStep = ($order->getType() === 'saliva' || $order->isPediatricOrder()) ? 'finalize' : 'process';
@@ -353,7 +353,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/process', name: 'order_process')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/process', name: 'read_order_process', methods: ['GET'])]
-    public function orderProcessAction($participantId, $orderId, Request $request)
+    public function orderProcessAction(string $participantId, string $orderId, Request $request): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         $wasFinalizeStepAvailable = in_array('finalize', $order->getAvailableSteps());
@@ -450,7 +450,7 @@ class OrderController extends BaseController
     // @ToDo - Replace SessionInterface with Symfony\Component\HttpFoundation\Session
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/finalize', name: 'order_finalize')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/finalize', name: 'read_order_finalize', methods: ['GET'])]
-    public function orderFinalizeAction($participantId, $orderId, Request $request, Session $session)
+    public function orderFinalizeAction(string $participantId, string $orderId, Request $request, Session $session): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         $wasPrintRequisitionStepAvailable = in_array('print_requisition', $order->getAvailableSteps());
@@ -590,7 +590,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/print/requisition', name: 'order_print_requisition')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/print/requisition', name: 'read_order_print_requisition')]
-    public function orderPrintRequisitionAction($participantId, $orderId, SessionInterface $session)
+    public function orderPrintRequisitionAction(string $participantId, string $orderId, SessionInterface $session): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         if ($order->isCancelled()) {
@@ -619,7 +619,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/requisition/pdf', name: 'order_requisition_pdf')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/requisition/pdf', name: 'read_order_requisition_pdf')]
-    public function orderRequisitionPdfAction($participantId, $orderId, Request $request, ParameterBagInterface $params)
+    public function orderRequisitionPdfAction(string $participantId, string $orderId, Request $request, ParameterBagInterface $params): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         if (empty($order->getFinalizedTs()) || empty($order->getMayoId()) || $order->isCancelled() || $order->isUnlocked()) {
@@ -640,7 +640,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/modify/{type}', name: 'order_modify')]
-    public function orderModifyAction($participantId, $orderId, $type, Request $request)
+    public function orderModifyAction(string $participantId, string $orderId, string $type, Request $request): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         // Allow cancel for active and restored orders
@@ -710,7 +710,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/revert', name: 'order_revert')]
-    public function orderRevertAction($participantId, $orderId, Request $request)
+    public function orderRevertAction(string $participantId, string $orderId, Request $request): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         if ($order->isDisabled() || !$order->isUnlocked()) {
@@ -733,7 +733,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/json-response', name: 'order_json')]
-    public function orderJsonAction($participantId, $orderId, Request $request, EnvironmentService $env)
+    public function orderJsonAction(string $participantId, string $orderId, Request $request, EnvironmentService $env): JsonResponse
     {
         if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
             throw $this->createAccessDeniedException();
@@ -755,7 +755,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}', name: 'order')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}', name: 'read_order')]
-    public function orderAction($participantId, $orderId)
+    public function orderAction(string $participantId, string $orderId): Response
     {
         $orderRepository = $this->em->getRepository(Order::class);
         $order = $orderRepository->find($orderId);
@@ -773,7 +773,7 @@ class OrderController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/order/{orderId}/biobank/summary', name: 'biobank_summary')]
     #[Route(path: '/read/participant/{participantId}/order/{orderId}/biobank/summary', name: 'read_biobank_summary')]
-    public function biobankSummaryAction($participantId, $orderId)
+    public function biobankSummaryAction(string $participantId, string $orderId): Response
     {
         $order = $this->loadOrder($participantId, $orderId);
         return $this->render('biobank/summary.html.twig', [
@@ -782,7 +782,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/order/pediatric/check', name: 'order_check_pediatric')]
-    public function orderCheckPediatric($participantId, RequestStack $requestStack, MeasurementService $measurementService): Response
+    public function orderCheckPediatric(string $participantId, RequestStack $requestStack, MeasurementService $measurementService): Response
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
@@ -804,6 +804,9 @@ class OrderController extends BaseController
         ]);
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     private function createOrderCollectForm(Order $order, array $formData, Request $request, Session $session, ParameterBagInterface $params, string $step): FormInterface
     {
         return $this->createForm(OrderType::class, $formData, [

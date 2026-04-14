@@ -279,12 +279,7 @@ class NphOrder
 
     public function removeNphSample(NphSample $nphSample): self
     {
-        if ($this->nphSamples->removeElement($nphSample)) {
-            // set the owning side to null (unless already changed)
-            if ($nphSample->getNphOrder() === $this) {
-                $nphSample->setNphOrder(null);
-            }
-        }
+        $this->nphSamples->removeElement($nphSample);
 
         return $this;
     }

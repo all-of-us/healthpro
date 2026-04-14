@@ -35,31 +35,36 @@ class NphSample
         'μL' => 'uL'
     ];
 
-    public static $cancelReasons = [
+    /** @var array<string, string> */
+    public static array $cancelReasons = [
         'Created in error' => 'CANCEL_ERROR',
         'Created for wrong participant' => 'CANCEL_WRONG_PARTICIPANT',
         'Labeling error identified after finalization' => 'CANCEL_LABEL_ERROR',
         'Other' => 'OTHER'
     ];
 
-    public static $restoreReasons = [
+    /** @var array<string, string> */
+    public static array $restoreReasons = [
         'Cancelled for wrong participant' => 'RESTORE_WRONG_PARTICIPANT',
         'Can be edited instead of cancelled' => 'RESTORE_AMEND',
         'Other' => 'OTHER'
     ];
 
-    public static $unlockReasons = [
+    /** @var array<string, string> */
+    public static array $unlockReasons = [
         'Change collection information' => 'CHANGE_COLLECTION_INFORMATION',
         'Change, add, or remove aliquot' => 'CHANGE_ADD_REMOVE_ALIQUOT',
         'Other' => 'OTHER'
     ];
 
-    public static $modifySuccessText = [
+    /** @var array<string, string> */
+    public static array $modifySuccessText = [
         'cancel' => 'cancelled',
         'restore' => 'restored',
         'unlock' => 'unlocked'
     ];
 
+    /** @var list<string> */
     public static array $stoolSamples = [
         'STOOL',
         'ST1',
@@ -78,79 +83,81 @@ class NphSample
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 100)]
-    private $sampleId;
+    private string $sampleId;
 
     #[ORM\ManyToOne(targetEntity: NphOrder::class, inversedBy: 'nphSamples')]
     #[ORM\JoinColumn(nullable: false)]
-    private $nphOrder;
+    private NphOrder $nphOrder;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $sampleCode;
+    private string $sampleCode;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $sampleMetadata;
+    private ?string $sampleMetadata = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $collectedSite;
+    private ?string $collectedSite = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    private $collectedUser;
+    private ?User $collectedUser = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $collectedTs;
+    private ?\DateTime $collectedTs = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $collectedNotes;
+    private ?string $collectedNotes = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $finalizedSite;
+    private ?string $finalizedSite = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    private $finalizedUser;
+    private ?User $finalizedUser = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $finalizedTs;
+    private ?\DateTime $finalizedTs = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $finalizedNotes;
+    private ?string $finalizedNotes = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $rdrId;
+    private ?string $rdrId = null;
 
+    /** @var Collection<int, NphAliquot> */
     #[ORM\OneToMany(targetEntity: NphAliquot::class, mappedBy: 'nphSample')]
-    private $nphAliquots;
+    private Collection $nphAliquots;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    private $modifiedUser;
+    private ?User $modifiedUser = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $modifiedSite;
+    private ?string $modifiedSite = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $modifiedTs;
+    private ?\DateTime $modifiedTs = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $modifyReason;
+    private ?string $modifyReason = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $modifyType;
+    private ?string $modifyType = null;
 
     #[ORM\Column(type: 'integer', nullable: false)]
-    private $sampleGroup;
+    private int $sampleGroup;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $collectedTimezoneId;
+    private ?int $collectedTimezoneId = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $finalizedTimezoneId;
+    private ?int $finalizedTimezoneId = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $modifiedTimezoneId;
+    private ?int $modifiedTimezoneId = null;
+
     #[ORM\Column(type: 'boolean', nullable: true)]
-    private $biobankFinalized;
+    private ?bool $biobankFinalized = null;
 
     public function __construct()
     {
@@ -174,16 +181,18 @@ class NphSample
         return $this;
     }
 
-    public function getNphOrder(): ?NphOrder
+    public function getNphOrder(): NphOrder
     {
         return $this->nphOrder;
     }
 
-    public function setNphOrder(?NphOrder $nphOrder): self
+    public function setNphOrder(NphOrder $nphOrder): self
     {
         $this->nphOrder = $nphOrder;
+
         // This loads collection data in phpunit
         $nphOrder->addNphSample($this);
+
         return $this;
     }
 
@@ -397,14 +406,13 @@ class NphSample
         return $this->getStatus() === self::DISPLAY_FINALIZED || $this->getStatus() === self::DISPLAY_BIOBANK_FINALIZED;
     }
 
-    /**
-     * @return Collection|NphAliquot[]
-     */
+    /** @return Collection<int, NphAliquot> */
     public function getNphAliquots(): Collection
     {
         return $this->nphAliquots;
     }
 
+    /** @return array<string, string> */
     public function getNphAliquotsStatus(): array
     {
         $aliquotsStatus = [];
@@ -414,6 +422,7 @@ class NphSample
         return $aliquotsStatus;
     }
 
+    /** @return list<string> */
     public function getNphAliquotIds(): array
     {
         $aliquotIds = [];
@@ -532,6 +541,10 @@ class NphSample
         return false;
     }
 
+    /**
+     * @param array<string, mixed> $samplesMetadata
+     * @return array<string, mixed>
+     */
     public function getRdrSampleObj(string $sampleIdentifier, string $description, array $samplesMetadata = []): array
     {
         $collectedTs = $this->getCollectedTs();
@@ -551,7 +564,7 @@ class NphSample
         if ($this->getNphOrder()->getOrderType() === NphOrder::TYPE_STOOL || $this->getNphOrder()->getOrderType() === NphOrder::TYPE_STOOL_2) {
             $sampleData['bowelMovement'] = $samplesMetadata['bowelType'] ?? null;
             $sampleData['bowelMovementQuality'] = $samplesMetadata['bowelQuality'] ?? null;
-            if ($samplesMetadata['freezedTs']) {
+            if (!empty($samplesMetadata['freezedTs'])) {
                 $freezedTs = new \DateTime();
                 $freezedTs->setTimestamp($samplesMetadata['freezedTs']);
                 $sampleData['freezed'] = $freezedTs->format('Y-m-d\TH:i:s\Z');
@@ -560,6 +573,10 @@ class NphSample
         return $sampleData;
     }
 
+    /**
+     * @param array<string, array<string, mixed>> $aliquotsInfo
+     * @return list<array<string, mixed>>
+     */
     public function getRdrAliquotsSampleObj(array $aliquotsInfo): array
     {
         $aliquotObj = [];
@@ -603,11 +620,12 @@ class NphSample
         return $this->sampleGroup;
     }
 
-    public function setSampleGroup($sampleGroup): void
+    public function setSampleGroup(int|string $sampleGroup): void
     {
-        $this->sampleGroup = $sampleGroup;
+        $this->sampleGroup = (int) $sampleGroup;
     }
 
+    /** @return array<string, mixed>|null */
     public function getSampleMetadataArray(): ?array
     {
         $sampleMetadata = json_decode($this->getSampleMetadata(), true);

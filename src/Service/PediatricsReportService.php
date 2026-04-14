@@ -9,6 +9,14 @@ use App\Entity\ZScores;
 use App\Service\Ppsc\PpscApiService;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * @phpstan-type AlertBucket array<string, int>
+ * @phpstan-type AlertMatrix array<string, AlertBucket>
+ * @phpstan-type ChartRow array<string, mixed>
+ * @phpstan-type CsvScalar bool|float|int|string|null
+ * @phpstan-type CsvRow array<int, CsvScalar>
+ * @phpstan-type MeasurementData array<string, mixed>
+ */
 class PediatricsReportService
 {
     public const BUCKET_NAME_STABLE = 'healthpro-stable-measurements-report';
@@ -155,6 +163,8 @@ class PediatricsReportService
     protected EnvironmentService $env;
     protected MeasurementService $measurementService;
     protected PpscApiService $ppscApiService;
+
+    /** @var list<ChartRow> */
     protected array $zScores;
 
     public function __construct(
@@ -179,7 +189,11 @@ class PediatricsReportService
         $this->generateCSVReport($csvData, 'Incentive_Report-' . date('Ymd-His') . '.csv');
     }
 
-    public function getIncentiveReportCSVData(array $incentives)
+    /**
+     * @param list<array<string, mixed>> $incentives
+     * @return list<CsvRow>
+     */
+    public function getIncentiveReportCSVData(array $incentives): array
     {
         $csvData = [];
         $csvData[] = ['Participant ID', 'Date Created', 'Site', 'Recipient', 'Date of Service', 'Incentive Occurrence',
@@ -386,8 +400,13 @@ class PediatricsReportService
         $this->em->getRepository(Measurement::class)->deleteTempEvaluationTable();
     }
 
+    /**
+     * @param MeasurementData $measurementData
+     * @param list<ChartRow> $heightForAgeChart
+     * @param list<ChartRow> $bloodPressureSystolicHeightChart
+     */
     public function getBloodPressureSystolicAlert(
-        $measurement,
+        Measurement $measurement,
         array $measurementData,
         float $ageInMonths,
         int $sexAtBirth,
@@ -414,8 +433,13 @@ class PediatricsReportService
         );
     }
 
+    /**
+     * @param MeasurementData $measurementData
+     * @param list<ChartRow> $heightForAgeChart
+     * @param list<ChartRow> $bloodPressureSystolicHeightChart
+     */
     public function getBloodPressureDiastolicAlert(
-        $measurement,
+        Measurement $measurement,
         array $measurementData,
         float $ageInMonths,
         int $sexAtBirth,
@@ -452,6 +476,7 @@ class PediatricsReportService
         return self::MODIFICATION_TYPE_MAPPING[$field][$modType] ?? ucfirst(str_replace('-', ' ', $modType));
     }
 
+    /** @return AlertMatrix */
     private function buildBlankAlertArray(): array
     {
         return [
@@ -527,6 +552,10 @@ class PediatricsReportService
         ];
     }
 
+    /**
+     * @param list<ChartRow> $heightForAgeChart
+     * @return array<string, float|int>
+     */
     private function getLMSValues(array $heightForAgeChart, float $ageInMonths, int $sexAtBirth): array
     {
         foreach ($heightForAgeChart as $item) {
@@ -537,8 +566,13 @@ class PediatricsReportService
         return [];
     }
 
+    /**
+     * @param MeasurementData $measurementData
+     * @param list<ChartRow> $heightForAgeChart
+     * @param list<ChartRow> $bloodPressureChart
+     */
     private function getBloodPressureAlert(
-        $measurement,
+        Measurement $measurement,
         array $measurementData,
         float $ageInMonths,
         int $sexAtBirth,
@@ -619,7 +653,7 @@ class PediatricsReportService
         return '';
     }
 
-    private function roundDownToNearestPercentile($percentile): int
+    private function roundDownToNearestPercentile(float $percentile): int
     {
         $percentiles = [5, 10, 25, 50, 75, 90, 95];
         $result = $percentiles[0];
@@ -635,7 +669,17 @@ class PediatricsReportService
         return $result;
     }
 
-    private function getMaxValueForPercentile($addValue, $sex, $heightPercentileField, $bpHeightPercentileCharts, $ageInMonths, $defaultMaxValue = null)
+    /**
+     * @param list<ChartRow> $bpHeightPercentileCharts
+     */
+    private function getMaxValueForPercentile(
+        float $addValue,
+        int $sex,
+        string $heightPercentileField,
+        array $bpHeightPercentileCharts,
+        float $ageInMonths,
+        ?float $defaultMaxValue = null
+    ): ?float
     {
         $maxValue = null;
         $ageInYears = $this->getAgeInYears($ageInMonths);
@@ -645,12 +689,12 @@ class PediatricsReportService
                 $ageInYears === $bpHeightPercentile['ageYear'] &&
                 $bpHeightPercentile['bpCentile'] === 95
             ) {
-                $maxValue = $bpHeightPercentile[$heightPercentileField] + $addValue;
+                $maxValue = (float) $bpHeightPercentile[$heightPercentileField] + $addValue;
                 break;
             }
         }
 
-        if ($defaultMaxValue && $maxValue > $defaultMaxValue) {
+        if ($defaultMaxValue !== null && $maxValue !== null && $maxValue > $defaultMaxValue) {
             $maxValue = $defaultMaxValue;
         }
 
@@ -666,6 +710,10 @@ class PediatricsReportService
         return (int) floor($ageInMonths / 12);
     }
 
+    /**
+     * @param MeasurementData $measurementData
+     * @param list<ChartRow> $heartRateAgeCharts
+     */
     private function getHeartRateAlert(array $measurementData, float $ageInMonths, array $heartRateAgeCharts): string
     {
         if (!array_key_exists('heart-rate', $measurementData)) {
@@ -780,6 +828,10 @@ class PediatricsReportService
         }
         return '';
     }
+    /**
+     * @param MeasurementData $measurementData
+     * @param list<ChartRow>|null $growthChartsByAge
+     */
     private function getHeadCircumferenceAlert(Measurement $measurement, array $measurementData, float $ageInMonths, int $sex, ?array $growthChartsByAge = null): string
     {
         if (!array_key_exists('head-circumference', $measurementData)) {
@@ -828,6 +880,7 @@ class PediatricsReportService
         }
         return '';
     }
+    /** @param MeasurementData $measurementData */
     private function getIrregularHeartRhythmAlert(array $measurementData): string
     {
         if (!array_key_exists('irregular-heart-rate', $measurementData)) {
@@ -840,6 +893,10 @@ class PediatricsReportService
         }
         return '';
     }
+    /**
+     * @param MeasurementData $measurementData
+     * @param list<ChartRow> $growthChartsByAge
+     */
     private function getWeightAlert(Measurement $measurement, array $measurementData, float $ageInMonths, array $growthChartsByAge, int $sex): string
     {
         if (!array_key_exists('weight', $measurementData)) {
@@ -899,6 +956,10 @@ class PediatricsReportService
         }
         return '';
     }
+    /**
+     * @param MeasurementData $measurementData
+     * @param list<ChartRow> $growthChartsByAge
+     */
     private function getWeightForLengthAlert(Measurement $measurement, array $measurementData, array $growthChartsByAge, int $sex): string
     {
         $weights = array_key_exists('weight', $measurementData) ? $measurementData['weight'] : [];
@@ -937,6 +998,10 @@ class PediatricsReportService
         }
         return '';
     }
+    /**
+     * @param MeasurementData $measurementData
+     * @param list<ChartRow> $growthChartsByAge
+     */
     private function getBMIAlert(Measurement $measurement, array $measurementData, float $ageInMonths, array $growthChartsByAge, int $sex): string
     {
         $weights = array_key_exists('weight', $measurementData) ? $measurementData['weight'] : [];
@@ -993,6 +1058,7 @@ class PediatricsReportService
         }
         return '';
     }
+    /** @param MeasurementData $measurementData */
     private function getHeightAlert(array $measurementData, float $ageInMonths): string
     {
         $heights = array_key_exists('height', $measurementData) ? $measurementData['height'] : [];
@@ -1027,6 +1093,7 @@ class PediatricsReportService
         }
         return '';
     }
+    /** @param MeasurementData $measurementData */
     private function getWaistAlert(array $measurementData, float $ageInMonths): string
     {
         $waistCircumferences = array_key_exists('waist-circumference', $measurementData) ? $measurementData['waist-circumference'] : [];
@@ -1045,7 +1112,8 @@ class PediatricsReportService
         return '';
     }
 
-    private function generateCSVReport(array $csvData, string $csvTitle)
+    /** @param list<CsvRow> $csvData */
+    private function generateCSVReport(array $csvData, string $csvTitle): void
     {
         // Create a temporary stream to hold the CSV data
         $tempStream = fopen('php://temp', 'w');

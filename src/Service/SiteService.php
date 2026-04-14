@@ -13,21 +13,26 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
+use App\Security\User as SecurityUser;
 
 class SiteService
 {
     public const CABOR_STATE = 'CA';
-    protected $siteNameMapper = [];
-    protected $nphSiteNameMapper = [];
-    protected $organizationNameMapper = [];
-    protected $awardeeNameMapper = [];
+    /** @var array<string, string> */
+    protected array $siteNameMapper = [];
+    /** @var array<string, string> */
+    protected array $nphSiteNameMapper = [];
+    /** @var array<string, string> */
+    protected array $organizationNameMapper = [];
+    /** @var array<string, string> */
+    protected array $awardeeNameMapper = [];
 
-    private $params;
-    private $requestStack;
-    private $em;
-    private $userService;
-    private $env;
-    private $tokenStorage;
+    private ParameterBagInterface $params;
+    private RequestStack $requestStack;
+    private EntityManagerInterface $em;
+    private UserService $userService;
+    private EnvironmentService $env;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(ParameterBagInterface $params, RequestStack $requestStack, EntityManagerInterface $em, UserService $userService, EnvironmentService $env, TokenStorageInterface $tokenStorage)
     {
@@ -57,7 +62,7 @@ class SiteService
         return !empty($site);
     }
 
-    public function getSiteId()
+    public function getSiteId(): ?string
     {
         if ($site = $this->requestStack->getSession()->get('site')) {
             return $site->id;
@@ -67,7 +72,7 @@ class SiteService
 
 
     //Super user ex: STSI
-    public function getAwardeeId()
+    public function getAwardeeId(): ?string
     {
         if ($awardee = $this->requestStack->getSession()->get('awardee')) {
             return $awardee->id;
@@ -75,7 +80,7 @@ class SiteService
         return null;
     }
 
-    public function isDiversionPouchSite()
+    public function isDiversionPouchSite(): bool
     {
         if (!$this->params->has('diversion_pouch_site')) {
             return false;
@@ -99,14 +104,14 @@ class SiteService
         return !empty($site);
     }
 
-    public function getSiteAwardee()
+    public function getSiteAwardee(): ?string
     {
         $siteEntity = $this->requestStack->getSession()->get('siteEntity');
         return $siteEntity ? $siteEntity->getOrganization() : null;
     }
 
 
-    public function getSiteOrganization()
+    public function getSiteOrganization(): ?string
     {
         $siteEntity = $this->requestStack->getSession()->get('siteEntity');
         return $siteEntity ? $siteEntity->getOrganizationId() : null;
@@ -118,7 +123,10 @@ class SiteService
         return $siteEntity ? $siteEntity->getAwardeeId() : null;
     }
 
-    public function getSuperUserAwardees()
+    /**
+     * @return list<string>|null
+     */
+    public function getSuperUserAwardees(): ?array
     {
         $sites = $this->getSuperUserAwardeeSites();
         if (!$sites) {
@@ -136,7 +144,10 @@ class SiteService
         return $awardees;
     }
 
-    public function getSuperUserAwardeeSites()
+    /**
+     * @return list<Site>|null
+     */
+    public function getSuperUserAwardeeSites(): ?array
     {
         $awardee = $this->getAwardeeId();
         if (!$awardee) {
@@ -148,7 +159,10 @@ class SiteService
         ]);
     }
 
-    public function getAwardeeSites($awardee = null)
+    /**
+     * @return list<Site>|null
+     */
+    public function getAwardeeSites(?string $awardee = null): ?array
     {
         $awardee = $awardee ?? $this->getAwardeeId();
         if (!$awardee) {
@@ -161,7 +175,7 @@ class SiteService
         ]);
     }
 
-    public function getAwardeeDisplayName($awardeeId)
+    public function getAwardeeDisplayName(?string $awardeeId): ?string
     {
         $awardeeName = $awardeeId;
         if (!empty($awardeeId)) {
@@ -177,7 +191,7 @@ class SiteService
         return $awardeeName;
     }
 
-    public function getOrganizationDisplayName($organizationId)
+    public function getOrganizationDisplayName(?string $organizationId): ?string
     {
         $organizationName = $organizationId;
         if (!empty($organizationId)) {
@@ -193,7 +207,7 @@ class SiteService
         return $organizationName;
     }
 
-    public function getSiteDisplayName($siteSuffix, $defaultToSiteSuffix = true)
+    public function getSiteDisplayName(?string $siteSuffix, bool $defaultToSiteSuffix = true): ?string
     {
         $siteName = $defaultToSiteSuffix ? $siteSuffix : null;
         if (!empty($siteSuffix)) {
@@ -224,7 +238,7 @@ class SiteService
         return null;
     }
 
-    public function isValidSite($email): bool
+    public function isValidSite(string $email): bool
     {
         if ($this->requestStack->getSession()->get('program') === User::PROGRAM_NPH) {
             return $this->isValidNphSite($email);
@@ -232,7 +246,7 @@ class SiteService
         return $this->isValidHpoSite($email);
     }
 
-    public function switchSite($email): bool
+    public function switchSite(string $email): bool
     {
         if ($this->requestStack->getSession()->get('program') === User::PROGRAM_NPH) {
             return $this->switchNphSite($email);
@@ -240,7 +254,7 @@ class SiteService
         return $this->switchHpoSite($email);
     }
 
-    public function switchHpoSite($email): bool
+    public function switchHpoSite(string $email): bool
     {
         $user = $this->userService->getUser();
         if ($user && $user->belongsToSite($email)) {
@@ -260,7 +274,7 @@ class SiteService
         return false;
     }
 
-    public function switchNphSite($email): bool
+    public function switchNphSite(string $email): bool
     {
         $user = $this->userService->getUser();
         if ($user && $user->belongsToSite($email, 'nphSites')) {
@@ -273,7 +287,7 @@ class SiteService
         return false;
     }
 
-    public function saveSiteMetaDataInSession()
+    public function saveSiteMetaDataInSession(): void
     {
         $site = $this->getSiteEntity();
         if (!empty($site)) {
@@ -291,7 +305,7 @@ class SiteService
         }
     }
 
-    public function getSiteEntity()
+    public function getSiteEntity(): Site|NphSite|null
     {
         $googleGroup = $this->getSiteId();
         if (!$googleGroup) {
@@ -305,7 +319,7 @@ class SiteService
         return !empty($site) ? $site[0] : null;
     }
 
-    public function getOrderType()
+    public function getOrderType(): string
     {
         if ($this->isDVType() && !$this->isDiversionPouchSite()) {
             return 'dv';
@@ -313,7 +327,7 @@ class SiteService
         return 'hpo';
     }
 
-    public function getSiteType()
+    public function getSiteType(): string
     {
         return $this->isDVType() ? 'dv' : 'hpo';
     }
@@ -324,7 +338,7 @@ class SiteService
         return $siteEntity && $siteEntity->getState() === self::CABOR_STATE ? true : false;
     }
 
-    public function getSiteWithPrefix($siteId): string
+    public function getSiteWithPrefix(string $siteId): string
     {
         return \App\Security\User::SITE_PREFIX . $siteId;
     }
@@ -389,13 +403,13 @@ class SiteService
         $this->tokenStorage->setToken($token);
     }
 
-    public function isActiveSite($siteId = null): bool
+    public function isActiveSite(?string $siteId = null): bool
     {
         $siteId = $siteId ?: $this->getSiteId();
         return $this->em->getRepository(Site::class)->getActiveSiteCount($siteId) > 0;
     }
 
-    protected function setNewRoles($user)
+    protected function setNewRoles(SecurityUser $user): void
     {
         $userRoles = $this->userService->getRoles($user->getAllRoles(), $this->requestStack->getSession()->get('site'), $this->requestStack->getSession()->get('awardee'));
         if ($user->getAllRoles() != $userRoles) {
@@ -404,7 +418,7 @@ class SiteService
         }
     }
 
-    private function isValidHpoSite($email): bool
+    private function isValidHpoSite(string $email): bool
     {
         $user = $this->userService->getUser();
         if (!$user || !$user->belongsToSite($email)) {
@@ -426,7 +440,7 @@ class SiteService
         return true;
     }
 
-    private function isValidNphSite($email): bool
+    private function isValidNphSite(string $email): bool
     {
         $user = $this->userService->getUser();
         if (!$user || !$user->belongsToSite($email, 'nphSites')) {
