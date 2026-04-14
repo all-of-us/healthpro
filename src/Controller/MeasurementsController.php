@@ -23,15 +23,16 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MeasurementsController extends BaseController
 {
-    protected $measurementService;
-    protected $loggerService;
-    protected $siteService;
-    protected $params;
-    protected $helpService;
+    protected MeasurementService $measurementService;
+    protected LoggerService $loggerService;
+    protected SiteService $siteService;
+    protected ParameterBagInterface $params;
+    protected HelpService $helpService;
     protected PpscApiService $ppscApiService;
     protected FormFactoryInterface $formFactory;
 
@@ -57,7 +58,7 @@ class MeasurementsController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}', name: 'measurement', defaults: ['measurementId' => null])]
     #[Route(path: '/read/participant/{participantId}/measurements/{measurementId}', name: 'read_measurement', methods: ['GET'])]
-    public function measurementsAction($participantId, $measurementId, Request $request)
+    public function measurementsAction(string $participantId, ?int $measurementId, Request $request): Response
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
@@ -300,7 +301,7 @@ class MeasurementsController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}/modify/{type}', name: 'measurement_modify', defaults: ['measurementId' => null])]
-    public function measurementsModifyAction($participantId, $measurementId, $type, Request $request)
+    public function measurementsModifyAction(string $participantId, int $measurementId, string $type, Request $request): Response
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
@@ -368,7 +369,7 @@ class MeasurementsController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}/revert', name: 'measurement_revert')]
-    public function measurementRevertAction($participantId, $measurementId, Request $request)
+    public function measurementRevertAction(string $participantId, int $measurementId, Request $request): Response
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
@@ -395,7 +396,7 @@ class MeasurementsController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}/summary', name: 'measurement_summary')]
     #[Route(path: '/read/participant/{participantId}/measurements/{measurementId}/summary', name: 'read_measurement_summary')]
-    public function measurementsSummaryAction($participantId, $measurementId)
+    public function measurementsSummaryAction(string $participantId, int $measurementId): Response
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
@@ -419,7 +420,7 @@ class MeasurementsController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/blood/donor/check', name: 'measurement_blood_donor_check')]
-    public function measurementBloodDonorCheckAction($participantId, Request $request)
+    public function measurementBloodDonorCheckAction(string $participantId, Request $request): Response
     {
         if (!$this->measurementService->requireBloodDonorCheck()) {
             throw $this->createAccessDeniedException();
@@ -449,7 +450,7 @@ class MeasurementsController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}/fhir', name: 'measurement_fhir')]
-    public function measurementFhirAction($participantId, $measurementId, Request $request, EnvironmentService $env)
+    public function measurementFhirAction(string $participantId, int $measurementId, Request $request, EnvironmentService $env): JsonResponse
     {
         $isTest = $request->query->has('test');
         if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
@@ -496,7 +497,7 @@ class MeasurementsController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}/rdr', name: 'measurement_rdr')]
-    public function measurementRdrAction($participantId, $measurementId, EnvironmentService $env)
+    public function measurementRdrAction(string $participantId, int $measurementId, EnvironmentService $env): JsonResponse
     {
         if (!$this->isGranted('ROLE_ADMIN') && !$env->isLocal()) {
             throw $this->createAccessDeniedException();

@@ -7,8 +7,22 @@ use App\Entity\Order;
 use App\Service\Ppsc\PpscApiService;
 use Doctrine\ORM\EntityManagerInterface;
 
+/**
+ * @phpstan-type ReviewRow array<string, mixed>
+ * @phpstan-type ParticipantBucket array{
+ *     orders: list<ReviewRow>|null,
+ *     ordersCount: int,
+ *     physicalMeasurements: list<ReviewRow>|null,
+ *     physicalMeasurementsCount: int,
+ *     incentives: mixed,
+ *     incentivesCount: int,
+ *     idVerifications: mixed,
+ *     idVerificationsCount: int
+ * }
+ */
 class ReviewService
 {
+    /** @var array<string, string> */
     public static $orderStatus = [
         'created_ts' => 'Created',
         'collected_ts' => 'Collected',
@@ -18,11 +32,13 @@ class ReviewService
     protected EntityManagerInterface $em;
     protected PpscApiService $ppscApiService;
 
+    /** @var array<string, string> */
     protected static $measurementsStatus = [
         'created_ts' => 'Created',
         'finalized_ts' => 'Finalized'
     ];
 
+    /** @var ParticipantBucket */
     protected static $emptyParticipant = [
         'orders' => null,
         'ordersCount' => 0,
@@ -42,7 +58,10 @@ class ReviewService
         $this->ppscApiService = $ppscApiService;
     }
 
-    public function getTodayParticipants($startTime, $endTime, $site = null)
+    /**
+     * @return array<string, ParticipantBucket>
+     */
+    public function getTodayParticipants(\DateTimeInterface $startTime, \DateTimeInterface $endTime, ?string $site = null): array
     {
         $participants = [];
         foreach ($this->getTodayRows($startTime, $endTime, $site) as $row) {
@@ -81,7 +100,8 @@ class ReviewService
         return $participants;
     }
 
-    public function getTodayOrders($today)
+    /** @return list<ReviewRow> */
+    public function getTodayOrders(string $today): array
     {
         $orders = [];
         foreach ($this->getTodayOrderRows($today) as $row) {
@@ -101,7 +121,8 @@ class ReviewService
         return $orders;
     }
 
-    public static function getOrderStatus($row, $status)
+    /** @param ReviewRow $row */
+    public static function getOrderStatus(array $row, string $status): string
     {
         $type = $row['h_type'];
         if ($type === Order::ORDER_CANCEL) {
@@ -118,7 +139,8 @@ class ReviewService
         return $status;
     }
 
-    public function getEvaluationStatus($row, $status)
+    /** @param ReviewRow $row */
+    public function getEvaluationStatus(array $row, string $status): string
     {
         if ($row['h_type'] === Measurement::EVALUATION_CANCEL) {
             $status = 'Cancelled';
@@ -132,7 +154,8 @@ class ReviewService
         return $status;
     }
 
-    public function loadFirstFiveParticipantNames(&$results): void
+    /** @param array<int, ReviewRow> $results */
+    public function loadFirstFiveParticipantNames(array &$results): void
     {
         $count = 0;
         foreach ($results as $key => $result) {
@@ -143,7 +166,8 @@ class ReviewService
         }
     }
 
-    protected function getTodayRows($startDate, $endDate, $site)
+    /** @return list<ReviewRow> */
+    protected function getTodayRows(\DateTimeInterface $startDate, \DateTimeInterface $endDate, ?string $site): array
     {
         $startTime = $startDate->format('Y-m-d H:i:s');
         $incentiveStartTime = $startDate->format('Y-m-d');
@@ -187,7 +211,8 @@ class ReviewService
         ]);
     }
 
-    protected function getTodayOrderRows($today)
+    /** @return list<ReviewRow> */
+    protected function getTodayOrderRows(string $today): array
     {
         $ordersQuery = 'SELECT o.*, ' .
             'oh.type as h_type, ' .

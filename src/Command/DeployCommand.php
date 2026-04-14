@@ -19,16 +19,19 @@ use Symfony\Component\Yaml\Parser;
 class DeployCommand extends Command
 {
     /** GAE application IDs for production. */
+    /** @var list<string> */
     private static array $PROD_APP_IDS = [
         'healthpro-prod'
     ];
 
     /** GAE application IDs for security testing and/or training. */
+    /** @var list<string> */
     private static array $STABLE_APP_IDS = [
         'pmi-hpo-test'
     ];
 
     /** GAE application IDs for staging. */
+    /** @var list<string> */
     private static array $STAGING_APP_IDS = [
         'pmi-hpo-staging', // dry run environment
         'healthpro-beta', // beta environment
@@ -36,12 +39,14 @@ class DeployCommand extends Command
     ];
 
     /** Create release tag when deploying these application IDs. */
+    /** @var list<string> */
     private static array $TAG_APP_IDS = [
         'healthpro-prod',
         'pmi-hpo-test'
     ];
 
     /** Apply enhanced instance class and scaling for these application IDs. */
+    /** @var list<string> */
     private static array $SCALE_APP_IDS = [
         'healthpro-prod'
     ];
@@ -73,7 +78,7 @@ class DeployCommand extends Command
         throw new Exception('Unable to determine environment!');
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $appDir = realpath(__DIR__ . '/../..');
         $this
@@ -251,7 +256,7 @@ class DeployCommand extends Command
     }
 
     /** Adds and pushes a release tag to git. */
-    private function tagRelease()
+    private function tagRelease(): void
     {
         $tag = "REL_{$this->appId}_{$this->release}";
         $this->out->writeln('');
@@ -262,7 +267,7 @@ class DeployCommand extends Command
     }
 
     /** Generate app configuration. */
-    private function generateAppConfig()
+    private function generateAppConfig(): void
     {
         $configFile = $this->appDir . DIRECTORY_SEPARATOR . 'app.yaml';
         $distFile = "{$configFile}.dist";
@@ -289,7 +294,7 @@ class DeployCommand extends Command
     }
 
     /** Generate PHP configuration. */
-    private function generatePhpConfig()
+    private function generatePhpConfig(): void
     {
         $configFile = $this->appDir . DIRECTORY_SEPARATOR . 'php.ini';
         $distFile = "{$configFile}.dist";
@@ -319,7 +324,7 @@ class DeployCommand extends Command
     }
 
     /** Generate cron configuration. */
-    private function generateCronConfig()
+    private function generateCronConfig(): void
     {
         $configFile = $this->appDir . DIRECTORY_SEPARATOR . 'cron.yaml';
         $distFile = "{$configFile}.dist";
@@ -345,7 +350,8 @@ class DeployCommand extends Command
     }
 
     /** Check all handlers for security concerns. */
-    private function checkHandlerSecurity($config)
+    /** @param array<string, mixed> $config */
+    private function checkHandlerSecurity(array $config): void
     {
         $this->out->writeln('Checking URL handler security...');
         foreach ($config['handlers'] as $handler) {
@@ -357,7 +363,8 @@ class DeployCommand extends Command
     }
 
     /** Sets the app's environment variables. */
-    private function configureEnv(&$config)
+    /** @param array<string, mixed> $config */
+    private function configureEnv(array &$config): void
     {
         $config['env_variables']['PMI_ENV'] = $this->determineEnv();
         $config['env_variables']['PMI_RELEASE'] = $this->release;
@@ -365,19 +372,23 @@ class DeployCommand extends Command
     }
 
     /** Enhance instance class and scaling */
-    private function configureScaling(&$config)
+    /** @param array<string, mixed> $config */
+    private function configureScaling(array &$config): void
     {
         $config['instance_class'] = 'F4'; // 512MB, 2.4 GHz
         // improve user experience during low traffic
         $config['automatic_scaling']['min_idle_instances'] = 2;
     }
 
-    private function runUnitTests()
+    private function runUnitTests(): void
     {
         $this->exec("{$this->appDir}/bin/phpunit");
     }
 
-    private function displayVulnerabilities($vulnerabilities)
+    /**
+     * @param array<string, array<string, mixed>> $vulnerabilities
+     */
+    private function displayVulnerabilities(array $vulnerabilities): void
     {
         // taken from SensioLabs\Security\Formatters\SimpleFormatter in 4.1 that was removed in 5.0
         $count = count($vulnerabilities);
@@ -400,7 +411,7 @@ class DeployCommand extends Command
         }
     }
 
-    private function runSecurityCheck()
+    private function runSecurityCheck(): void
     {
         $this->out->writeln('Running Symfony Security Check...');
         $process = Process::fromShellCommandline('symfony security:check --disable-exit-code --format=json --dir=' . escapeshellarg($this->appDir));
@@ -429,7 +440,7 @@ class DeployCommand extends Command
         }
     }
 
-    private function runJsSecurityCheck()
+    private function runJsSecurityCheck(): void
     {
         $this->out->writeln('Running npm audit...');
         $process = $this->exec('npm audit', false);
@@ -453,7 +464,7 @@ class DeployCommand extends Command
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      * ($type parameter in run callback is required but not used)
      */
-    private function exec($cmd, $mustRun = true, $raw = false): Process
+    private function exec(string $cmd, bool $mustRun = true, bool $raw = false): Process
     {
         $process = Process::fromShellCommandline($cmd);
         $process->setTimeout(null);
@@ -468,7 +479,11 @@ class DeployCommand extends Command
         return $process;
     }
 
-    private function removeComposerIgnore($vulnerabilities): array
+    /**
+     * @param array<string, array<string, mixed>> $vulnerabilities
+     * @return array<string, array<string, mixed>>
+     */
+    private function removeComposerIgnore(array $vulnerabilities): array
     {
         $newVulnerabilities = $vulnerabilities;
         $ignoredVulnerabilities = json_decode(file_get_contents($this->appDir . DIRECTORY_SEPARATOR . 'composerignore.json'), true);
@@ -493,7 +508,10 @@ class DeployCommand extends Command
         return $newVulnerabilities;
     }
 
-    private function isVulnerabilityIgnored($vulnerabilities, $link): bool
+    /**
+     * @param array<int, array<string, mixed>> $vulnerabilities
+     */
+    private function isVulnerabilityIgnored(array $vulnerabilities, string $link): bool
     {
         foreach ($vulnerabilities as $vulnerability) {
             if ($link == $vulnerability['link']) {
