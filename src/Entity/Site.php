@@ -12,89 +12,89 @@ class Site
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'boolean')]
-    private $status;
+    private bool $status;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $name;
+    private string $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $siteId;
+    private ?string $siteId = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $rdrSiteId;
+    private ?string $rdrSiteId = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $organizationId;
+    private ?string $organizationId = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $awardeeId;
+    private ?string $awardeeId = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $googleGroup;
+    private string $googleGroup;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $mayolinkAccount;
+    private ?string $mayolinkAccount = null;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $timezone;
+    private ?string $timezone = null;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $organization;
+    private ?string $organization = null;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $type;
+    private ?string $type = null;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $awardee;
+    private ?string $awardee = null;
 
     #[ORM\Column(type: 'string', length: 512, nullable: true)]
-    private $email;
+    private ?string $email = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $centrifugeType;
+    private ?string $centrifugeType = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $workqueueDownload;
+    private string $workqueueDownload;
 
     #[ORM\Column(type: 'boolean')]
-    private $ehrModificationProtocol = false;
+    private bool $ehrModificationProtocol = false;
 
     #[ORM\Column(type: 'boolean')]
-    private $deleted = false;
+    private bool $deleted = false;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $siteType;
+    private ?string $siteType = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $dvModule;
+    private ?string $dvModule = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $state;
+    private ?string $state = null;
 
     #[ORM\OneToOne(targetEntity: 'App\Entity\SiteSync', mappedBy: 'site', cascade: ['persist', 'remove'])]
-    private $siteSync;
+    private ?SiteSync $siteSync = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getStatus(): ?bool
+    public function getStatus(): bool
     {
         return $this->status;
     }
 
-    public function setStatus(int $status): self
+    public function setStatus(bool|int $status): self
     {
-        $this->status = $status;
+        $this->status = (bool) $status;
 
         return $this;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -154,7 +154,7 @@ class Site
         return $this;
     }
 
-    public function getGoogleGroup(): ?string
+    public function getGoogleGroup(): string
     {
         return $this->googleGroup;
     }
@@ -250,7 +250,7 @@ class Site
         return $this;
     }
 
-    public function getWorkqueueDownload(): ?string
+    public function getWorkqueueDownload(): string
     {
         return $this->workqueueDownload;
     }
@@ -262,26 +262,26 @@ class Site
         return $this;
     }
 
-    public function getEhrModificationProtocol(): ?bool
+    public function getEhrModificationProtocol(): bool
     {
         return $this->ehrModificationProtocol;
     }
 
-    public function setEhrModificationProtocol(int $ehrModificationProtocol): self
+    public function setEhrModificationProtocol(bool|int $ehrModificationProtocol): self
     {
-        $this->ehrModificationProtocol = $ehrModificationProtocol;
+        $this->ehrModificationProtocol = (bool) $ehrModificationProtocol;
 
         return $this;
     }
 
-    public function getDeleted(): ?bool
+    public function getDeleted(): bool
     {
         return $this->deleted;
     }
 
-    public function setDeleted(int $deleted): self
+    public function setDeleted(bool|int $deleted): self
     {
-        $this->deleted = $deleted;
+        $this->deleted = (bool) $deleted;
 
         return $this;
     }

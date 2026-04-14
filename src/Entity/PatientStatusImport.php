@@ -12,38 +12,40 @@ class PatientStatusImport
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $fileName;
+    private string $fileName;
 
     #[ORM\Column(type: 'integer')]
-    private $userId;
+    private int $userId;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $awardee;
+    private string $awardee;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $site;
+    private string $site;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTimeInterface $createdTs;
 
     #[ORM\Column(type: 'smallint', options: ['default' => 0])]
-    private $importStatus = 0;
+    private int $importStatus = 0;
 
+    /** @var Collection<int, PatientStatusImportRow> */
     #[ORM\OneToMany(targetEntity: PatientStatusImportRow::class, mappedBy: 'import', cascade: ['persist', 'remove'])]
-    private $PatientStatusImportRows;
+    private Collection $PatientStatusImportRows;
 
     #[ORM\Column(type: 'smallint', options: ['default' => 0])]
-    private $confirm = 0;
+    private int $confirm = 0;
 
+    /** @var Collection<int, PatientStatusHistory> */
     #[ORM\OneToMany(targetEntity: 'App\Entity\PatientStatusHistory', mappedBy: 'import')]
-    private $patientStatusHistories;
+    private Collection $patientStatusHistories;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Organization')]
     #[ORM\JoinColumn(name: 'organization', referencedColumnName: 'id')]
-    private $organization;
+    private ?Organization $organization = null;
 
     public function __construct()
     {
@@ -129,7 +131,7 @@ class PatientStatusImport
     }
 
     /**
-     * @return Collection|PatientStatusImportRow[]
+     * @return Collection<int, PatientStatusImportRow>
      */
     public function getPatientStatusImportRows(): Collection
     {
@@ -172,7 +174,7 @@ class PatientStatusImport
     }
 
     /**
-     * @return Collection|PatientStatusHistory[]
+     * @return Collection<int, PatientStatusHistory>
      */
     public function getPatientStatusHistories(): Collection
     {

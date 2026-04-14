@@ -94,52 +94,54 @@ class NphOrder
         ],
     ];
 
+    /** @var list<string> */
     public static array $stoolVisits = ['preLMT', 'preDSMT'];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 100)]
-    private $orderId;
+    private string $orderId;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $participantId;
+    private string $participantId;
 
     #[ORM\Column(type: 'string', length: 10)]
-    private $module;
+    private string $module;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $timepoint;
+    private string $timepoint;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $visitType;
+    private ?string $visitType = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $site;
+    private string $site;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private $user;
+    private User $user;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTime $createdTs;
 
+    /** @var Collection<int, NphSample> */
     #[ORM\OneToMany(targetEntity: NphSample::class, mappedBy: 'nphOrder')]
-    private $nphSamples;
+    private Collection $nphSamples;
 
     #[ORM\Column(type: 'string', length: 20)]
-    private $orderType;
+    private string $orderType;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $metadata;
+    private ?string $metadata = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $biobankId;
+    private string $biobankId;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $createdTimezoneId;
+    private ?int $createdTimezoneId = null;
 
     #[ORM\Column]
     private bool $DowntimeGenerated = false;
@@ -240,7 +242,7 @@ class NphOrder
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -260,7 +262,7 @@ class NphOrder
     }
 
     /**
-     * @return Collection|NphSample[]
+     * @return Collection<int, NphSample>
      */
     public function getNphSamples(): Collection
     {
@@ -330,6 +332,9 @@ class NphOrder
         return false;
     }
 
+    /**
+     * @param list<string> $activeSamples
+     */
     public function canRestore(array $activeSamples = []): bool
     {
         foreach ($this->getNphSamples() as $nphSample) {
@@ -340,7 +345,7 @@ class NphOrder
         return false;
     }
 
-    public function canModify($type): bool
+    public function canModify(string $type): bool
     {
         if ($type === NphSample::CANCEL) {
             return $this->canCancel();
@@ -363,7 +368,7 @@ class NphOrder
         return $this;
     }
 
-    public function getSampleGroupBySampleCode(string $sampleCode): ?string
+    public function getSampleGroupBySampleCode(string $sampleCode): ?int
     {
         foreach ($this->nphSamples as $nphSample) {
             if ($nphSample->getSampleCode() === $sampleCode) {
@@ -462,19 +467,31 @@ class NphOrder
         return false;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getMetadataArray(): ?array
     {
-        $metadata = json_decode($this->getMetadata(), true);
-        if ($metadata) {
-            $metadata['bowelType'] = isset($metadata['bowelType']) ? array_search(
+        $metadataValue = $this->getMetadata();
+        if ($metadataValue === null) {
+            return null;
+        }
+
+        $metadata = json_decode($metadataValue, true);
+        if (!is_array($metadata)) {
+            return null;
+        }
+
+        $metadata['bowelType'] = isset($metadata['bowelType']) ? array_search(
                 $metadata['bowelType'],
                 NphOrderForm::$bowelMovements
             ) : '';
-            $metadata['bowelQuality'] = isset($metadata['bowelQuality']) ? array_search(
-                $metadata['bowelQuality'],
-                NphOrderForm::$bowelMovementQuality
-            ) : '';
-        }
+
+        $metadata['bowelQuality'] = isset($metadata['bowelQuality']) ? array_search(
+            $metadata['bowelQuality'],
+            NphOrderForm::$bowelMovementQuality
+        ) : '';
+
         return $metadata;
     }
 

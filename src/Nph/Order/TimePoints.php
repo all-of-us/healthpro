@@ -4,24 +4,37 @@ namespace App\Nph\Order;
 
 class TimePoints
 {
+    /** @var int */
     protected $module;
 
+    /** @var array<string, string> */
     protected $timePoints;
 
+    /** @var array<string, string> */
     protected $rdrTimePoints = [];
 
+    /** @var array<string, list<string>> */
     protected $timePointSampleTypes;
 
+    /**
+     * @return array<string, string>
+     */
     public function getTimePoints(): array
     {
         return $this->timePoints;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getRdrTimePoints(): array
     {
         return $this->rdrTimePoints;
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     public function getTimePointSamples(): array
     {
         $samples = $this->getSamplesInformation();
@@ -40,6 +53,9 @@ class TimePoints
         return $timePointSamples;
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public function getSamplesInformation(): array
     {
         $module = 'Module' . $this->module;
