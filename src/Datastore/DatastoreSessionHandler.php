@@ -13,7 +13,7 @@ class DatastoreSessionHandler extends AbstractSessionHandler
         return true;
     }
 
-    public function doDestroy($id): bool
+    public function doDestroy(string $id): bool
     {
         try {
             $session = Session::fetchOneById($id);
@@ -34,12 +34,12 @@ class DatastoreSessionHandler extends AbstractSessionHandler
      * This noop method is required since the AbstractSessionHandler
      * class implements SessionUpdateTimestampHandlerInterface
      */
-    public function updateTimestamp($id, $data): bool
+    public function updateTimestamp(string $id, string $data): bool
     {
         return true;
     }
 
-    public function gc($maxlifetime): int|false
+    public function gc(int $maxlifetime): int|false
     {
         $modified = new DateTime("-{$maxlifetime} seconds");
         $session = new Session();
@@ -48,12 +48,14 @@ class DatastoreSessionHandler extends AbstractSessionHandler
         return 1;
     }
 
-    public function doRead($id): string
+    public function doRead(string $id): string
     {
         try {
             $session = Session::fetchOneById($id);
             if ($session) {
-                return $session->data;
+                $data = $session->get();
+
+                return is_string($data['data'] ?? null) ? $data['data'] : '';
             }
             return '';
         } catch (\Exception $e) {
@@ -63,7 +65,7 @@ class DatastoreSessionHandler extends AbstractSessionHandler
         }
     }
 
-    public function doWrite($id, $sessionData): bool
+    public function doWrite(string $id, string $sessionData): bool
     {
         try {
             $data = [

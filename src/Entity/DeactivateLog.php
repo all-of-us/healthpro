@@ -13,22 +13,22 @@ class DeactivateLog
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $participantId;
+    private string $participantId;
 
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private $insertTs;
+    private \DateTimeInterface $insertTs;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $deactivateTs;
+    private ?\DateTimeInterface $deactivateTs = null;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $hpoId;
+    private ?string $hpoId = null;
 
     #[ORM\Column(type: 'string', length: 2000, nullable: true)]
-    private $emailNotified;
+    private ?string $emailNotified = null;
 
     public function getId(): ?int
     {

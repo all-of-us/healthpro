@@ -14,7 +14,7 @@ class JiraService
     private const DESTINATION_PROJECT_KEY = 'PD';
     private const DESTINATION_ISSUE_TYPE_RELEASE = '10102'; // 10102 = release
 
-    private $client;
+    private ?Client $client = null;
 
     public function __construct(ParameterBagInterface $params, LoggerInterface $logger)
     {
@@ -28,10 +28,13 @@ class JiraService
         ]);
     }
 
+    /**
+     * @return list<object>
+     */
     public function getVersions(int $count = 10): array
     {
         $endpoint = sprintf('project/%s/version', self::SOURCE_PROJECT_KEY);
-        $response = $this->client->request('GET', $endpoint, [
+        $response = $this->getClient()->request('GET', $endpoint, [
             'query' => [
                 'orderBy' => '-releaseDate',
                 'maxResults' => $count,
@@ -43,10 +46,13 @@ class JiraService
         return $responseObject->values ?? [];
     }
 
+    /**
+     * @return list<object>
+     */
     public function getIssuesByVersion(string $version): array
     {
         $jql = sprintf('project=%s AND fixVersion=%s', self::SOURCE_PROJECT_KEY, $version);
-        $response = $this->client->request('POST', 'search/jql', [
+        $response = $this->getClient()->request('POST', 'search/jql', [
             'json' => [
                 'jql' => $jql,
                 'fields' => ['issuetype', 'status', 'summary', 'assignee']
@@ -57,6 +63,9 @@ class JiraService
         return $responseObject->issues ?? [];
     }
 
+    /**
+     * @param array<string, mixed> $description
+     */
     public function createReleaseTicket(string $title, array $description, string $componentId): ?string
     {
         $fields = [
@@ -74,7 +83,7 @@ class JiraService
                 ['id' => $componentId]
             ];
         }
-        $response = $this->client->request('POST', 'issue', [
+        $response = $this->getClient()->request('POST', 'issue', [
             'json' => [
                 'fields' => $fields
             ]
@@ -84,7 +93,10 @@ class JiraService
         return $responseObject->key ?? null;
     }
 
-    public function createComment(string $ticketId, $comment): bool
+    /**
+     * @param string|array<string, mixed> $comment
+     */
+    public function createComment(string $ticketId, string|array $comment): bool
     {
         try {
             if (is_string($comment)) {
@@ -106,12 +118,12 @@ class JiraService
             } else {
                 $body = $comment;
             }
-            $response = $this->client->request('POST', "issue/{$ticketId}/comment", [
+            $response = $this->getClient()->request('POST', "issue/{$ticketId}/comment", [
                 'json' => [
                     'body' => $body
                 ]
             ]);
-            return $response && $response->getStatusCode() === 201;
+            return $response->getStatusCode() === 201;
         } catch (\Exception $e) {
             return false;
         }
@@ -124,7 +136,7 @@ class JiraService
                 'Accept' => 'application/json',
                 'X-Atlassian-Token' => 'no-check'
             ];
-            $response = $this->client->request('POST', "issue/{$ticketId}/attachments", [
+            $response = $this->getClient()->request('POST', "issue/{$ticketId}/attachments", [
                 'headers' => $headers,
                 'multipart' => [
                     [
@@ -134,17 +146,29 @@ class JiraService
                     ]
                 ]
             ]);
-            return $response && $response->getStatusCode() === 200;
+            return $response->getStatusCode() === 200;
         } catch (\Exception $e) {
             return false;
         }
     }
 
-    public function getComponents(): ?array
+    /**
+     * @return list<object>
+     */
+    public function getComponents(): array
     {
         $endpoint = sprintf('project/%s/components', self::DESTINATION_PROJECT_KEY);
-        $response = $this->client->request('GET', $endpoint);
+        $response = $this->getClient()->request('GET', $endpoint);
         $responseObject = json_decode($response->getBody()->getContents());
         return $responseObject ?? [];
+    }
+
+    private function getClient(): Client
+    {
+        if ($this->client === null) {
+            throw new \LogicException('Jira client is not configured.');
+        }
+
+        return $this->client;
     }
 }

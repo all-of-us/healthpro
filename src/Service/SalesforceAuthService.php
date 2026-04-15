@@ -34,20 +34,23 @@ class SalesforceAuthService
         return $this->getProvider()->getAuthorizationUrl();
     }
 
-    public function getAccessToken($code): AccessTokenInterface|AccessToken
+    public function getAccessToken(string $code): AccessTokenInterface
     {
         return $this->getProvider()->getAccessToken('authorization_code', ['code' => $code]);
     }
 
-    public function getResourceOwner($token): ResourceOwnerInterface
+    public function getResourceOwner(AccessToken $token): ResourceOwnerInterface
     {
         return $this->getProvider()->getResourceOwner($token);
     }
 
-    public function processAuth($credentials): SalesforceUser
+    public function processAuth(string $credentials): SalesforceUser
     {
         // Exchange the authorization code for an access token
         $accessToken = $this->getAccessToken($credentials);
+        if (!$accessToken instanceof AccessToken) {
+            throw new \UnexpectedValueException('Salesforce provider returned an unexpected access token type.');
+        }
 
         // Get user details from the OIDC provider
         $resourceOwner = $this->getResourceOwner($accessToken);
@@ -58,7 +61,7 @@ class SalesforceAuthService
         return $user;
     }
 
-    private function getParams($field): string|null
+    private function getParams(string $field): ?string
     {
         $ppscEnv = $this->env->getPpscEnv($this->requestStack->getSession()->get('ppscEnv'));
         $ppscPortal = $this->requestStack->getSession()->get('ppscPortal');

@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(path: '/admin/sites')]
@@ -24,7 +25,7 @@ class SitesController extends BaseController
     }
 
     #[Route(path: '/', name: 'admin_sites')]
-    public function index(SiteRepository $siteRepository, ParameterBagInterface $params)
+    public function index(SiteRepository $siteRepository, ParameterBagInterface $params): Response
     {
         $sites = $siteRepository->findBy(['deleted' => 0], ['name' => 'asc']);
         return $this->render('admin/sites/index.html.twig', [
@@ -35,7 +36,7 @@ class SitesController extends BaseController
     }
 
     #[Route(path: '/site/{id}', name: 'admin_site')]
-    public function edit(SiteRepository $siteRepository, LoggerService $loggerService, Request $request, ParameterBagInterface $params, EnvironmentService $env, $id = null)
+    public function edit(SiteRepository $siteRepository, LoggerService $loggerService, Request $request, ParameterBagInterface $params, EnvironmentService $env, ?int $id = null): Response
     {
         $syncEnabled = $params->has('sites_use_rdr') ? $params->get('sites_use_rdr') : false;
         if ($id) {
@@ -100,7 +101,7 @@ class SitesController extends BaseController
     }
 
     #[Route(path: '/sync', name: 'admin_siteSync')]
-    public function siteSyncAction(SiteSyncService $siteSyncService, ParameterBagInterface $params, Request $request)
+    public function siteSyncAction(SiteSyncService $siteSyncService, ParameterBagInterface $params, Request $request): Response
     {
         if (!$params->has('sites_use_rdr')) {
             $formView = false;

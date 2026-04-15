@@ -156,7 +156,7 @@ class MeasurementsController extends BaseController
                                     list($field, $replicate) = $field;
                                     $measurementsForm->get($field)->get($replicate)->addError(new FormError($measurement->getFormFieldErrorMessage(
                                         $field,
-                                        $replicate
+                                        (int) $replicate
                                     )));
                                 } else {
                                     $measurementsForm->get($field)->addError(new FormError($measurement->getFormFieldErrorMessage($field)));
@@ -262,7 +262,7 @@ class MeasurementsController extends BaseController
                         list($field, $replicate) = $field;
                         $measurementsForm->get($field)->get($replicate)->addError(new FormError($measurement->getFormFieldErrorMessage(
                             $field,
-                            $replicate
+                            (int) $replicate
                         )));
                     } else {
                         $measurementsForm->get($field)->addError(new FormError($measurement->getFormFieldErrorMessage($field)));

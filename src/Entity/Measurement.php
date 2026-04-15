@@ -79,6 +79,10 @@ class Measurement
         'hip-circumference-source-ehr-date'
     ];
 
+    public bool $canCancel = false;
+    public bool $canRestore = false;
+    public string $reasonDisplayText = '';
+
     /** @var string|null */
     protected $finalizedUserEmail;
 

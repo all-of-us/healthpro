@@ -7,12 +7,13 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 
 class MeasurementType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         foreach ($options['schema']->fields as $field) {
             if (isset($field->formField) && !$field->formField) {
@@ -144,10 +145,9 @@ class MeasurementType extends AbstractType
                 $builder->add($field->name, $class, $fieldOptions);
             }
         }
-        return $builder->getForm();
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'schema' => null,
@@ -155,15 +155,21 @@ class MeasurementType extends AbstractType
         ]);
     }
 
-    protected static function calculateBmi($height, $weight)
+    protected static function calculateBmi(mixed $height, mixed $weight): float|false
     {
-        if ($height && $weight) {
+        if (is_numeric($height) && is_numeric($weight) && (float) $height !== 0.0) {
+            $height = (float) $height;
+            $weight = (float) $weight;
+
             return $weight / (($height / 100) * ($height / 100));
         }
         return false;
     }
 
-    private function addDiastolicBloodPressureConstraint($form, $field)
+    /**
+     * @return list<Constraints\Collection>
+     */
+    private function addDiastolicBloodPressureConstraint(FormInterface $form, \stdClass $field): array
     {
         $compareType = $field->compare->type;
         $compareField = $field->compare->field;
