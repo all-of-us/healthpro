@@ -4,33 +4,33 @@ namespace App\Security;
 
 class MockUser
 {
-    private $id;
-    private $email;
-    private $timezone;
+    private int $id;
+    private string $email;
+    private ?string $timezone;
 
-    public function __construct($email, $timezone = null)
+    public function __construct(string $email, ?string $timezone = null)
     {
         $this->email = $email;
         $this->timezone = $timezone;
         $this->id = hexdec(substr(sha1($email), 0, 8));
     }
 
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function getTimezone()
+    public function getTimezone(): ?string
     {
         return $this->timezone;
     }
 
-    public function getUserId()
+    public function getUserId(): int
     {
         return $this->id;
     }

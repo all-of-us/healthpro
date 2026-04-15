@@ -10,29 +10,29 @@ class IdVerificationImportRow
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $participantId;
+    private string $participantId;
 
     #[ORM\ManyToOne(targetEntity: IdVerificationImport::class, inversedBy: 'idVerificationImportRows')]
     #[ORM\JoinColumn(nullable: false)]
-    private $import;
+    private IdVerificationImport $import;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $userEmail;
+    private ?string $userEmail = null;
 
     #[ORM\Column(type: 'datetime')]
-    private $verifiedDate;
+    private \DateTimeInterface $verifiedDate;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $verificationType;
+    private ?string $verificationType = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $visitType;
+    private ?string $visitType = null;
 
     #[ORM\Column(type: 'smallint', options: ['default' => 0])]
-    private $rdrStatus = 0;
+    private int $rdrStatus = 0;
 
     public function getId(): ?int
     {
@@ -56,7 +56,7 @@ class IdVerificationImportRow
         return $this->import;
     }
 
-    public function setImport(?IdVerificationImport $import): self
+    public function setImport(IdVerificationImport $import): self
     {
         $this->import = $import;
 

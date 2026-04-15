@@ -17,14 +17,16 @@ class PatientStatus
     public const NO_ACCESS = 'NO_ACCESS';
     public const UNKNOWN = 'UNKNOWN';
 
-    public static $patientStatus = [
+    /** @var array<string, string> */
+    public static array $patientStatus = [
         'Yes: Confirmed in EHR system' => self::YES,
         'No: Not found in EHR system' => self::NO,
         'No Access: Unable to check EHR system' => self::NO_ACCESS,
         'Unknown: Inconclusive search results' => self::UNKNOWN
     ];
 
-    public static $onSitePatientStatus = [
+    /** @var array<string, string> */
+    public static array $onSitePatientStatus = [
         'Yes' => self::YES,
         'No' => self::NO,
         'No Access' => self::NO_ACCESS,
@@ -34,22 +36,23 @@ class PatientStatus
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $participantId;
+    private string $participantId;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $organization;
+    private string $organization;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $awardee;
+    private string $awardee;
 
+    /** @var Collection<int, PatientStatusHistory> */
     #[ORM\OneToMany(targetEntity: 'App\Entity\PatientStatusHistory', mappedBy: 'patientStatus')]
-    private $patientStatusHistories;
+    private Collection $patientStatusHistories;
 
     #[ORM\OneToOne(targetEntity: 'App\Entity\PatientStatusHistory', inversedBy: 'patientStatusRecords', cascade: ['persist', 'remove'])]
-    private $history;
+    private ?PatientStatusHistory $history = null;
 
     public function __construct()
     {
@@ -98,7 +101,7 @@ class PatientStatus
     }
 
     /**
-     * @return Collection|PatientStatusHistory[]
+     * @return Collection<int, PatientStatusHistory>
      */
     public function getPatientStatusHistories(): Collection
     {
@@ -119,10 +122,6 @@ class PatientStatus
     {
         if ($this->patientStatusHistories->contains($patientStatusHistory)) {
             $this->patientStatusHistories->removeElement($patientStatusHistory);
-            // set the owning side to null (unless already changed)
-            if ($patientStatusHistory->getPatientStatus() === $this) {
-                $patientStatusHistory->setPatientStatus(null);
-            }
         }
 
         return $this;

@@ -12,25 +12,25 @@ class DeceasedLog
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $participantId;
+    private string $participantId;
 
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private $insertTs;
+    private \DateTimeInterface $insertTs;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $deceasedTs;
+    private ?\DateTimeInterface $deceasedTs = null;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $organizationId;
+    private ?string $organizationId = null;
 
     #[ORM\Column(type: 'string', length: 2000, nullable: true)]
-    private $emailNotified;
+    private ?string $emailNotified = null;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $deceasedStatus;
+    private ?string $deceasedStatus = null;
 
     public function getId(): ?int
     {
