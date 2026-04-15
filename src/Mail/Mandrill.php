@@ -6,10 +6,10 @@ use App\HttpClient;
 
 class Mandrill
 {
-    private $apiKey;
-    private $client;
+    private string $apiKey;
+    private HttpClient $client;
 
-    public function __construct($apiKey)
+    public function __construct(string $apiKey)
     {
         $this->apiKey = $apiKey;
         $this->client = new HttpClient([
@@ -18,13 +18,17 @@ class Mandrill
         ]);
     }
 
-    public function ping()
+    public function ping(): bool
     {
         $result = $this->post('users/ping.json');
         return $result === 'PING!';
     }
 
-    public function send(array $to, $from, $subject, $content, $tags = null)
+    /**
+     * @param list<string> $to
+     * @param list<string>|null $tags
+     */
+    public function send(array $to, string $from, string $subject, string $content, ?array $tags = null): bool
     {
         $message = [
             'from_email' => $from,
@@ -47,7 +51,10 @@ class Mandrill
             && $result[0]->status === 'sent';
     }
 
-    protected function post($endpoint, array $data = [])
+    /**
+     * @param array<string, mixed> $data
+     */
+    protected function post(string $endpoint, array $data = []): mixed
     {
         $data['key'] = $this->apiKey;
         $response = $this->client->request('POST', $endpoint, [

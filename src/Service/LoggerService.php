@@ -8,16 +8,20 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * @phpstan-type LogMetadata array{user: ?string, site: ?string, ip: ?string}
+ * @phpstan-type LogArray array{action: string, data: mixed, ts: \DateTime, user: ?string, site: ?string, ip: ?string}
+ */
 class LoggerService
 {
     private const PMI_AUDIT_PREFIX = 'PMI_AUDIT_';
 
-    protected $logger;
-    protected $requestStack;
-    protected $userService;
-    protected $env;
-    protected $action;
-    protected $data;
+    protected LoggerInterface $logger;
+    protected RequestStack $requestStack;
+    protected UserService $userService;
+    protected EnvironmentService $env;
+    protected string $action;
+    protected mixed $data = null;
 
     public function __construct(
         LoggerInterface $logger,
@@ -31,17 +35,20 @@ class LoggerService
         $this->env = $env;
     }
 
-    public function log($action, $data = null)
+    public function log(string $action, mixed $data = null): void
     {
         $this->action = $action;
         $this->data = $data;
         $this->logSyslog();
-        if (!$this->env->values['isUnitTest'] && !$this->env->isPhpDevServer() && $action != Log::REQUEST) {
+        if (!$this->env->values['isUnitTest'] && !$this->env->isPhpDevServer() && $action !== Log::REQUEST) {
             $this->logDatastore();
         }
     }
 
-    public function getLogMetaData()
+    /**
+     * @return LogMetadata
+     */
+    public function getLogMetadata(): array
     {
         $user = $site = $ip = null;
 
@@ -72,7 +79,8 @@ class LoggerService
 
                 // getClientIps reverses the order, so we want the last ip which will be the user's origin ip
                 $ips = $request->getClientIps();
-                $ip = array_pop($ips);
+                $lastIp = array_pop($ips);
+                $ip = is_string($lastIp) ? $lastIp : null;
 
                 // reset trusted proxies
                 Request::setTrustedProxies($originalTrustedProxies, $originalTrustedHeaderSet);
@@ -92,7 +100,10 @@ class LoggerService
         ];
     }
 
-    protected function buildLogArray()
+    /**
+     * @return LogArray
+     */
+    protected function buildLogArray(): array
     {
         $logArray = [];
         $logArray['action'] = $this->action;
@@ -102,7 +113,7 @@ class LoggerService
         return $logArray;
     }
 
-    protected function logSyslog()
+    protected function logSyslog(): void
     {
         $logArray = $this->buildLogArray();
         $syslogData = [];
@@ -116,7 +127,7 @@ class LoggerService
         $this->logger->info(implode(' ', $syslogData));
     }
 
-    protected function logDatastore()
+    protected function logDatastore(): void
     {
         $logArray = $this->buildLogArray();
         $data = [

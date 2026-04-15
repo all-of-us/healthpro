@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Drc\GoogleUser;
+use App\Security\User;
 use Exception;
 use Google\Client as GoogleClient;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -13,12 +14,12 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class AuthService
 {
-    private $params;
-    private $requestStack;
-    private $urlGenerator;
-    private $callbackUrl;
-    private $tokenStorage;
-    private $env;
+    private ContainerBagInterface $params;
+    private RequestStack $requestStack;
+    private UrlGeneratorInterface $urlGenerator;
+    private string $callbackUrl;
+    private TokenStorageInterface $tokenStorage;
+    private EnvironmentService $env;
 
     public function __construct(
         ContainerBagInterface $params,
@@ -64,13 +65,13 @@ class AuthService
         return $user;
     }
 
-    public function setMockAuthToken($user)
+    public function setMockAuthToken(User $user): void
     {
         $token = new PreAuthenticatedToken($user, 'main', $user->getRoles());
         $this->tokenStorage->setToken($token);
     }
 
-    public function getGoogleLogoutUrl($route = 'home')
+    public function getGoogleLogoutUrl(string $route = 'home'): ?string
     {
         $dest = $this->generateUrl($route);
 
@@ -81,7 +82,10 @@ class AuthService
         return "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=$dest";
     }
 
-    public function generateUrl($route, $parameters = [])
+    /**
+     * @param array<string, mixed> $parameters
+     */
+    public function generateUrl(string $route, array $parameters = []): string
     {
         // `login_url` is the URL prefix to use in the event that our site
         // is being reverse-proxied from a different domain (i.e., from the WAF)
@@ -110,6 +114,8 @@ class AuthService
 
     private function getSessionState(): ?string
     {
-        return $this->requestStack->getSession()->get('auth_state');
+        $state = $this->requestStack->getSession()->get('auth_state');
+
+        return is_string($state) ? $state : null;
     }
 }
