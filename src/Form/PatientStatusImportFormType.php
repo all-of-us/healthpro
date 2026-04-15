@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints\File;
 
 class PatientStatusImportFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('patient_status_csv', Type\FileType::class, [

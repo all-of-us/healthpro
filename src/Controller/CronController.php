@@ -26,7 +26,7 @@ class CronController extends BaseController
     }
 
     #[Route(path: '/ping-test', name: 'cron_ping_test')]
-    public function pingTestAction()
+    public function pingTestAction(): Response
     {
         return $this->json(['success' => true]);
     }
@@ -53,24 +53,24 @@ class CronController extends BaseController
     }
 
     #[Route(path: '/delete-cache-keys', name: 'cron_delete_cache_keys')]
-    public function deleteCacheKeysAction(ParameterBagInterface $params)
+    public function deleteCacheKeysAction(ParameterBagInterface $params): Response
     {
-        $cache = new DatastoreAdapter($params->get('ds_clean_up_limit'));
+        $cache = new DatastoreAdapter((int) $params->get('ds_clean_up_limit'));
         $cache->prune();
         return $this->json(['success' => true]);
     }
 
     #[Route(path: '/delete-session-keys', name: 'cron_delete_session_keys')]
-    public function deleteSessionKeysAction(SessionService $sessionService)
+    public function deleteSessionKeysAction(SessionService $sessionService): Response
     {
         $sessionService->deleteKeys();
         return $this->json(['success' => true]);
     }
 
     #[Route(path: '/backfill-order-processed-time', name: 'backfill_order_processed_time')]
-    public function backfillOrderProcessedTimeAction(ParameterBagInterface $params)
+    public function backfillOrderProcessedTimeAction(ParameterBagInterface $params): Response
     {
-        $limit = $params->has('backfill_order_limit') ? $params->get('backfill_order_limit') : 500;
+        $limit = $params->has('backfill_order_limit') ? (int) $params->get('backfill_order_limit') : 500;
         $orders = $this->em->getRepository(Order::class)->getBackfillOrders($limit);
         $batchSize = 50;
         foreach ($orders as $key => $order) {
@@ -90,7 +90,7 @@ class CronController extends BaseController
     }
 
     #[Route(path: '/repair-hfh-participants', name: 'cron_repair_hfh_participants')]
-    public function repairHfhParticipantsAction(HFHRepairService $HFHRepairService)
+    public function repairHfhParticipantsAction(HFHRepairService $HFHRepairService): Response
     {
         $HFHRepairService->repairHFHParticipants();
         return $this->json(['success' => true]);
@@ -149,7 +149,7 @@ class CronController extends BaseController
     }
 
     #[Route(path: '/backfill-nph-dlw', name: 'cron_backfill_nph_dlw')]
-    public function backfillNphDlw(NphDlwBackfillService $backfill)
+    public function backfillNphDlw(NphDlwBackfillService $backfill): Response
     {
         $backfill->backfillNphDlw();
         return $this->json(['success' => true]);

@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints;
 
 class ParticipantLookupBiobankIdType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $constraints = [
             new Constraints\NotBlank(),

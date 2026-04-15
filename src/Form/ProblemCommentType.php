@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Constraints;
 
 class ProblemCommentType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('staff_name', Type\TextType::class, [

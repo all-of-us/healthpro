@@ -18,7 +18,7 @@ class Visit3Diet extends TimePoints
         'day12' => ['24urine']
     ];
 
-    public function __construct($module)
+    public function __construct(int $module)
     {
         $this->module = $module;
     }

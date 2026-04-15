@@ -502,7 +502,7 @@ class OrderController extends BaseController
                     if ($finalizeForm->has('fedexTracking') && !empty($finalizeForm['fedexTracking']->getData())) {
                         $duplicateFedexTracking = $this->em->getRepository(Order::class)->getDuplicateFedexTracking(
                             $finalizeForm['fedexTracking']->getData(),
-                            $orderId
+                            (int) $orderId
                         );
                         if (!empty($duplicateFedexTracking)) {
                             $finalizeForm['fedexTracking']['first']->addError(new FormError('This tracking number has already been used for another order.'));

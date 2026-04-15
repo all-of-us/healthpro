@@ -232,7 +232,7 @@ class OrderService
         $statusType = $type === Order::ORDER_CANCEL ? 'cancelled' : 'restored';
         $obj->status = $statusType;
         $obj->amendedReason = $reason;
-        $user = $this->order->getOrderUser($this->userService->getUser());
+        $user = $this->order->getOrderUser($this->userService->getUserEntity());
         $site = $this->order->getOrderSite($this->siteService->getSiteId());
         $obj->{$statusType . 'Info'} = $this->order->getOrderUserSiteData($user, $site);
         return $obj;

@@ -9,6 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IdVerificationType extends AbstractType
 {
+    /** @var array<string, array<string, string>> */
     public static $idVerificationChoices = [
         'verificationType' => [
             'A photo and at least one piece of PII' => 'PHOTO_AND_ONE_OF_PII',
@@ -25,7 +26,7 @@ class IdVerificationType extends AbstractType
         ]
     ];
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('confirmation', Type\ChoiceType::class, [
@@ -66,7 +67,7 @@ class IdVerificationType extends AbstractType
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => null,

@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints;
 
 class PediatricMeasurementType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         foreach ($options['schema']->fields as $field) {
             if (isset($field->formField) && !$field->formField) {
@@ -135,10 +135,9 @@ class PediatricMeasurementType extends AbstractType
                 $builder->add($field->name, $class, $fieldOptions);
             }
         }
-        return $builder->getForm();
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'schema' => null,
@@ -146,6 +145,9 @@ class PediatricMeasurementType extends AbstractType
         ]);
     }
 
+    /**
+     * @return list<Constraints\Collection>
+     */
     private function addDiastolicBloodPressureConstraint(FormInterface $form, \stdClass $field): array
     {
         $compareType = $field->compare->type;

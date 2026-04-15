@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints;
 
 class NphAdminOrderGenerationType extends NphOrderForm
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $samples = $options['samples'];
         $orderType = $options['orderType'];
@@ -122,7 +122,6 @@ class NphAdminOrderGenerationType extends NphOrderForm
             'required' => false
         ]);
 
-        return $builder->getForm();
     }
 
     public function configureOptions(OptionsResolver $resolver)

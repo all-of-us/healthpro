@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Form\Nph\NphOrderForm;
+use App\Helper\NphParticipant;
 use App\Repository\NphOrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -96,6 +97,8 @@ class NphOrder
 
     /** @var list<string> */
     public static array $stoolVisits = ['preLMT', 'preDSMT'];
+
+    public NphParticipant|false|null $participant = null;
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

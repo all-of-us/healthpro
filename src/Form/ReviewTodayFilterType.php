@@ -12,10 +12,10 @@ class ReviewTodayFilterType extends AbstractType
 {
     public const DATE_RANGE_LIMIT = 30;
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $constraintDate = new \DateTime('today', new \DateTimeZone($options['timezone']));
-        return $builder
+        $builder
             ->add('start_date', Type\DateTimeType::class, [
                 'required' => true,
                 'label' => 'Start Date',

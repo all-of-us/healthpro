@@ -7,8 +7,8 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class SessionService
 {
-    private $params;
-    private $env;
+    private ParameterBagInterface $params;
+    private EnvironmentService $env;
 
     public function __construct(ParameterBagInterface $params, EnvironmentService $env)
     {
@@ -16,11 +16,11 @@ class SessionService
         $this->env = $env;
     }
 
-    public function deleteKeys()
+    public function deleteKeys(): bool
     {
         $sessionTimeout = $this->env->values['sessionTimeOut'];
         $modified = new \DateTime("-{$sessionTimeout} seconds");
-        $limit = $this->params->get('ds_clean_up_limit');
+        $limit = (int) $this->params->get('ds_clean_up_limit');
         $session = new Session();
         $results = $session->getBatch('modified', $modified, '<', $limit);
         $session->deleteBatch($results);

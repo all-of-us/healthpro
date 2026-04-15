@@ -13,11 +13,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class NphParticipantLookupController extends BaseController
 {
-    protected $nphParticipantSummaryService;
+    protected NphParticipantSummaryService $nphParticipantSummaryService;
 
     public function __construct(EntityManagerInterface $em, NphParticipantSummaryService $nphParticipantSummaryService)
     {
@@ -26,7 +27,7 @@ class NphParticipantLookupController extends BaseController
     }
 
     #[Route(path: '/nph/participants', name: 'nph_participants')]
-    public function participantsAction(Request $request, ParameterBagInterface $params)
+    public function participantsAction(Request $request, ParameterBagInterface $params): Response
     {
         $idForm = $this->createForm(ParticipantLookupIdType::class, null, ['placeholder' => '10000000000000']);
         $idForm->handleRequest($request);

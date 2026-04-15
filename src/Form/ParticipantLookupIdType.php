@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Constraints;
 
 class ParticipantLookupIdType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('participantId', Type\TextType::class, [

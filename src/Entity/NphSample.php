@@ -445,10 +445,7 @@ class NphSample
     public function removeNphAliquot(NphAliquot $nphAliquot): self
     {
         if ($this->nphAliquots->removeElement($nphAliquot)) {
-            // set the owning side to null (unless already changed)
-            if ($nphAliquot->getNphSample() === $this) {
-                $nphAliquot->setNphSample(null);
-            }
+            // NphAliquot requires an owning sample, so only update the inverse collection here.
         }
 
         return $this;

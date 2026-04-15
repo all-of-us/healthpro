@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Constraints;
 
 class ProblemType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $constraintDateTime = new \DateTime('+5 minutes');
         $problemTypeAttributes = [

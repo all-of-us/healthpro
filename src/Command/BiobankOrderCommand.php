@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class BiobankOrderCommand extends Command
 {
-    private $orderService;
+    private OrderService $orderService;
 
     public function __construct(OrderService $orderService)
     {

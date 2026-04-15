@@ -10,6 +10,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class GcsBucketService
 {
     protected StorageClient $storageClient;
+    /** @var array<string, mixed> */
     protected array $config = [];
 
     public function __construct(EnvironmentService $environment, KernelInterface $appKernel, ParameterBagInterface $params)

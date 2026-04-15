@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints;
 
 class NphSampleFinalizeType extends NphOrderForm
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $sample = $options['sample'];
         $orderType = $options['orderType'];
@@ -288,10 +288,9 @@ class NphSampleFinalizeType extends NphOrderForm
             'required' => false
         ]);
 
-        return $builder->getForm();
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'sample' => null,
@@ -309,6 +308,11 @@ class NphSampleFinalizeType extends NphOrderForm
         ]);
     }
 
+    /**
+     * @param array<string, mixed> $aliquot
+     *
+     * @return array<string, mixed>
+     */
     private function getVolumeAttributes(array $aliquot): array
     {
         $volumeAttributes = [

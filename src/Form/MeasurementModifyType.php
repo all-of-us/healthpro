@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints;
 
 class MeasurementModifyType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $reasonType = $options['type'] . 'Reasons';
         $reasons = Measurement::$$reasonType;

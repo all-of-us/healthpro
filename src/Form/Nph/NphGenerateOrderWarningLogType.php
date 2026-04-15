@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class NphGenerateOrderWarningLogType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('status', Type\HiddenType::class);
         $builder->add('period', Type\HiddenType::class);

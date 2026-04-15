@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Form\SettingsType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(path: '/settings')]
@@ -16,7 +17,7 @@ class SettingsController extends BaseController
     }
 
     #[Route(path: '/', name: 'settings')]
-    public function settings(Request $request)
+    public function settings(Request $request): Response
     {
         $user = $this->getUserEntity();
         $settingsForm = $this->createForm(SettingsType::class, $user);

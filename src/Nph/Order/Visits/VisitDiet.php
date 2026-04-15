@@ -14,7 +14,7 @@ class VisitDiet extends TimePoints
         'day0' => ['urine', 'saliva', 'blood']
     ];
 
-    public function __construct($module)
+    public function __construct(int $module)
     {
         $this->module = $module;
     }

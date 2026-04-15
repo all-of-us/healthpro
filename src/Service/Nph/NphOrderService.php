@@ -2007,7 +2007,7 @@ class NphOrderService
         return count($totalIds) > count($uniqueIds);
     }
 
-    private function getTimezoneid(): ?int
+    private function getTimezoneid(): int
     {
         return $this->userService->getUserEntity()->getTimezoneId();
     }

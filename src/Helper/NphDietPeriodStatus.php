@@ -15,6 +15,7 @@ class NphDietPeriodStatus
     public const PERIOD1 = 'Period1';
     public const PERIOD3 = 'Period3';
 
+    /** @var array<string, array<string, string>> */
     public static array $dietPeriodStatusMap = [
         'not_started' => [
             'text' => 'Not Started',
@@ -80,6 +81,7 @@ class NphDietPeriodStatus
         ],
     ];
 
+    /** @var array<string, string> */
     public static array $dietToolTipMessages = [
         'complete_unfinalized' => 'This diet period was marked complete with unfinalized samples. Uncheck the sample processing complete box to aliquot and finalize all samples. For any samples that cannot be finalized, please cancel the sample(s). Samples left unfinalized are at risk of disposal.',
         'complete_unfinalized_1' => 'This module was marked complete with unfinalized samples. Uncheck the sample processing complete box to aliquot and finalize all samples. For any samples that cannot be finalized, please cancel the sample(s). Samples left unfinalized are at risk of disposal.',
