@@ -8,12 +8,12 @@ use App\Entity\Organization;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Form\SiteType;
+use App\Security\User as SecurityUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
-use App\Security\User as SecurityUser;
 
 class SiteService
 {

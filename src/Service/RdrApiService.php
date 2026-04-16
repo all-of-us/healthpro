@@ -4,9 +4,9 @@ namespace App\Service;
 
 use App\Cache\DatastoreAdapter;
 use App\HttpClient;
-use GuzzleHttp\ClientInterface;
 use Google\Client as GoogleClient;
 use Google\Service\Oauth2 as GoogleServiceOauth2;
+use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;

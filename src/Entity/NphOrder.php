@@ -486,9 +486,9 @@ class NphOrder
         }
 
         $metadata['bowelType'] = isset($metadata['bowelType']) ? array_search(
-                $metadata['bowelType'],
-                NphOrderForm::$bowelMovements
-            ) : '';
+            $metadata['bowelType'],
+            NphOrderForm::$bowelMovements
+        ) : '';
 
         $metadata['bowelQuality'] = isset($metadata['bowelQuality']) ? array_search(
             $metadata['bowelQuality'],

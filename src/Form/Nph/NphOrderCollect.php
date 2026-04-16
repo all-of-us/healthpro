@@ -76,7 +76,6 @@ class NphOrderCollect extends NphOrderForm
         $builder->add('samplesCheckAll', Type\CheckboxType::class, [
             'required' => false
         ]);
-
     }
 
     public function configureOptions(OptionsResolver $resolver)

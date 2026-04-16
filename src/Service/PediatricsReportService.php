@@ -679,8 +679,7 @@ class PediatricsReportService
         array $bpHeightPercentileCharts,
         float $ageInMonths,
         ?float $defaultMaxValue = null
-    ): ?float
-    {
+    ): ?float {
         $maxValue = null;
         $ageInYears = $this->getAgeInYears($ageInMonths);
         foreach ($bpHeightPercentileCharts as $bpHeightPercentile) {

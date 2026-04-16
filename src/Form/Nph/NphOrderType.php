@@ -163,7 +163,6 @@ class NphOrderType extends AbstractType
         'label' => 'Order Creation Time',
         'attr' => ['class' => 'order-ts', 'autocomplete' => 'off'],
         ]);
-
     }
 
     public function configureOptions(OptionsResolver $resolver): void
