@@ -61,6 +61,7 @@ class IdVerificationRepository extends ServiceEntityRepository
     public function getOnsiteIdVerificationsCount(string $site, array $params): int
     {
         $queryBuilder = $this->createQueryBuilder('idv')
+            ->where('idv.site = :site')
             ->select('count(idv.id)');
 
         $this->setQueryBuilder($queryBuilder, $params, $site);

@@ -20,6 +20,7 @@ security:
     access_control:
         - { path: ^/(login|logout|keepalive|client-timeout|agree|timeout|salesforce), roles: PUBLIC_ACCESS }
         - { path: ^/cron/.*, roles: PUBLIC_ACCESS }
+        - { path: ^/$, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/admin($|\/).*, roles: ROLE_ADMIN }
         - { path: ^/nph($|\/)$, roles: [ROLE_NPH_USER, ROLE_NPH_BIOBANK, ROLE_NPH_ADMIN] }
         - { path: ^/nph/biobank($|\/), roles: ROLE_NPH_BIOBANK }

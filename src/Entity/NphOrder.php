@@ -135,7 +135,7 @@ class NphOrder
     private Collection $nphSamples;
 
     #[ORM\Column(type: 'string', length: 20)]
-    private string $orderType;
+    private string $orderType = '';
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $metadata = null;
