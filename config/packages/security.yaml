@@ -20,6 +20,8 @@ security:
     access_control:
         - { path: ^/(login|logout|keepalive|client-timeout|agree|timeout|salesforce), roles: PUBLIC_ACCESS }
         - { path: ^/cron/.*, roles: PUBLIC_ACCESS }
+        # The home route is used as an authenticated landing page for multiple roles,
+        # so it needs its own rule instead of falling through to the ROLE_USER catch-all.
         - { path: ^/$, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/admin($|\/).*, roles: ROLE_ADMIN }
         - { path: ^/nph($|\/)$, roles: [ROLE_NPH_USER, ROLE_NPH_BIOBANK, ROLE_NPH_ADMIN] }
@@ -37,4 +39,4 @@ security:
         - { path: ^/nph/access/manage($|\/).*, roles: [ROLE_MANAGE_USERS_NPH] }
         - { path: ^/read($|\/).*, roles: ROLE_READ_ONLY }
         - { path: ^/(notification|notifications)($|\/), roles: [ROLE_USER, ROLE_AWARDEE, ROLE_BIOBANK, ROLE_SCRIPPS] }
-        - { path: ^/.*\S$, roles: ROLE_USER }
+        - { path: ^/.+$, roles: ROLE_USER }
