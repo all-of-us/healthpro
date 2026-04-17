@@ -34,9 +34,6 @@ class NphOrderLookupController extends AbstractController
         NphParticipantSummaryService $participantSummary
     ): Response {
         $recentOrders = $this->em->getRepository(NphOrder::class)->getRecentOrdersBySite($siteService->getSiteId());
-        foreach ($recentOrders as &$order) {
-            $order->participant = $participantSummary->getParticipantById($order->getParticipantId());
-        }
         $idForm = $this->getIdForm($request, $siteService, $participantSummary);
         if ($idForm instanceof RedirectResponse) {
             return $idForm;
