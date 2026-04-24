@@ -63,7 +63,7 @@ class HenryFordRepairTest extends KernelTestCase
         ];
     }
 
-    public function createMeasurement($params = [], $user)
+    public function createMeasurement($params, $user)
     {
         $measurement = new Measurement();
         $measurement->setUser($user);
@@ -107,7 +107,7 @@ class HenryFordRepairTest extends KernelTestCase
         $testOrder = $this->createOrder($this->getOrderData());
         $testMeasurement = $this->createMeasurement($this->getMeasurementData(), $user);
         $this->addTestParticipantToDatabase();
-        $this->assertCount(1, $conn->fetchAll("SELECT * FROM henry_ford_repair WHERE participant_id = 'P123456789'"));
+        $this->assertCount(1, $conn->fetchAllAssociative("SELECT * FROM henry_ford_repair WHERE participant_id = 'P123456789'"));
         $this->assertSame('henryford', $testOrder->getFinalizedSite());
         $this->assertSame('henryford', $testMeasurement->getFinalizedSite());
         $this->em->persist($testOrder);
@@ -118,6 +118,6 @@ class HenryFordRepairTest extends KernelTestCase
         $testOrder = $this->em->find(Order::class, $testOrder->getId());
         $this->assertSame('henryforddearbornuopo', $testOrder->getFinalizedSite());
         $this->assertSame('henryforddearbornuopo', $testMeasurement->getFinalizedSite());
-        $this->assertCount(0, $conn->fetchAll("SELECT * FROM henry_ford_repair WHERE participant_id = 'P123456789'"));
+        $this->assertCount(0, $conn->fetchAllAssociative("SELECT * FROM henry_ford_repair WHERE participant_id = 'P123456789'"));
     }
 }

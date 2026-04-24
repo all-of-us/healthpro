@@ -13,7 +13,7 @@ class OrderRepositoryTest extends RepositoryTestCase
     public function setup(): void
     {
         parent::setUp();
-        $this->repo = static::$container->get(OrderRepository::class);
+        $this->repo = static::getContainer()->get(OrderRepository::class);
     }
 
     protected function getUser(): User

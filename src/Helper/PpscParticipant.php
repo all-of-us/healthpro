@@ -158,9 +158,7 @@ class PpscParticipant
         $this->awardee = $participant->awardee ?? null;
         $this->organization = $participant->organization ?? null;
         $this->site = $participant->site ?? null;
-        if ($participant->isPediatric == 1) {
-            $this->isPediatric = true;
-        }
+        $this->isPediatric = !empty($participant->isPediatric);
         $this->genderIdentity = $participant->genderIdentity ?? null;
         $this->middleName = $participant->middleName ?? null;
         $this->lastName = $participant->lastName ?? null;

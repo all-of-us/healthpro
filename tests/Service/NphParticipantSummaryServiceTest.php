@@ -6,16 +6,18 @@ use App\Helper\NphParticipant;
 use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\RdrApiService;
 use GuzzleHttp\Psr7\Response;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class NphParticipantSummaryServiceTest extends ServiceTestCase
 {
     public function testGetParticipantById()
     {
-        $mockParamsService = $this->createMock(ParameterBagInterface::class);
-        $mockParamsService->method('has')->will($this->returnValueMap([
-            ['rdr_disable_cache', true]
-        ]));
+        $mockParamsService = new ParameterBag([
+            'rdr_disable_cache' => true,
+            'cache_time' => 300,
+            'ds_clean_up_limit' => 100,
+        ]);
         $mockRdrApiService = $this->createMock(RdrApiService::class);
         $data = $this->getMockRdrResponseData();
         $mockRdrApiService->method('GQLPost')->willReturn($this->getGuzzleResponse($data));

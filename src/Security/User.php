@@ -221,6 +221,11 @@ class User implements UserInterface
         return $this->googleUser->getEmail();
     }
 
+    public function getUserIdentifier(): string
+    {
+        return $this->googleUser->getEmail();
+    }
+
     public function getEmail()
     {
         return $this->googleUser->getEmail();

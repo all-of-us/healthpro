@@ -16,4 +16,4 @@ monolog:
             facility: !php/const LOG_USER
             level: info
             logopts: !php/const LOG_PERROR
-            channels: ["!deprecation"]
+            channels: ["!deprecation", "!doctrine"]
