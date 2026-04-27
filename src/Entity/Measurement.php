@@ -525,10 +525,10 @@ class Measurement
         return !empty($this->getFinalizedTs()) && empty($this->getRdrId());
     }
 
-    public function getReasonDisplayText(): ?string
+    public function getReasonDisplayText(): string
     {
         if (empty($this->getHistory())) {
-            return null;
+            return '';
         }
         // Check only cancel reasons
         $reasonDisplayText = array_search($this->getHistory()->getReason(), self::$cancelReasons);
