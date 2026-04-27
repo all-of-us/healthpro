@@ -161,8 +161,8 @@ class Order
     /** @var array<string, array<string, mixed>> */
     private $salivaSamplesInformation = [];
 
-    /** @var array<int|string, mixed> */
-    private $salivaInstructions = [];
+    /** @var string */
+    private $salivaInstructions = '';
 
     /** @var string|null */
     private $currentVersion;
@@ -995,10 +995,7 @@ class Order
         return $this->salivaSamplesInformation;
     }
 
-    /**
-     * @return array<int|string, mixed>
-     */
-    public function getSalivaInstructions(): array
+    public function getSalivaInstructions(): string
     {
         return $this->salivaInstructions;
     }
@@ -1075,6 +1072,9 @@ class Order
         }
         $this->salivaSamples = $salivaSamples;
 
+        if (!isset($schema['salivaInstructions']) || !is_string($schema['salivaInstructions'])) {
+            throw new \Exception('Invalid samples schema');
+        }
         $this->salivaInstructions = $schema['salivaInstructions'];
 
         $this->setSampleIds();
