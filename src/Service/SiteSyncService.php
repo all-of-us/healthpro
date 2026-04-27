@@ -134,7 +134,7 @@ class SiteSyncService
                         $siteData->setState($site->address->state);
                     }
                     if (empty($siteData->getWorkqueueDownload())) {
-                        $siteData->setWorkqueueDownload('full_data'); // default value for workqueue downlaod
+                        $siteData->setWorkqueueDownload(Site::WORKQUEUE_DOWNLOAD_FULL_DATA); // default value for workqueue downlaod
                     }
                     if ($existingArray) {
                         /** @var NormalizedEntity $siteDataArray */

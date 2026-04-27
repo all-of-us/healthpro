@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: 'App\Repository\SiteRepository')]
 class Site
 {
+    public const WORKQUEUE_DOWNLOAD_FULL_DATA = 'full_data';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -57,7 +59,7 @@ class Site
     private ?string $centrifugeType = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private string $workqueueDownload;
+    private string $workqueueDownload = self::WORKQUEUE_DOWNLOAD_FULL_DATA;
 
     #[ORM\Column(type: 'boolean')]
     private bool $ehrModificationProtocol = false;

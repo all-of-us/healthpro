@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Audit\Log;
+use App\Entity\Site;
 use App\Form\SiteType;
 use App\Repository\SiteRepository;
 use App\Service\EnvironmentService;
@@ -81,7 +82,7 @@ class SitesController extends BaseController
                     $this->addFlash('success', 'Site updated.');
                 } else {
                     $site = $form->getData();
-                    $site->setWorkqueueDownload(SiteType::FULL_DATA_ACCESS);
+                    $site->setWorkqueueDownload(Site::WORKQUEUE_DOWNLOAD_FULL_DATA);
                     $this->em->persist($site);
                     $this->em->flush();
                     $loggerService->log(Log::SITE_ADD, $site->getId());
