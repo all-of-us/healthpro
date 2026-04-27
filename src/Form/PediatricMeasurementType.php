@@ -95,8 +95,6 @@ class PediatricMeasurementType extends AbstractType
                 $constraints[] = new Constraints\Range([
                     'min' => $minDate,
                     'max' => new \DateTime('today'),
-                    'minMessage' => 'Date cannot be greater than six months in the past',
-                    'maxMessage' => 'Date cannot be in the future',
                     'notInRangeMessage' => 'Date cannot be greater than six months in the past and cannot be in the future'
                 ]);
                 $dateOptions = [
