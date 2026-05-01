@@ -450,7 +450,7 @@ class MeasurementsController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/pediatric/assent/check', name: 'measurement_pediatric_assent_check')]
-    public function measurementPediatricAssentCheckAction($participantId, Request $request): Response
+    public function measurementPediatricAssentCheckAction(string $participantId, Request $request): Response
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {

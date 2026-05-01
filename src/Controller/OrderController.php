@@ -70,7 +70,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/order/pediatric/assent/check', name: 'order_assent_pediatric')]
-    public function orderAssentPediatric($participantId, RequestStack $requestStack): Response
+    public function orderAssentPediatric(string $participantId, RequestStack $requestStack): Response
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {

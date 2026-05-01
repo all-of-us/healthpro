@@ -351,7 +351,7 @@ class MeasurementService
      */
     private function getSexSpecificChartsData(string $chartClass, string $sexAtBirth): array
     {
-        /** @var \App\Repository\BmiForAge5YearsAndUpRepository|\App\Repository\HeadCircumferenceForAge0To36MonthsRepository|\App\Repository\HeightForAge0To23MonthsRepository|\App\Repository\HeightForAge24MonthsTo6YearsRepository|\App\Repository\WeightForAge0To23MonthsRepository|\App\Repository\WeightForAge24MonthsAndUpRepository|\App\Repository\WeightForLength0To23MonthsRepository|\App\Repository\WeightForLength23MonthsTo5YearsRepository $repository */
+        /** @var \App\Repository\BmiForAge5YearsAndUpRepository|\App\Repository\HeadCircumferenceForAge0To36MonthsRepository|\App\Repository\HeightForAge0To23MonthsRepository|\App\Repository\HeightForAge24MonthsAndUpRepository|\App\Repository\WeightForAge0To23MonthsRepository|\App\Repository\WeightForAge24MonthsAndUpRepository|\App\Repository\WeightForLength0To23MonthsRepository|\App\Repository\WeightForLength23MonthsTo5YearsRepository $repository */
         $repository = $this->em->getRepository($chartClass);
 
         return $repository->getChartsData($sexAtBirth);
