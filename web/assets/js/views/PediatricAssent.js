@@ -2,10 +2,12 @@ $(document).ready(function () {
     const $assentSelect = $("#pediatricAssent");
     const $continueBtn = $("#continueBtn");
     const $errorMessage = $("#assentErrorMessage");
-    const getValues = (dataKey) => (($assentSelect.data(dataKey) || "").toString()
-        .split(",")
-        .map((value) => value.trim())
-        .filter(Boolean));
+    const getValues = (dataKey) =>
+        ($assentSelect.data(dataKey) || "")
+            .toString()
+            .split(",")
+            .map((value) => value.trim())
+            .filter(Boolean);
     const continueValues = getValues("continueValues");
     const errorValues = getValues("errorValues");
     const resetState = () => {
