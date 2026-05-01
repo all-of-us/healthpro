@@ -15,12 +15,13 @@
             <div class="card-body">
                 <div>
                     <label class="form-label" for="pediatricAssent">
-                        Does the pediatric participant assent to physical measurements during this visit?
+                        Does the pediatric participant assent to physical measures today?
                     </label>
-                    <select class="form-select" id="pediatricAssent">
+                    <select class="form-select" id="pediatricAssent" data-continue-values="yes,unable" data-error-values="no">
                         <option value="" selected>Select</option>
                         <option value="yes">Yes</option>
                         <option value="no">No</option>
+                        <option value="unable">Participant is unable to provide assent</option>
                     </select>
                     <div id="assentErrorMessage" class="text-danger mt-2 d-none">
                         <i class="fa fa-exclamation-circle"></i> The participant has not assented. You may not proceed with physical measurements.
