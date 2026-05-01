@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints;
 
 class DeceasedReportReviewType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('reportStatus', ChoiceType::class, [

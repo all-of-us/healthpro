@@ -30,7 +30,7 @@ class NphOrderType extends AbstractType
     private const STOOL_BARCODE_ID_PATTERN = '/^[0-9]{11}$/';
     private const STOOL_BARCODE_ID_PATTERN_ERROR_MESSAGE = 'Stool tube barcode ID invalid.  Please enter a valid stool tube barcode ID.';
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $ordersData = $builder->getData();
         $timePointSamples = $options['timePointSamples'];
@@ -163,11 +163,9 @@ class NphOrderType extends AbstractType
         'label' => 'Order Creation Time',
         'attr' => ['class' => 'order-ts', 'autocomplete' => 'off'],
         ]);
-
-        return $builder->getForm();
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'timePointSamples' => null,
@@ -179,6 +177,9 @@ class NphOrderType extends AbstractType
         ]);
     }
 
+    /**
+     * @param array<string, mixed> $formData
+     */
     private function isStoolChecked(array $formData, string $fieldName): bool
     {
         $sampleStool = $fieldName === self::STOOL_KIT_FIELD ? NphSample::SAMPLE_STOOL : NphSample::SAMPLE_STOOL_2;
@@ -196,7 +197,7 @@ class NphOrderType extends AbstractType
         return false;
     }
 
-    private function addStoolKitField(&$builder, $isStoolKitDisabled, $stoolKitData, $fieldName): void
+    private function addStoolKitField(FormBuilderInterface $builder, bool $isStoolKitDisabled, ?string $stoolKitData, string $fieldName): void
     {
         $stoolKitAttributes = [
             'class' => 'stool-id',

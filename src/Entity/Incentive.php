@@ -23,7 +23,8 @@ class Incentive
     public const ITEM_OF_APPRECIATION = 'item_of_appreciation';
     public const PEDIATRIC_VISIT = 'pediatric_visit';
 
-    public static $incentiveTypeChoices = [
+    /** @var array<string, string> */
+    public static array $incentiveTypeChoices = [
         'Cash' => self::CASH,
         'Gift Card' => self::GIFT_CARD,
         'Voucher' => self::VOUCHER,
@@ -32,20 +33,23 @@ class Incentive
         'Other' => self::OTHER,
     ];
 
-    public static $incentiveOccurrenceChoices = [
+    /** @var array<string, string> */
+    public static array $incentiveOccurrenceChoices = [
         'One-time Incentive' => self::ONE_TIME,
         'Redraw' => self::REDRAW,
         'Other' => self::OTHER,
         'Pediatric Visit' => self::PEDIATRIC_VISIT,
     ];
 
-    public static $incentiveAmountChoices = [
+    /** @var array<string, string> */
+    public static array $incentiveAmountChoices = [
         '$25.00' => '25',
         '$15.00' => '15',
         'Other' => self::OTHER
     ];
 
-    public static $giftCardTypes = [
+    /** @var list<string> */
+    public static array $giftCardTypes = [
         'ClinCard',
         'Target',
         'Safeway',
@@ -61,14 +65,16 @@ class Incentive
         'Meijer',
     ];
 
-    public static $recipientChoices = [
+    /** @var array<string, string> */
+    public static array $recipientChoices = [
         'Adult Participant' => self::ADULT_PARTICIPANT,
         'Pediatric Guardian' => self::PEDIATRIC_GUARDIAN,
         'Pediatric Participant' => self::PEDIATRIC_PARTICIPANT,
         'Other' => self::OTHER,
     ];
 
-    public static $itemTypes = [
+    /** @var list<string> */
+    public static array $itemTypes = [
         'Candy',
         'Pencil',
         'Pen',
@@ -78,64 +84,64 @@ class Incentive
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $participantId;
+    private string $participantId;
 
     #[ORM\OneToOne(targetEntity: 'App\Entity\User')]
-    private $user;
+    private ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $site;
+    private string $site;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $incentiveDateGiven;
+    private ?\DateTimeInterface $incentiveDateGiven = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $incentiveType;
+    private ?string $incentiveType = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $otherIncentiveType;
+    private ?string $otherIncentiveType = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $incentiveOccurrence;
+    private ?string $incentiveOccurrence = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $otherIncentiveOccurrence;
+    private ?string $otherIncentiveOccurrence = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $incentiveAmount;
+    private ?int $incentiveAmount = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $giftCardType;
+    private ?string $giftCardType = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $notes;
+    private ?string $notes = null;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTimeInterface $createdTs;
 
     #[ORM\OneToOne(targetEntity: 'App\Entity\User', cascade: ['persist', 'remove'])]
-    private $amendedUser;
+    private ?User $amendedUser = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $amendedTs;
+    private ?\DateTimeInterface $amendedTs = null;
 
     #[ORM\OneToOne(targetEntity: 'App\Entity\User', cascade: ['persist', 'remove'])]
-    private $cancelledUser;
+    private ?User $cancelledUser = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $cancelledTs;
+    private ?\DateTimeInterface $cancelledTs = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $rdrId;
+    private ?string $rdrId = null;
 
     #[ORM\Column(type: 'boolean')]
-    private $declined;
+    private bool $declined;
 
     #[ORM\ManyToOne(targetEntity: IncentiveImport::class, inversedBy: 'incentives')]
-    private $import;
+    private ?IncentiveImport $import = null;
 
     #[ORM\Column(length: 255)]
     private string $Recipient;
@@ -154,7 +160,7 @@ class Incentive
         return $this->id;
     }
 
-    public function getParticipantId(): ?string
+    public function getParticipantId(): string
     {
         return $this->participantId;
     }
@@ -178,7 +184,7 @@ class Incentive
         return $this;
     }
 
-    public function getSite(): ?string
+    public function getSite(): string
     {
         return $this->site;
     }
@@ -252,12 +258,12 @@ class Incentive
 
     public function getIncentiveAmount(): ?string
     {
-        return $this->incentiveAmount;
+        return $this->incentiveAmount !== null ? (string) $this->incentiveAmount : null;
     }
 
-    public function setIncentiveAmount(?string $incentiveAmount): self
+    public function setIncentiveAmount(int|string|null $incentiveAmount): self
     {
-        $this->incentiveAmount = $incentiveAmount;
+        $this->incentiveAmount = $incentiveAmount !== null ? (int) $incentiveAmount : null;
 
         return $this;
     }
@@ -286,7 +292,7 @@ class Incentive
         return $this;
     }
 
-    public function getCreatedTs(): ?\DateTimeInterface
+    public function getCreatedTs(): \DateTimeInterface
     {
         return $this->createdTs;
     }
@@ -351,21 +357,21 @@ class Incentive
         return $this->rdrId;
     }
 
-    public function setRdrId(string $rdrId): self
+    public function setRdrId(?string $rdrId): self
     {
         $this->rdrId = $rdrId;
 
         return $this;
     }
 
-    public function getDeclined(): ?bool
+    public function getDeclined(): bool
     {
         return $this->declined;
     }
 
-    public function setDeclined(int $status): self
+    public function setDeclined(bool|int $status): self
     {
-        $this->declined = $status;
+        $this->declined = (bool) $status;
 
         return $this;
     }
@@ -450,7 +456,8 @@ class Incentive
         return $this;
     }
 
-    public static function getIncentiveOptions($isPediatricParticipant = false): array
+    /** @return array<string, string> */
+    public static function getIncentiveOptions(bool $isPediatricParticipant = false): array
     {
         $choices = self::$incentiveTypeChoices;
         if (!$isPediatricParticipant) {
@@ -459,7 +466,8 @@ class Incentive
         return $choices;
     }
 
-    public static function getIncentiveOccurenceOptions($isPediatricParticipant = false): array
+    /** @return array<string, string> */
+    public static function getIncentiveOccurenceOptions(bool $isPediatricParticipant = false): array
     {
         $choices = self::$incentiveOccurrenceChoices;
         if (!$isPediatricParticipant) {

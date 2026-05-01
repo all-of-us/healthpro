@@ -14,7 +14,7 @@ use Twig\Error\SyntaxError;
 
 class PDFService
 {
-    private $mpdf;
+    private Mpdf $mpdf;
     private Environment $twig;
 
     public function __construct(Environment $twig)
@@ -44,6 +44,9 @@ class PDFService
         $this->twig = $twig;
     }
 
+    /**
+     * @param array<string, mixed> $OrderSummary
+     */
     public function batchPDF(array $OrderSummary, NphParticipant $participant, string $module, string $visit): string
     {
         $stoolPrinted = false;

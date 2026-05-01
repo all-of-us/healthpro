@@ -6,6 +6,9 @@ use App\Entity\NphOrder;
 
 class NphProgramSummaryService
 {
+    /**
+     * @return list<string>
+     */
     public function getModules(): array
     {
         $moduleFiles = scandir(__DIR__ . '/../../Nph/Order/Samples/');
@@ -18,6 +21,9 @@ class NphProgramSummaryService
         return $modules;
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public function getProgramSummary(): array
     {
         $programSummary = [];
@@ -29,7 +35,13 @@ class NphProgramSummaryService
         return $programSummary;
     }
 
-    public function combineOrderSummaryWithProgramSummary($orderSummary, $programSummary): array
+    /**
+     * @param array<string, mixed> $orderSummary
+     * @param array<string, array<string, mixed>> $programSummary
+     *
+     * @return array<string, mixed>
+     */
+    public function combineOrderSummaryWithProgramSummary(array $orderSummary, array $programSummary): array
     {
         $combinedSummary = [];
         $orderSummaryOrder = $orderSummary['order'];
@@ -79,6 +91,11 @@ class NphProgramSummaryService
         return $combinedSummary;
     }
 
+    /**
+     * @param array<string, mixed> $combinedArray
+     *
+     * @return array<string, mixed>
+     */
     public function separateStoolSamples(array $combinedArray): array
     {
         foreach ($combinedArray as $index => $item) {
@@ -127,7 +144,10 @@ class NphProgramSummaryService
     }
 
 
-    private function getModuleSummary($module): array
+    /**
+     * @return array<string, mixed>
+     */
+    private function getModuleSummary(string $module): array
     {
         $moduleSummary = [];
         $moduleClass = 'App\Nph\Order\Modules\Module' . $module;

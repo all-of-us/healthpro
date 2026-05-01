@@ -17,7 +17,7 @@ class DeceasedReportType extends AbstractType
 {
     private const AOU_START_DATE = '2018-05-06';
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('dateOfDeath', DateType::class, [

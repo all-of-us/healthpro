@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -113,13 +114,15 @@ class Problem
     #[ORM\Column(type: 'datetime', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $updatedTs;
 
+    /** @var Collection<int, ProblemComment> */
     #[ORM\OneToMany(targetEntity: 'App\Entity\ProblemComment', mappedBy: 'problem')]
-    private $problemComments;
+    private Collection $problemComments;
 
     public function __construct()
     {
         $this->createdTs = new \DateTime();
         $this->updatedTs = new \DateTime();
+        $this->problemComments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -308,7 +311,7 @@ class Problem
     }
 
     /**
-     * @return Collection|ProblemComment[]
+     * @return Collection<int, ProblemComment>
      */
     public function getProblemComments(): Collection
     {
@@ -329,10 +332,7 @@ class Problem
     {
         if ($this->problemComments->contains($problemComment)) {
             $this->problemComments->removeElement($problemComment);
-            // set the owning side to null (unless already changed)
-            if ($problemComment->getProblem() === $this) {
-                $problemComment->setProblem(null);
-            }
+            // ProblemComment requires an owning problem, so only update the inverse collection here.
         }
 
         return $this;

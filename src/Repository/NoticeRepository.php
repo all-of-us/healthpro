@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Notice|null findOneBy(array $criteria, array $orderBy = null)
  * @method Notice[]    findAll()
  * @method Notice[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<Notice>
  */
 class NoticeRepository extends ServiceEntityRepository
 {
@@ -22,7 +23,7 @@ class NoticeRepository extends ServiceEntityRepository
     /**
      * @return Notice[] Returns an array of currently active Notice objects that match a URL path
      */
-    public function getActiveNotices($path)
+    public function getActiveNotices(string $path): array
     {
         $currentNotices = $this->createQueryBuilder('n')
             ->where('n.status = true')
@@ -44,7 +45,7 @@ class NoticeRepository extends ServiceEntityRepository
         return $matchingNotices;
     }
 
-    private static function patternToRegex($pattern)
+    private static function patternToRegex(string $pattern): string
     {
         $specialCases = [
             '/ppsc/participant/p' => '/^\/ppsc\/participant\/[^\/]+$/i',

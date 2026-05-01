@@ -10,22 +10,22 @@ class EhrWithdrawalLog
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $participantId;
+    private string $participantId;
 
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private $insertTs;
+    private \DateTimeInterface $insertTs;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $ehrWithdrawalTs;
+    private ?\DateTimeInterface $ehrWithdrawalTs = null;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $awardeeId;
+    private ?string $awardeeId = null;
 
     #[ORM\Column(type: 'string', length: 2000, nullable: true)]
-    private $emailNotified;
+    private ?string $emailNotified = null;
 
     public function getId(): ?int
     {

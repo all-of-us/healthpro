@@ -10,7 +10,7 @@ class Awardee
 {
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 20)]
-    private $id;
+    private string $id;
 
     /**
      * @var string

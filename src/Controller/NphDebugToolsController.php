@@ -36,7 +36,7 @@ class NphDebugToolsController extends BaseController
     }
 
     #[Route(path: '/participant/{id}', name: 'nph_admin_debug_participant')]
-    public function participantAction($id, NphParticipantSummaryService $nphParticipantSummaryService): Response
+    public function participantAction(string $id, NphParticipantSummaryService $nphParticipantSummaryService): Response
     {
         $participant = $nphParticipantSummaryService->getAllParticipantDetailsById($id);
         if (!$participant) {

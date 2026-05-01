@@ -16,7 +16,7 @@ class ResponseListener
         $this->params = $params;
     }
 
-    public function onKernelResponse(ResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         $response = $event->getResponse();
         $this->addSecurityHeaders($response, $this->params);

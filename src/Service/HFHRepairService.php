@@ -19,12 +19,12 @@ class HFHRepairService
         $this->loggerService = $logger;
     }
 
-    public function repairHFHParticipants(int $repairLimit = 100, $pariticpantId = null): void
+    public function repairHFHParticipants(int $repairLimit = 100, ?string $participantId = null): void
     {
         $this->em->getConnection()->beginTransaction();
         $count = 0;
         $conn = $this->em->getConnection();
-        if ($pariticpantId === null) {
+        if ($participantId === null) {
             $sql = 'SELECT * FROM henry_ford_repair LIMIT 0, :repairLimit';
             $stmt = $conn->prepare($sql);
             $stmt->bindParam('repairLimit', $repairLimit, ParameterType::INTEGER);
@@ -32,7 +32,7 @@ class HFHRepairService
             $sql = 'SELECT * FROM henry_ford_repair WHERE participant_id = :participantId LIMIT 0, :repairLimit';
             $stmt = $conn->prepare($sql);
             $stmt->bindParam('repairLimit', $repairLimit, ParameterType::INTEGER);
-            $stmt->bindParam('participantId', $pariticpantId, ParameterType::STRING);
+            $stmt->bindParam('participantId', $participantId, ParameterType::STRING);
         }
         $results = $stmt->executeQuery()->fetchAllAssociative();
         $deleteSql = 'DELETE FROM henry_ford_repair where id = :id';

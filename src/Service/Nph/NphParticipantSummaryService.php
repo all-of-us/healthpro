@@ -23,7 +23,7 @@ class NphParticipantSummaryService
         $this->params = $params;
     }
 
-    public function getParticipantById(string $participantId, string $refresh = null): NphParticipant|false
+    public function getParticipantById(string $participantId, ?string $refresh = null): NphParticipant|false
     {
         if (!preg_match('/^\w+$/', $participantId)) {
             return false;
@@ -32,7 +32,7 @@ class NphParticipantSummaryService
         $cacheKey = 'nph_rdr_participant_' . $participantId;
         $cacheEnabled = $this->params->has('rdr_disable_cache') ? !$this->params->get('rdr_disable_cache') : true;
         $cacheTime = $this->params->has('cache_time') ? intval($this->params->get('cache_time')) : self::CACHE_TIME;
-        $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? $this->params->get('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
+        $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? (int) $this->params->get('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
         $cache = new \App\Cache\DatastoreAdapter($dsCleanUpLimit);
         if ($cacheEnabled && !$refresh) {
             try {
@@ -70,10 +70,14 @@ class NphParticipantSummaryService
     }
 
     /**
+     * @param array<string, string|null> $params
+     *
      * @throws FailedRequestException
      * @throws InvalidResponseException
+     *
+     * @return list<NphParticipant>
      */
-    public function search($params): ?array
+    public function search(array $params): array
     {
         $query = $this->getSearchQuery($params);
         try {
@@ -101,7 +105,10 @@ class NphParticipantSummaryService
         return $results;
     }
 
-    public function getAllParticipantDetailsById($participantId): ?array
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getAllParticipantDetailsById(string $participantId): ?array
     {
         try {
             $query = $this->getAllParticipantsByIdQuery($participantId);
@@ -205,6 +212,9 @@ class NphParticipantSummaryService
 
     /**
      * @throws InvalidDobException
+     */
+    /**
+     * @param array<string, string|null> $params
      */
     private function getSearchQuery(array $params): string
     {

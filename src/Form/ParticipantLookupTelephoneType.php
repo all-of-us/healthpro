@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Constraints;
 
 class ParticipantLookupTelephoneType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('phone', Type\TelType::class, [

@@ -14,6 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method PatientStatus|null findOneBy(array $criteria, array $orderBy = null)
  * @method PatientStatus[]    findAll()
  * @method PatientStatus[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<PatientStatus>
  */
 class PatientStatusRepository extends ServiceEntityRepository
 {
@@ -22,7 +23,10 @@ class PatientStatusRepository extends ServiceEntityRepository
         parent::__construct($registry, PatientStatus::class);
     }
 
-    public function getOrgPatientStatusData($participantId, $organizationId)
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getOrgPatientStatusData(string $participantId, string $organizationId): ?array
     {
         $query = '
             SELECT ps.id as ps_id,
@@ -55,7 +59,10 @@ class PatientStatusRepository extends ServiceEntityRepository
         return null;
     }
 
-    public function getOrgPatientStatusHistoryData($participantId, $organization)
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getOrgPatientStatusHistoryData(string $participantId, string $organization): array
     {
         $query = '
             SELECT ps.id as ps_id,
@@ -90,7 +97,10 @@ class PatientStatusRepository extends ServiceEntityRepository
         return $results;
     }
 
-    public function getAwardeePatientStatusData($participantId, $organization)
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getAwardeePatientStatusData(string $participantId, string $organization): array
     {
         $query = '
             SELECT ps.id as ps_id,
@@ -128,7 +138,12 @@ class PatientStatusRepository extends ServiceEntityRepository
         return $results;
     }
 
-    public function getOnsitePatientStatuses($awardee, $params): array
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getOnsitePatientStatuses(string $awardee, array $params): array
     {
         $queryBuilder = $this->createQueryBuilder('ps')
             ->select('ps.participantId, s.name as siteName, s.siteId, psh.status, psh.comments, psh.createdTs, psi.id as importId, u.email')
@@ -178,7 +193,10 @@ class PatientStatusRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getOnsitePatientStatusSites($awardee)
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getOnsitePatientStatusSites(string $awardee): array
     {
         $queryBuilder = $this->createQueryBuilder('ps')
             ->select('s.name as siteName, s.siteId')
@@ -194,7 +212,10 @@ class PatientStatusRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getOnsitePatientStatusesCount($awardee, $params): int
+    /**
+     * @param array<string, mixed> $params
+     */
+    public function getOnsitePatientStatusesCount(string $awardee, array $params): int
     {
         $queryBuilder = $this->createQueryBuilder('ps')
             ->select('count(psh.id)')

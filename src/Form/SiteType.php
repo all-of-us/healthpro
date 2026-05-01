@@ -18,6 +18,7 @@ class SiteType extends AbstractType
     public const DOWNLOAD_DISABLED = 'disabled';
     public const DV_HYBRID = 'hybrid';
 
+    /** @var array<string, array<string, int|string|null>> */
     public static $siteChoices = [
         'status' => [
             'Active' => 1,
@@ -38,7 +39,7 @@ class SiteType extends AbstractType
     ];
 
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('name', Type\TextType::class, [
@@ -121,7 +122,7 @@ class SiteType extends AbstractType
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Site::class,

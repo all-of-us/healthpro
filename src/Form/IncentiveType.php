@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints;
 
 class IncentiveType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $otherIncentiveAmount = $builder->getData() && !in_array(
             $builder->getData()->getIncentiveAmount(),

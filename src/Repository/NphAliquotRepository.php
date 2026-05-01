@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method NphAliquot|null findOneBy(array $criteria, array $orderBy = null)
  * @method NphAliquot[]    findAll()
  * @method NphAliquot[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<NphAliquot>
  */
 class NphAliquotRepository extends ServiceEntityRepository
 {

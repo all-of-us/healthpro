@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints;
 
 class NphSampleResubmitType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add("{$options['sample']}Notes", Type\TextareaType::class, [
             'label' => 'Notes',

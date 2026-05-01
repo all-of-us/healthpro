@@ -48,9 +48,9 @@ class NphOrderController extends BaseController
 
     #[Route(path: '/participant/{participantId}/order/module/{module}/visit/{visit}', name: 'nph_generate_oder')]
     public function generateOrderAction(
-        $participantId,
-        $module,
-        $visit,
+        string $participantId,
+        string $module,
+        string $visit,
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphParticipantSummaryService,
         Request $request
@@ -67,8 +67,8 @@ class NphOrderController extends BaseController
             throw $this->createAccessDeniedException('Withdrawn participant.');
         }
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
-        $dietPeriod = $module === 1 ? $visit : substr($visit, 0, 7);
-        if (!$nphOrderService->canGenerateOrders($participantId, $module, $dietPeriod, $participant->module)) {
+        $dietPeriod = $module === '1' ? $visit : substr($visit, 0, 7);
+        if (!$nphOrderService->canGenerateOrders($participantId, $module, $dietPeriod, (string) $participant->module)) {
             throw $this->createNotFoundException('Orders cannot be generated for this diet.');
         }
         if ($request->get('orderType') === NphOrder::TYPE_STOOL) {
@@ -136,8 +136,8 @@ class NphOrderController extends BaseController
 
     #[Route(path: '/participant/{participantId}/order/{orderId}/collect', name: 'nph_order_collect')]
     public function orderCollectAction(
-        $participantId,
-        $orderId,
+        string $participantId,
+        string $orderId,
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphNphParticipantSummaryService,
         Request $request
@@ -243,9 +243,9 @@ class NphOrderController extends BaseController
 
     #[Route(path: '/participant/{participantId}/order/{orderId}/sample/{sampleId}/finalize', name: 'nph_sample_finalize')]
     public function sampleFinalizeAction(
-        $participantId,
-        $orderId,
-        $sampleId,
+        string $participantId,
+        string $orderId,
+        string $sampleId,
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphNphParticipantSummaryService,
         Request $request
@@ -279,8 +279,8 @@ class NphOrderController extends BaseController
         ]);
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
-        $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
-        $canGenerateOrders = $nphOrderService->canGenerateOrders($participantId, $order->getModule(), $dietPeriod, $participant->module);
+        $dietPeriod = $order->getModule() === '1' ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
+        $canGenerateOrders = $nphOrderService->canGenerateOrders($participantId, $order->getModule(), $dietPeriod, (string) $participant->module);
         $isParticipantDeactivated = $nphNphParticipantSummaryService->isParticipantDeactivated($participant, $order->getModule());
         $isParticipantWithdrawn = $nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule());
         $isFormDisabled = $isParticipantDeactivated || $sample->isDisabled() || ($sample->getModifyType() !==
@@ -385,9 +385,18 @@ class NphOrderController extends BaseController
     }
 
     #[Route(path: '/participant/{participantId}/order/module/{module}/visit/{visit}/LabelPrint/{sampleGroup}', name: 'nph_order_label_print')]
-    public function orderSummary($participantId, $module, $visit, $sampleGroup, NphParticipantSummaryService $nphNphParticipantSummaryService, NphOrderService $nphOrderService): Response
-    {
+    public function orderSummary(
+        string $participantId,
+        string $module,
+        string $visit,
+        string $sampleGroup,
+        NphParticipantSummaryService $nphNphParticipantSummaryService,
+        NphOrderService $nphOrderService
+    ): Response {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
         $this->checkCrossSiteParticipant($participant->nphPairedSiteSuffix);
         $nphOrderService->loadModules($module, $visit, $participantId, $participant->biobankId);
         $orderInfo = $nphOrderService->getParticipantOrderSummaryByModuleVisitAndSampleGroup($participantId, $module, $visit, $sampleGroup);
@@ -412,8 +421,8 @@ class NphOrderController extends BaseController
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphNphParticipantSummaryService,
         Request $request
-    ) {
-        if (!in_array($type, [NphSample::CANCEL, NphSample::RESTORE, NphSample::UNLOCK])) {
+    ): Response {
+        if (!in_array($type, [NphSample::CANCEL, NphSample::RESTORE, NphSample::UNLOCK], true)) {
             throw $this->createNotFoundException();
         }
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
@@ -470,14 +479,14 @@ class NphOrderController extends BaseController
     }
     #[Route(path: '/participant/{participantId}/order/{orderId}/samples/modify/{type}', name: 'nph_samples_modify')]
     public function sampleModifyAction(
-        $participantId,
+        string $participantId,
         string $orderId,
         string $type,
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphNphParticipantSummaryService,
         Request $request
     ): Response {
-        if (!in_array($type, [NphSample::CANCEL, NphSample::RESTORE, NphSample::UNLOCK])) {
+        if (!in_array($type, [NphSample::CANCEL, NphSample::RESTORE, NphSample::UNLOCK], true)) {
             throw $this->createNotFoundException();
         }
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
@@ -620,7 +629,7 @@ class NphOrderController extends BaseController
     }
 
     #[Route(path: '/aliquot/instructions/file/{id}', name: 'aliquot_instructions_file')]
-    public function aliquotInstructions($id, HelpService $helpService)
+    public function aliquotInstructions(string $id, HelpService $helpService): Response
     {
         $document = Samples::$aliquotDocuments[$id] ?? null;
         if (!$document) {
@@ -641,21 +650,27 @@ class NphOrderController extends BaseController
             return $streamedResponse;
         } catch (\Exception $e) {
             error_log('Failed to retrieve Confluence file ' . $url . ' (' . $id . ')');
-            echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>';
-            exit;
+            return new Response(
+                '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>',
+                Response::HTTP_BAD_GATEWAY,
+                ['Content-Type' => 'text/html; charset=UTF-8']
+            );
         }
     }
 
     #[Route(path: '/participant/{participantId}/module/{module}/visit/{visit}/dlw/collect', name: 'nph_dlw_collect')]
     public function dlwSampleCollect(
-        $participantId,
-        $module,
-        $visit,
+        string $participantId,
+        string $module,
+        string $visit,
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphNphParticipantSummaryService,
         Request $request
     ): Response {
         $participant = $nphNphParticipantSummaryService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
         if ($nphNphParticipantSummaryService->isParticipantWithdrawn($participant, $module)) {
             throw $this->createAccessDeniedException('Withdrawn participant.');
         }

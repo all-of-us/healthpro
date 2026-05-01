@@ -24,6 +24,7 @@ class User
 
     public const DEFAULT_TIMEZONE = 'America/New_York';
 
+    /** @var array<int, string> */
     public static array $timezones = [
         1 => 'America/Puerto_Rico',
         2 => 'America/New_York',
@@ -38,19 +39,19 @@ class User
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $email;
+    private string $email;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $google_id;
+    private string $google_id;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $timezone;
+    private ?string $timezone = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $lastLogin;
+    private ?\DateTimeInterface $lastLogin = null;
 
     public function getId(): ?int
     {
@@ -105,10 +106,14 @@ class User
         return $this;
     }
 
+    /**
+     * @param list<string>       $removeRoles
+     * @param array<int, string> $roles
+     */
     public static function removeUserRoles(array $removeRoles, array &$roles): void
     {
         foreach ($removeRoles as $removeRole) {
-            if (($key = array_search($removeRole, $roles)) !== false) {
+            if (($key = array_search($removeRole, $roles, true)) !== false) {
                 unset($roles[$key]);
             }
         }

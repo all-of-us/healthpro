@@ -13,22 +13,22 @@ class WithdrawalLog
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $participantId;
+    private string $participantId;
 
     #[ORM\Column(type: 'datetime')]
-    private $insertTs;
+    private \DateTimeInterface $insertTs;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $withdrawalTs;
+    private ?\DateTimeInterface $withdrawalTs = null;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $hpoId;
+    private ?string $hpoId = null;
 
     #[ORM\Column(type: 'string', length: 2000, nullable: true)]
-    private $emailNotified;
+    private ?string $emailNotified = null;
 
     public function getId(): ?int
     {

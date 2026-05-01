@@ -19,14 +19,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class MeasurementService
 {
-    protected $em;
-    protected $requestStack;
-    protected $userService;
+    protected EntityManagerInterface $em;
+    protected RequestStack $requestStack;
+    protected UserService $userService;
     protected PpscApiService $ppscApiService;
-    protected $siteService;
-    protected $params;
-    protected $measurement;
-    protected $loggerService;
+    protected SiteService $siteService;
+    protected ParameterBagInterface $params;
+    protected Measurement $measurement;
+    protected LoggerService $loggerService;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -46,7 +46,7 @@ class MeasurementService
         $this->loggerService = $loggerService;
     }
 
-    public function load($measurement, $participant, $type = null)
+    public function load(Measurement $measurement, mixed $participant, ?string $type = null): void
     {
         $this->measurement = $measurement;
         $version = $this->getCurrentVersion($type);
@@ -63,13 +63,14 @@ class MeasurementService
         }
     }
 
-    public function loadFromAObject($measurement)
+    public function loadFromAObject(Measurement $measurement): void
     {
         $this->measurement = $measurement;
         if (empty($measurement->getFinalizedUser())) {
-            $finalizedUserId = $measurement->getFinalizedTs() ? $measurement->getUserId() : $this->userService->getUser()->getId();
+            $currentUser = $this->userService->getUser();
+            $finalizedUserId = $measurement->getFinalizedTs() ? $measurement->getUser()?->getId() : $currentUser?->getId();
             $finalizedUser = $this->em->getRepository(User::class)->findOneBy(['id' => $finalizedUserId]);
-            $finalizedUserEmail = $finalizedUser->getEmail();
+            $finalizedUserEmail = $finalizedUser?->getEmail() ?? $currentUser?->getEmail() ?? '';
             $finalizedSite = $measurement->getFinalizedTs() || strpos($this->requestStack->getCurrentRequest()->get('_route'), 'read_') === 0 ? $measurement->getSite() : $this->requestStack->getSession()->get('site')->id;
         } else {
             $finalizedUserEmail = $measurement->getFinalizedUser()->getEmail();
@@ -78,7 +79,7 @@ class MeasurementService
         $measurement->loadFromAObject($finalizedUserEmail, $finalizedSite);
     }
 
-    public function createMeasurement($participantId, $fhir)
+    public function createMeasurement(string $participantId, \stdClass $fhir): string|bool
     {
         try {
             $response = $this->ppscApiService->post("participants/{$participantId}/physical-measurements", $fhir);
@@ -93,7 +94,7 @@ class MeasurementService
         return false;
     }
 
-    public function getMeasurmeent($participantId, $measurementId)
+    public function getMeasurmeent(string $participantId, string $measurementId): \stdClass|bool
     {
         try {
             $response = $this->ppscApiService->get("participants/{$participantId}/physical-measurements/{$measurementId}");
@@ -111,12 +112,12 @@ class MeasurementService
         return false;
     }
 
-    public function requireBloodDonorCheck()
+    public function requireBloodDonorCheck(): bool
     {
         return $this->requestStack->getSession()->get('siteType') === 'dv' && ($this->siteService->isDiversionPouchSite() || $this->siteService->isBloodDonorPmSite());
     }
 
-    public function getCurrentVersion($type)
+    public function getCurrentVersion(?string $type): string
     {
         if ($type === Measurement::BLOOD_DONOR && $this->requireBloodDonorCheck()) {
             return Measurement::BLOOD_DONOR_CURRENT_VERSION;
@@ -130,7 +131,7 @@ class MeasurementService
         return Measurement::CURRENT_VERSION;
     }
 
-    public function requireEhrModificationProtocol()
+    public function requireEhrModificationProtocol(): bool
     {
         $sites = $this->em->getRepository(Site::class)->findOneBy([
             'deleted' => 0,
@@ -143,13 +144,13 @@ class MeasurementService
         return false;
     }
 
-    public function canEdit($measurementId, $participant)
+    public function canEdit(mixed $measurementId, mixed $participant): bool
     {
         // Allow cohort 1 and 2 participants to edit existing PMs even if status is false
         return !$participant->status && !empty($measurementId) ? $participant->editExistingOnly : $participant->status;
     }
 
-    public function copyMeasurements($newMeasurement)
+    public function copyMeasurements(Measurement $newMeasurement): void
     {
         $newMeasurement->setParentId($this->measurement->getId());
         $newMeasurement->setFinalizedUser(null);
@@ -158,13 +159,13 @@ class MeasurementService
         $newMeasurement->setRdrId(null);
     }
 
-    public function cancelRestoreRdrMeasurement($type, $reason)
+    public function cancelRestoreRdrMeasurement(string $type, string $reason): bool
     {
         $measurementRdrObject = $this->getCancelRestoreRdrObject($type, $reason);
         return $this->cancelRestoreMeasurement($this->measurement->getParticipantId(), $this->measurement->getRdrId(), $measurementRdrObject);
     }
 
-    public function getCancelRestoreRdrObject($type, $reason)
+    public function getCancelRestoreRdrObject(string $type, string $reason): \stdClass
     {
         $obj = new \StdClass();
         $statusType = $type === Measurement::EVALUATION_CANCEL ? 'cancelled' : 'restored';
@@ -176,7 +177,7 @@ class MeasurementService
         return $obj;
     }
 
-    public function cancelRestoreMeasurement($participantId, $measurementId, $measurementJson)
+    public function cancelRestoreMeasurement(string $participantId, string $measurementId, \stdClass $measurementJson): bool
     {
         try {
             $response = $this->ppscApiService->patch("participants/{$participantId}/physical-measurements/{$measurementId}", $measurementJson);
@@ -190,7 +191,7 @@ class MeasurementService
         return false;
     }
 
-    public function createMeasurementHistory($type, $measurementId, $reason = '')
+    public function createMeasurementHistory(string $type, mixed $measurementId, string $reason = ''): bool
     {
         $status = false;
         $connection = $this->em->getConnection();
@@ -224,7 +225,7 @@ class MeasurementService
         return $status;
     }
 
-    public function revertMeasurement($measurement)
+    public function revertMeasurement(Measurement $measurement): bool
     {
         try {
             $measurementId = $measurement->getId();
@@ -237,7 +238,7 @@ class MeasurementService
         }
     }
 
-    public function sendToRdr()
+    public function sendToRdr(): bool
     {
         // Check if parent_id exists
         $parentRdrId = null;
@@ -260,7 +261,7 @@ class MeasurementService
         return false;
     }
 
-    public function getLastError()
+    public function getLastError(): mixed
     {
         return $this->ppscApiService->getLastError();
     }
@@ -304,7 +305,13 @@ class MeasurementService
         return $this->requireBloodDonorCheck() ? 'measurement_blood_donor_check' : 'measurement';
     }
 
-    protected function getMeasurementUserSiteData($user, $site)
+    /**
+     * @return array{
+     *     author: array{system: string, value: string},
+     *     site: array{system: string, value: ?string}
+     * }
+     */
+    protected function getMeasurementUserSiteData(string $user, ?string $site): array
     {
         return [
             'author' => [
@@ -318,19 +325,35 @@ class MeasurementService
         ];
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getGrowthChartsData(string $sexAtBirth, int $ageInMonths): array
     {
         $growthCharts = $this->measurement->getGrowthChartsByAge($ageInMonths);
         return [
-            'weightForAgeCharts' => $growthCharts['weightForAgeCharts'] ? $this->em->getRepository($growthCharts['weightForAgeCharts'])->getChartsData($sexAtBirth) : [],
-            'weightForLengthCharts' => $growthCharts['weightForLengthCharts'] ? $this->em->getRepository($growthCharts['weightForLengthCharts'])->getChartsData($sexAtBirth) : [],
-            'heightForAgeCharts' => $growthCharts['heightForAgeCharts'] ? $this->em->getRepository($growthCharts['heightForAgeCharts'])->getChartsData($sexAtBirth) : [],
-            'headCircumferenceForAgeCharts' => $growthCharts['headCircumferenceForAgeCharts'] ? $this->em->getRepository($growthCharts['headCircumferenceForAgeCharts'])->getChartsData($sexAtBirth) : [],
-            'bmiForAgeCharts' => $growthCharts['bmiForAgeCharts'] ? $this->em->getRepository($growthCharts['bmiForAgeCharts'])->getChartsData($sexAtBirth) : [],
+            'weightForAgeCharts' => $growthCharts['weightForAgeCharts'] ? $this->getSexSpecificChartsData($growthCharts['weightForAgeCharts'], $sexAtBirth) : [],
+            'weightForLengthCharts' => $growthCharts['weightForLengthCharts'] ? $this->getSexSpecificChartsData($growthCharts['weightForLengthCharts'], $sexAtBirth) : [],
+            'heightForAgeCharts' => $growthCharts['heightForAgeCharts'] ? $this->getSexSpecificChartsData($growthCharts['heightForAgeCharts'], $sexAtBirth) : [],
+            'headCircumferenceForAgeCharts' => $growthCharts['headCircumferenceForAgeCharts'] ? $this->getSexSpecificChartsData($growthCharts['headCircumferenceForAgeCharts'], $sexAtBirth) : [],
+            'bmiForAgeCharts' => $growthCharts['bmiForAgeCharts'] ? $this->getSexSpecificChartsData($growthCharts['bmiForAgeCharts'], $sexAtBirth) : [],
             'bpSystolicHeightPercentileChart' => $this->em->getRepository(BloodPressureSystolicHeightPercentile::class)->getChartsData(),
             'bpDiastolicHeightPercentileChart' => $this->em->getRepository(BloodPressureDiastolicHeightPercentile::class)->getChartsData(),
             'heartRateAgeCharts' => $this->em->getRepository(HeartRateAge::class)->getChartsData(),
             'zScoreCharts' => $this->em->getRepository(ZScores::class)->getChartsData()
         ];
+    }
+
+    /**
+     * @param class-string $chartClass
+     *
+     * @return array<int|string, mixed>
+     */
+    private function getSexSpecificChartsData(string $chartClass, string $sexAtBirth): array
+    {
+        /** @var \App\Repository\BmiForAge5YearsAndUpRepository|\App\Repository\HeadCircumferenceForAge0To36MonthsRepository|\App\Repository\HeightForAge0To23MonthsRepository|\App\Repository\HeightForAge24MonthsTo6YearsRepository|\App\Repository\WeightForAge0To23MonthsRepository|\App\Repository\WeightForAge24MonthsAndUpRepository|\App\Repository\WeightForLength0To23MonthsRepository|\App\Repository\WeightForLength23MonthsTo5YearsRepository $repository */
+        $repository = $this->em->getRepository($chartClass);
+
+        return $repository->getChartsData($sexAtBirth);
     }
 }

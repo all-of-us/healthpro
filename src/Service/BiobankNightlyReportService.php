@@ -40,6 +40,9 @@ class BiobankNightlyReportService
         $this->gcsBucketService->uploadFile($bucketName, $tempStream, $fileName);
     }
 
+    /**
+     * @return list<array<int, string>>
+     */
     private function getNightlyReportCsvData(): array
     {
         $orders = $this->em->getRepository(Order::class)->getNightlyReportOrders();

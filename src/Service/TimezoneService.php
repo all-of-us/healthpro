@@ -4,7 +4,10 @@ namespace App\Service;
 
 class TimezoneService
 {
-    public static $timezoneOptions = [
+    /**
+     * @var array<string, string>
+     */
+    public static array $timezoneOptions = [
         'America/Puerto_Rico' => 'Atlantic Standard Time',
         'America/New_York' => 'Eastern Time',
         'America/Chicago' => 'Central Time',
@@ -21,8 +24,12 @@ class TimezoneService
      * Returns human-friendly timezone from given string. If no match found,
      * return the given value.
      */
-    public function getTimezoneDisplay(string $timezone): ?string
+    public function getTimezoneDisplay(?string $timezone): ?string
     {
+        if ($timezone === null) {
+            return null;
+        }
+
         if (array_key_exists($timezone, static::$timezoneOptions)) {
             return static::$timezoneOptions[$timezone];
         }

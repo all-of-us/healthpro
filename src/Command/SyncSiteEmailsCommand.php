@@ -18,11 +18,11 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class SyncSiteEmailsCommand extends Command
 {
-    private $siteSyncService;
-    private $environmentService;
-    private $loggerService;
-    private $normalizer;
-    private $em;
+    private SiteSyncService $siteSyncService;
+    private EnvironmentService $environmentService;
+    private LoggerService $loggerService;
+    private NormalizerInterface $normalizer;
+    private EntityManagerInterface $em;
 
     public function __construct(EnvironmentService $environmentService, SiteSyncService $siteSyncService, LoggerService $loggerService, NormalizerInterface $normalizer, EntityManagerInterface $em)
     {

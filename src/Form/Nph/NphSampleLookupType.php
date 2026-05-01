@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints;
 
 class NphSampleLookupType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('sampleId', Type\TextType::class, [

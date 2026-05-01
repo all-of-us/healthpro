@@ -6,6 +6,9 @@ use App\Entity\DeactivateLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<DeactivateLog>
+ */
 class DeactivateLogRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -13,6 +16,9 @@ class DeactivateLogRepository extends ServiceEntityRepository
         parent::__construct($registry, DeactivateLog::class);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getDeactivatedNotifications(): array
     {
         return $this->createQueryBuilder('d')
@@ -24,6 +30,9 @@ class DeactivateLogRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getLatestAwardees(): array
     {
         return $this->createQueryBuilder('d')

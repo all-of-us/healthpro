@@ -12,6 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Incentive|null findOneBy(array $criteria, array $orderBy = null)
  * @method Incentive[]    findAll()
  * @method Incentive[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<Incentive>
  */
 class IncentiveRepository extends ServiceEntityRepository
 {
@@ -20,6 +21,9 @@ class IncentiveRepository extends ServiceEntityRepository
         parent::__construct($registry, Incentive::class);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function search(string $query, string $field = 'i.giftCardType'): array
     {
         $query = trim($query);
@@ -42,7 +46,12 @@ class IncentiveRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function getOnsiteIncentives($site, $params): array
+    /**
+     * @param array<string, mixed> $params
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function getOnsiteIncentives(string $site, array $params): array
     {
         $queryBuilder = $this->createQueryBuilder('i')
             ->select('i.createdTs, i.participantId, i.incentiveDateGiven, i.incentiveOccurrence,
@@ -100,7 +109,10 @@ class IncentiveRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function getOnsiteIncentivesCount($site, $params): int
+    /**
+     * @param array<string, mixed> $params
+     */
+    public function getOnsiteIncentivesCount(string $site, array $params): int
     {
         $queryBuilder = $this->createQueryBuilder('i')
             ->select('count(i.id)')
@@ -141,7 +153,10 @@ class IncentiveRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function getActiveIncentivesIncludingRelated(Participant $participant)
+    /**
+     * @return array<int, Incentive>
+     */
+    public function getActiveIncentivesIncludingRelated(Participant $participant): array
     {
         $queryBuilder = $this->createQueryBuilder('i')
             ->select('i')
@@ -152,7 +167,10 @@ class IncentiveRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function getPediatricIncentivesForReport(\DateTime $startDate, \DateTime $endDate)
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getPediatricIncentivesForReport(\DateTime $startDate, \DateTime $endDate): array
     {
         $queryBuild = $this->createQueryBuilder('i')
             ->select('i.participantId, i.createdTs, i.site, i.Recipient, i.incentiveDateGiven,

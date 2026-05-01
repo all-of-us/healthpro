@@ -27,6 +27,7 @@ class PpscParticipant
     public int|null $ageInMonths;
     public int|null $sexAtBirth;
 
+    /** @var list<float> */
     private static array $pediatricWeightBreakpoints = [
         1000,
         50,
@@ -36,6 +37,7 @@ class PpscParticipant
         2.5
     ];
 
+    /** @var array<string, array{0: int, 1: int}> */
     private static array $pediatricAgeRangeMeasurementVersions = [
         'peds-1' => [0, 23],
         'peds-2' => [24, 35],
@@ -70,7 +72,10 @@ class PpscParticipant
         return new \DateTime('1933-03-03');
     }
 
-    public function checkIdentifiers($notes): bool|array
+    /**
+     * @return array<int, string>|false
+     */
+    public function checkIdentifiers(?string $notes): array|bool
     {
         if (empty($notes)) {
             return false;

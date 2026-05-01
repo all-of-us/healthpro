@@ -24,7 +24,7 @@ class HpoPpscController extends BaseController
     #[Route(path: '/ppsc/participant/{id}', name: 'participant')]
     #[Route(path: '/read/participant/{id}', name: 'read_participant', methods: ['GET'])]
     public function ppscParticipantDetailsAction(
-        $id,
+        string $id,
         Request $request,
         PpscApiService $ppscApiService,
         MeasurementService $measurementService,

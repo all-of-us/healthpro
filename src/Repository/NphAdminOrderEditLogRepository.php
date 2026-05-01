@@ -25,6 +25,9 @@ class NphAdminOrderEditLogRepository extends ServiceEntityRepository
         parent::__construct($registry, NphAdminOrderEditLog::class);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getOrderEditLogs(?DateTime $startDate = null, ?DateTime $endDate = null): array
     {
         $queryBuilder = $this->createQueryBuilder('na')

@@ -30,7 +30,7 @@ class VisitDLW extends TimePoints
         'day14F' => ['urineDlw'],
     ];
 
-    public function __construct($module)
+    public function __construct(int $module)
     {
         $this->module = $module;
     }

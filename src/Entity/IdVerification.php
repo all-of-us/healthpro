@@ -12,31 +12,31 @@ class IdVerification
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    private $user;
+    private ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $site;
+    private string $site;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $participantId;
+    private string $participantId;
 
     #[ORM\Column(type: 'datetime')]
-    private $verifiedDate;
+    private \DateTimeInterface $verifiedDate;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $verificationType;
+    private ?string $verificationType = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $visitType;
+    private ?string $visitType = null;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTimeInterface $createdTs;
 
     #[ORM\ManyToOne(targetEntity: IdVerificationImport::class)]
-    private $import;
+    private ?IdVerificationImport $import = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $GuardianVerified = null;

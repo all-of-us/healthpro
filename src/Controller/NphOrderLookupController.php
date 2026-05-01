@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class NphOrderLookupController extends AbstractController
 {
-    protected $em;
+    protected EntityManagerInterface $em;
 
     public function __construct(EntityManagerInterface $em)
     {
@@ -152,6 +152,9 @@ class NphOrderLookupController extends AbstractController
         return $form;
     }
 
+    /**
+     * @param array<int, NphOrder>|null $recentOrders
+     */
     private function generateOrderLookupView(
         string $formpath,
         FormInterface $idForm,

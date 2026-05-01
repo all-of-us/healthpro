@@ -237,9 +237,9 @@ class NphBiobankController extends BaseController
         $nphProgramSummary = $nphProgramSummaryService->getProgramSummary();
         $combined = $nphProgramSummaryService->combineOrderSummaryWithProgramSummary($nphOrderInfo, $nphProgramSummary);
         $sampleProcessingStatusByModule = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatusByModule($participant->id);
-        $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participant->id, $participant->module);
-        $activeDietPeriod = $nphOrderService->getActiveDietPeriod($moduleDietPeriodsStatus, $participant->module);
-        $activeModule = $nphOrderService->getActiveModule($moduleDietPeriodsStatus, $participant->module);
+        $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participant->id, (string) $participant->module);
+        $activeDietPeriod = $nphOrderService->getActiveDietPeriod($moduleDietPeriodsStatus, (string) $participant->module);
+        $activeModule = $nphOrderService->getActiveModule($moduleDietPeriodsStatus, (string) $participant->module);
         $generateOrderWarningLogByModule = $this->em->getRepository(NphGenerateOrderWarningLog::class)->getGenerateOrderWarningLogByModule($participant->id);
         return $this->render('program/nph/biobank/participant.html.twig', [
             'participant' => $participant,
@@ -281,7 +281,7 @@ class NphBiobankController extends BaseController
                 $participantId = $sample->getNphOrder()->getParticipantId();
                 $participant = $nphParticipantSummaryService->getParticipantById($participantId);
                 if (!$participant) {
-                    throw $this->createNotFoundException("Participant not found for sample ID $sample->getSampleId()");
+                    throw $this->createNotFoundException(sprintf('Participant not found for sample ID %s', $sample->getSampleId()));
                 }
                 return $this->redirectToRoute('nph_biobank_sample_finalize', [
                     'biobankId' => $participant->biobankId,
@@ -335,7 +335,7 @@ class NphBiobankController extends BaseController
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphParticipantSummaryService,
         Request $request
-    ) {
+    ): Response {
         $participant = $nphParticipantSummaryService->search(['biobankId' => $biobankId]);
         $participant = $participant[0];
         if (!$participant) {
@@ -358,7 +358,7 @@ class NphBiobankController extends BaseController
         $sampleCode = $sample->getSampleCode();
         $sampleData = $nphOrderService->getExistingSampleData($sample);
         $dietPeriod = $order->getModule() === 1 ? $order->getVisitPeriod() : substr($order->getVisitPeriod(), 0, 7);
-        $canGenerateOrders = $nphOrderService->canGenerateOrders($participant->id, $order->getModule(), $dietPeriod, $participant->module);
+        $canGenerateOrders = $nphOrderService->canGenerateOrders($participant->id, $order->getModule(), $dietPeriod, (string) $participant->module);
         $isParticipantWithdrawn = $nphParticipantSummaryService->isParticipantWithdrawn($participant, $order->getModule());
         $isParticipantDeactivated = $nphParticipantSummaryService->isParticipantDeactivated($participant, $order->getModule());
         $isSampleDisabled = $isParticipantWithdrawn || $isParticipantDeactivated || $sample->isDisabled() ||
@@ -487,6 +487,9 @@ class NphBiobankController extends BaseController
         return new JsonResponse(['success' => true]);
     }
 
+    /**
+     * @return array{0: ?\DateTime, 1: ?\DateTime, 2: ?string, 3: \Symfony\Component\Form\FormInterface}
+     */
     private function getDateRangeFilterForm(Request $request): array
     {
         $userTimeZone = $this->getSecurityUser()->getTimeZone();
