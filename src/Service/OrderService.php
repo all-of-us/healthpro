@@ -256,6 +256,57 @@ class OrderService
         return $id;
     }
 
+    public function applyPediatricOrderSelection(Order $order, string $selection): void
+    {
+        switch ($selection) {
+            case 'blood':
+                $order->setRequestedSamples(json_encode($order->getPediatricBloodSamples()));
+                return;
+            case 'saliva':
+                $order->setType(Order::ORDER_TYPE_SALIVA);
+                $order->setRequestedSamples(json_encode($order->getPediatricSalivaSamples()));
+                return;
+            case 'urine':
+                $order->setRequestedSamples(json_encode($order->getPediatricUrineSamples()));
+                return;
+            default:
+                throw new \InvalidArgumentException('Unsupported pediatric order selection.');
+        }
+    }
+
+    public function persistNewOrder(Order $order, PpscParticipant $participant, ?string $siteType, ?string $orderType): void
+    {
+        $order->setUser($this->userService->getUserEntity());
+        $order->setSite($this->siteService->getSiteId());
+        $order->setParticipantId($participant->id);
+        $order->setBiobankId($participant->biobankId);
+        $order->setCreatedTs(new \DateTime());
+        $order->setCreatedTimezoneId($this->userService->getUserEntity()->getTimezoneId());
+        if ($siteType === 'dv' && $this->params->has('order_samples_version_dv')) {
+            $order->setVersion($this->params->get('order_samples_version_dv'));
+        } else {
+            $order->setVersion($order->getCurrentVersion());
+        }
+        $order->setAgeInMonths($participant->ageInMonths);
+        if ($orderType === 'hpo') {
+            $order->setProcessedCentrifugeType(Order::SWINGING_BUCKET);
+        }
+        if ($siteType === 'dv' && $this->siteService->isDiversionPouchSite()) {
+            $order->setType(Order::ORDER_TYPE_DIVERSION);
+        }
+        $disableTubeSelect = $this->params->has('order_disable_dv_tube_select') && $this->params->get('order_disable_dv_tube_select');
+        if (!$disableTubeSelect && $siteType === 'dv' && $this->siteService->isDiversionPouchSite() === false &&
+            $this->params->has('order_samples_version_dv') && (float) $this->params->get('order_samples_version_dv') > 3.1) {
+            $order->setVersion(null);
+            $order->setType(Order::TUBE_SELECTION_TYPE);
+        }
+        if (empty($order->getOrderId())) {
+            $order->setOrderId($this->generateId());
+        }
+        $this->em->persist($order);
+        $this->em->flush();
+    }
+
     public function setOrderUpdateFromForm(string $step, FormInterface $form): void
     {
         $formData = $form->getData();

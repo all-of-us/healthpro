@@ -9,11 +9,13 @@
         </h2>
     </div>
     <ul class="nav nav-tabs">
+        <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link active" href="#">Assent</a></li>
-        {% if siteType == 'dv' %}
-            {% set steps = ['Safety Check', 'Create', 'Collect', 'Process', 'Finalize'] %}
+        {% if selection == 'blood' %}
+            {% set steps = ['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
         {% else %}
-            {% set steps = ['Safety Check', 'Create', 'Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
+            {% set steps = ['Print Labels', 'Collect', 'Finalize', 'Print Requisition'] %}
         {% endif %}
         {% for step in steps %}
             <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#">{{ step }}</a></li>
@@ -24,28 +26,31 @@
             Pediatric Assent
         </div>
         <div class="card-body">
-            <div>
-                <label class="form-label" for="pediatricAssent">
-                    Does the pediatric participant assent to giving a blood sample?
-                </label>
-                <select class="form-select" id="pediatricAssent" data-continue-values="yes,unable" data-error-values="no">
-                    <option value="" selected>Select</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                    <option value="unable">Participant is unable to provide assent</option>
-                </select>
-                <div id="assentErrorMessage" class="text-danger mt-2 d-none">
-                    <i class="fa fa-exclamation-circle"></i> The participant has not assented. You may not proceed with order collection.
+            <form method="post" class="prevent-resubmit">
+                <div>
+                    <label class="form-label" for="pediatricAssent">
+                        {{ assentQuestion }}
+                    </label>
+                    <select class="form-select" id="pediatricAssent" name="pediatricAssent" data-continue-values="yes,unable" data-error-values="no">
+                        <option value="" selected>Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unable">Participant is unable to provide assent</option>
+                    </select>
+                    <div id="assentErrorMessage" class="text-danger mt-2{% if not showServerError %} d-none{% endif %}">
+                        <i class="fa fa-exclamation-circle"></i> {{ assentErrorMessage }}
+                    </div>
                 </div>
-            </div>
+                <input type="hidden" name="_token" value="{{ csrf_token('pediatricOrderAssent') }}"/>
+                <div class="mt-4">
+                    <a href="{{ path('order_check_pediatric', { participantId: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
+                    <button type="submit" class="btn btn-primary d-none" id="continueBtn">
+                        Continue
+                        <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                    </button>
+                </div>
+            </form>
         </div>
-    </div>
-    <div class="mt-4">
-        <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
-        <a href="{{ path('order_check_pediatric', { participantId: participant.id }) }}" class="btn btn-primary d-none" id="continueBtn">
-            Continue
-            <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
-        </a>
     </div>
 {% endblock %}
 {% block pagejs %}
