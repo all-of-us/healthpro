@@ -6,6 +6,7 @@ $(document).ready(function () {
     const $errorMessage = $("#assentErrorMessage");
     const modalElement = document.getElementById("pediatricAssentWarningModal");
     const warningModal = modalElement ? new bootstrap.Modal(modalElement) : null;
+    let isAcknowledgingNoAssent = false;
 
     const resetSubmittingState = () => {
         $form.data("submitting", 0);
@@ -13,29 +14,37 @@ $(document).ready(function () {
         $form.find(".spinner-border").hide();
     };
 
-    const toggleContinueButton = () => {
-        const hasValue = (($assentSelect.val() || "").toString()).length > 0;
-        $continueBtn.prop("disabled", !hasValue);
+    const hideContinueButton = () => {
+        $continueBtn.addClass("d-none").prop("disabled", true);
+    };
+
+    const showContinueButton = () => {
+        $continueBtn.removeClass("d-none").prop("disabled", false);
+    };
+
+    const updateUiForSelection = () => {
+        const value = ($assentSelect.val() || "").toString();
+        if (value === "yes" || value === "unable") {
+            showContinueButton();
+            return;
+        }
+        hideContinueButton();
+        if (value === "no" && warningModal) {
+            warningModal.show();
+        }
     };
 
     const shouldConfirmNoResponse = () =>
-        (($assentSelect.val() || "").toString() === "no" &&
-            ($acknowledgeInput.val() || "0").toString() !== "1");
+        ($assentSelect.val() || "").toString() === "no" && ($acknowledgeInput.val() || "0").toString() !== "1";
 
-    toggleContinueButton();
+    hideContinueButton();
 
     $assentSelect.on("change", () => {
+        isAcknowledgingNoAssent = false;
         $acknowledgeInput.val("0");
-        toggleContinueButton();
+        updateUiForSelection();
         if ($errorMessage.length) {
             $errorMessage.addClass("d-none");
-        }
-    });
-
-    $continueBtn.on("click", (event) => {
-        if (shouldConfirmNoResponse()) {
-            event.preventDefault();
-            warningModal.show();
         }
     });
 
@@ -48,6 +57,7 @@ $(document).ready(function () {
     });
 
     $("#acknowledgeNoAssentBtn").on("click", () => {
+        isAcknowledgingNoAssent = true;
         $acknowledgeInput.val("1");
         warningModal.hide();
         $form.trigger("submit");
@@ -55,6 +65,12 @@ $(document).ready(function () {
 
     if (modalElement) {
         modalElement.addEventListener("hidden.bs.modal", () => {
+            if (!isAcknowledgingNoAssent && ($assentSelect.val() || "").toString() === "no") {
+                $assentSelect.val("");
+                $acknowledgeInput.val("0");
+                hideContinueButton();
+            }
+            isAcknowledgingNoAssent = false;
             $assentSelect.trigger("focus");
         });
     }

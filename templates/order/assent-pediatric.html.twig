@@ -47,7 +47,7 @@
                 <input type="hidden" name="acknowledgeNoAssent" id="acknowledgeNoAssent" value="0"/>
                 <div class="mt-4">
                     <a href="{{ path('order_check_pediatric', { participantId: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
-                    <button type="submit" class="btn btn-primary" id="continueBtn" disabled>
+                    <button type="submit" class="btn btn-primary d-none" id="continueBtn" disabled>
                         Continue
                         <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
                     </button>
