@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method EhrWithdrawalLog|null findOneBy(array $criteria, array $orderBy = null)
  * @method EhrWithdrawalLog[]    findAll()
  * @method EhrWithdrawalLog[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<EhrWithdrawalLog>
  */
 class EhrWithdrawalLogRepository extends ServiceEntityRepository
 {
@@ -20,7 +21,7 @@ class EhrWithdrawalLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return EhrWithdrawalLog[] Returns an array of EhrWithdrawalLog objects
+     * @return array<int, array<string, string|null>>
      */
     public function getLatestAwardees()
     {

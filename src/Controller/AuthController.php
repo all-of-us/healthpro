@@ -25,8 +25,11 @@ class AuthController extends BaseController
         parent::__construct($em);
     }
 
+    /**
+     * @param UserProviderInterface<User> $userProvider
+     */
     #[Route(path: '/login', name: 'login')]
-    public function login(UserService $userService, Request $request, UserProviderInterface $userProvider, EnvironmentService $env, AuthService $authService, SessionInterface $session, ParameterBagInterface $params)
+    public function login(UserService $userService, Request $request, UserProviderInterface $userProvider, EnvironmentService $env, AuthService $authService, SessionInterface $session, ParameterBagInterface $params): Response
     {
         if ($this->getUser()) {
             return $this->redirectToRoute('home');
@@ -75,13 +78,13 @@ class AuthController extends BaseController
     }
 
     #[Route(path: '/login/start', name: 'login_start')]
-    public function loginStart(AuthService $auth)
+    public function loginStart(AuthService $auth): Response
     {
         return $this->redirect($auth->getAuthUrl());
     }
 
     #[Route(path: '/login/callback', name: 'login_callback')]
-    public function loginCallback()
+    public function loginCallback(): Response
     {
         // This never gets executed as it's handled by guard authenticator
         $this->addFlash('error', 'Authentication failed. Please try again.');

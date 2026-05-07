@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method MeasurementQueue|null findOneBy(array $criteria, array $orderBy = null)
  * @method MeasurementQueue[]    findAll()
  * @method MeasurementQueue[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<MeasurementQueue>
  */
 class MeasurementQueueRepository extends ServiceEntityRepository
 {

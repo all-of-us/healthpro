@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints;
 
 class NphSampleModifyBulkType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if ($options['type'] != NphSample::UNLOCK) {
             $samples = $options['samples'];

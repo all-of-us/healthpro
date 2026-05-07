@@ -13,9 +13,9 @@ class NphPDFController extends AbstractController
 {
     #[Route(path: '/nph/participant/{participantId}/render_pdf/module/{module}/visit/{visit}', name: 'nph_render_pdf')]
     public function render_pdf(
-        $participantId,
-        $module,
-        $visit,
+        string $participantId,
+        string $module,
+        string $visit,
         PDFService $PDF,
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphParticipantSummaryService
@@ -37,10 +37,10 @@ class NphPDFController extends AbstractController
 
     #[Route(path: '/nph/participant/{participantId}/render_pdf/module/{module}/visit/{visit}/{sampleGroup}', name: 'nph_render_pdf_sample_group')]
     public function renderPDFSampleGroup(
-        $participantId,
-        $module,
-        $visit,
-        $sampleGroup,
+        string $participantId,
+        string $module,
+        string $visit,
+        string $sampleGroup,
         PDFService $PDF,
         NphOrderService $nphOrderService,
         NphParticipantSummaryService $nphParticipantSummaryService

@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints;
 
 class MockLoginType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('userName', Type\TextType::class, [

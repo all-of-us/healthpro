@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints;
 
 class BiobankOrderType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $disabled = $options['order']->isFormDisabled();
         $samples = $options['order']->getCustomRequestedSamples();
@@ -43,8 +43,6 @@ class BiobankOrderType extends AbstractType
             'required' => false,
             'constraints' => new Constraints\Type('string')
         ]);
-        $form = $builder->getForm();
-        return $form;
     }
 
     public function configureOptions(OptionsResolver $resolver)

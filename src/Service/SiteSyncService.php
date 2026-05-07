@@ -12,19 +12,30 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
+/**
+ * @phpstan-type AwardeeEntry object{resource: stdClass}
+ * @phpstan-type NormalizedEntity array<string, mixed>
+ * @phpstan-type SiteSyncChange array{old: NormalizedEntity, new: NormalizedEntity}
+ * @phpstan-type SiteSyncSummary array{created: list<NormalizedEntity>, modified: list<SiteSyncChange>, deleted: list<string>}
+ */
 class SiteSyncService
 {
     public const SITE_PREFIX = 'hpo-site-';
-    private $rdrApiService;
-    private $em;
-    private $env;
-    private $loggerService;
-    private $params;
-    private $normalizer;
-    private $orgEndpoint = 'rdr/v1/Awardee?_inactive=true';
-    private $entries;
-    private $googleGroupsService;
-    private $adminEmails = [];
+    private RdrApiService $rdrApiService;
+    private EntityManagerInterface $em;
+    private EnvironmentService $env;
+    private LoggerService $loggerService;
+    private ParameterBagInterface $params;
+    private NormalizerInterface $normalizer;
+    private string $orgEndpoint = 'rdr/v1/Awardee?_inactive=true';
+
+    /** @var list<AwardeeEntry>|null */
+    private ?array $entries = null;
+
+    private GoogleGroupsService $googleGroupsService;
+
+    /** @var array<string, string> */
+    private array $adminEmails = [];
 
     public function __construct(
         RdrApiService $rdrApiService,
@@ -44,12 +55,18 @@ class SiteSyncService
         $this->googleGroupsService = $googleGroupsService;
     }
 
-    public function dryRun()
+    /**
+     * @return SiteSyncSummary
+     */
+    public function dryRun(): array
     {
         return $this->sync(true);
     }
 
-    public function sync($preview = false)
+    /**
+     * @return SiteSyncSummary
+     */
+    public function sync(bool $preview = false): array
     {
         $sitesCount = 0;
         $created = [];
@@ -74,6 +91,7 @@ class SiteSyncService
                     $primaryId = null;
                     $siteId = $site->id;
                     if (array_key_exists($siteId, $existingSites)) {
+                        /** @var NormalizedEntity $existingArray */
                         $existingArray = $this->normalizer->normalize($existingSites[$siteId], null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
                         $siteData = $existingSites[$siteId];
                         $primaryId = $siteData->getId();
@@ -116,9 +134,10 @@ class SiteSyncService
                         $siteData->setState($site->address->state);
                     }
                     if (empty($siteData->getWorkqueueDownload())) {
-                        $siteData->setWorkqueueDownload('full_data'); // default value for workqueue downlaod
+                        $siteData->setWorkqueueDownload(Site::WORKQUEUE_DOWNLOAD_FULL_DATA); // default value for workqueue downlaod
                     }
                     if ($existingArray) {
+                        /** @var NormalizedEntity $siteDataArray */
                         $siteDataArray = $this->normalizer->normalize($siteData, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
                         if ($existingArray != $siteDataArray) {
                             $modified[] = [
@@ -136,7 +155,9 @@ class SiteSyncService
                         }
                         unset($deleted[array_search($siteId, $deleted)]);
                     } else {
-                        $created[] = $this->normalizer->normalize($siteData, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
+                        /** @var NormalizedEntity $createdSite */
+                        $createdSite = $this->normalizer->normalize($siteData, null, [AbstractNormalizer::IGNORED_ATTRIBUTES => ['siteSync']]);
+                        $created[] = $createdSite;
                         if (!$preview) {
                             $this->em->persist($siteData);
                             $this->em->flush();
@@ -154,7 +175,7 @@ class SiteSyncService
             foreach ($deleted as $siteId) {
                 $site = $existingSites[$siteId];
                 $site->setDeleted(true);
-                $this->em->persist($siteData);
+                $this->em->persist($site);
                 $this->em->flush();
                 $this->loggerService->log(Log::SITE_DELETE, $existingSites[$siteId]->getId());
             }
@@ -167,7 +188,7 @@ class SiteSyncService
         ];
     }
 
-    public function syncAwardees()
+    public function syncAwardees(): void
     {
         $entries = $this->getAwardeeEntriesFromRdr();
         $awardeesMap = [];
@@ -204,7 +225,7 @@ class SiteSyncService
         }
     }
 
-    public function syncOrganizations()
+    public function syncOrganizations(): void
     {
         $entries = $this->getAwardeeEntriesFromRdr();
         $organizationsMap = [];
@@ -243,6 +264,9 @@ class SiteSyncService
         }
     }
 
+    /**
+     * @return list<string>
+     */
     public function getSiteAdminEmails(Site $site): array
     {
         $siteAdmins = [];
@@ -273,7 +297,10 @@ class SiteSyncService
         return $siteAdmins;
     }
 
-    private function getAwardeeEntriesFromRdr()
+    /**
+     * @return list<AwardeeEntry>
+     */
+    private function getAwardeeEntriesFromRdr(): array
     {
         if (!is_null($this->entries)) {
             return $this->entries;
@@ -287,7 +314,10 @@ class SiteSyncService
         return [];
     }
 
-    private function getSitesFromDb()
+    /**
+     * @return array<string, Site>
+     */
+    private function getSitesFromDb(): array
     {
         $sitesRepository = $this->em->getRepository(Site::class);
         $sites = $sitesRepository->findBy(['deleted' => 0]);

@@ -10,6 +10,9 @@ use DateTime;
  * @property string $lastName
  * @property string $firstName
  * @property string $phoneNumber
+ * @phpstan-type ConsentStatus array{value: string, time: ?string}
+ * @phpstan-type DietMap array<string, string>
+ * @phpstan-type ModuleConsents array<int, array<string, ConsentStatus>>
  */
 class NphParticipant
 {
@@ -25,32 +28,39 @@ class NphParticipant
     public const DIET_CONTINUED = 'continued';
     public const DIET_INCOMPLETE = 'incomplete';
     public const DEFAULT_CONSENT_STATUS = 'active';
-    public $id;
-    public $cacheTime;
-    public $rdrData;
-    public $dob;
-    public $nphPairedSiteSuffix;
-    public $module;
-    public $module1TissueConsentStatus;
-    public $module1TissueConsentTime;
+    public ?string $id = null;
+    public mixed $cacheTime = null;
+    public \stdClass $rdrData;
+    public ?DateTime $dob = null;
+    public ?string $nphPairedSiteSuffix = null;
+    public int $module = 1;
+    public string $module1TissueConsentStatus = self::OPTIN_DENY;
+    public ?string $module1TissueConsentTime = null;
+    /** @var DietMap */
     public array $module1DietStatus;
+    /** @var DietMap */
     public array $module2DietStatus;
+    /** @var DietMap */
     public array $module3DietStatus;
+    /** @var DietMap */
     public array $module1DietPeriod;
+    /** @var DietMap */
     public array $module2DietPeriod;
+    /** @var DietMap */
     public array $module3DietPeriod;
     public string $biobankId = '';
+    /** @var ModuleConsents */
     public array $moduleConsents = [];
-    public string $aouConsentStatus;
-    public ?string $aouConsentStatusTime;
+    public string $aouConsentStatus = self::DEFAULT_CONSENT_STATUS;
+    public ?string $aouConsentStatusTime = null;
     public bool $isAouWithdrawn = false;
     public bool $isAouDeactivated = false;
-    public string $module1NphConsentStatus;
-    public ?string $module1NphConsentStatusTime;
-    public string $module2NphConsentStatus;
-    public ?string $module2NphConsentStatusTime;
-    public string $module3NphConsentStatus;
-    public ?string $module3NphConsentStatusTime;
+    public string $module1NphConsentStatus = self::DEFAULT_CONSENT_STATUS;
+    public ?string $module1NphConsentStatusTime = null;
+    public string $module2NphConsentStatus = self::DEFAULT_CONSENT_STATUS;
+    public ?string $module2NphConsentStatusTime = null;
+    public string $module3NphConsentStatus = self::DEFAULT_CONSENT_STATUS;
+    public ?string $module3NphConsentStatusTime = null;
     public bool $isNphModule1Withdrawn = false;
     public bool $isNphModule1Deactivated = false;
     public bool $isNphModule2Withdrawn = false;
@@ -60,6 +70,14 @@ class NphParticipant
 
     public function __construct(?\stdClass $rdrParticipant = null)
     {
+        $this->rdrData = new \stdClass();
+        $this->module1DietStatus = [];
+        $this->module2DietStatus = [];
+        $this->module3DietStatus = [];
+        $this->module1DietPeriod = [];
+        $this->module2DietPeriod = [];
+        $this->module3DietPeriod = [];
+
         if (is_object($rdrParticipant)) {
             if (!empty($rdrParticipant->cacheTime)) {
                 $this->cacheTime = $rdrParticipant->cacheTime;
@@ -73,7 +91,7 @@ class NphParticipant
     /**
      * Magic methods for RDR data
      */
-    public function __get(string $key)
+    public function __get(string $key): mixed
     {
         if (isset($this->rdrData->{$key})) {
             return $this->rdrData->{$key};
@@ -81,11 +99,12 @@ class NphParticipant
         return null;
     }
 
-    public function __isset(string $key)
+    public function __isset(string $key): bool
     {
         return true;
     }
 
+    /** @return ConsentStatus */
     private function getModule1TissueConsentStatus(): array
     {
         $latestDate = null;
@@ -199,6 +218,7 @@ class NphParticipant
     }
 
 
+    /** @param list<object> $nphEnrollmentStatus */
     private function getParticipantMostRecentModule(array $nphEnrollmentStatus): int
     {
         $moduleMap = [
@@ -231,6 +251,7 @@ class NphParticipant
         return $mostRecentModule;
     }
 
+    /** @return DietMap */
     private function getModuleDietStatus(int $module): array
     {
         $dietStatus = [];
@@ -259,6 +280,7 @@ class NphParticipant
         return $dietStatus;
     }
 
+    /** @return DietMap */
     private function getModuleDietPeriod(int $module): array
     {
         if ($module !== $this->getParticipantModule()) {
@@ -313,7 +335,8 @@ class NphParticipant
         return $dietPeriods;
     }
 
-    private function getModuleConsents()
+    /** @return ModuleConsents */
+    private function getModuleConsents(): array
     {
         $consentStatus = [];
         if (isset($this->rdrData->nphModule1ConsentStatus)) {
@@ -329,6 +352,7 @@ class NphParticipant
         return $consentStatus;
     }
 
+    /** @param list<object> $dietStatus */
     private function sortDietStatus(array &$dietStatus): void
     {
         if (!empty($dietStatus)) {
@@ -340,6 +364,7 @@ class NphParticipant
         }
     }
 
+    /** @return ConsentStatus */
     private function getAouConsentStatus(): array
     {
         $statusMap = [
@@ -368,6 +393,7 @@ class NphParticipant
         return $consentStatus;
     }
 
+    /** @return ConsentStatus */
     private function getNphConsentStatusByModule(string $module): array
     {
         $statusMap = [
@@ -414,7 +440,7 @@ class NphParticipant
         return $consentStatus;
     }
 
-    private function getModuleConsentStatusTime(string $module)
+    private function getModuleConsentStatusTime(string $module): ?string
     {
         $latestDate = null;
         $consentStatusTime = null;

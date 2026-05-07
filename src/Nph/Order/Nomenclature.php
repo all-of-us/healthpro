@@ -4,6 +4,7 @@ namespace App\Nph\Order;
 
 class Nomenclature
 {
+    /** @var array<string, string> */
     public static array $moduleVisitMapper = [
         '1_LMT' => 'LMT (Visit 2)',
         '1_LMTStool' => 'LMT (Visit 2) | Stool',
@@ -33,6 +34,7 @@ class Nomenclature
         '3_Period3LMT' => 'LMT (DP 3 Day 14)'
     ];
 
+    /** @var array<string, string> */
     public static array $modulePeriodVisitMapper = [
         '1_LMT' => 'LMT (Visit 2)',
         '2_Period1Diet' => 'Diet Period 1 - Diet (Visit 1)',

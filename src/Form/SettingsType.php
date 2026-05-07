@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints;
 
 class SettingsType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('timezone', Type\ChoiceType::class, [

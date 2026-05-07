@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Mail\Mandrill;
 use App\Mail\Sendgrid;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Twig\Environment;
 
 class Message
 {
@@ -12,18 +14,19 @@ class Message
     public const SENDGRID = 4;
     public const TEST_SUB_PREFIX = '[TEST] ';
 
-    protected $env;
-    protected $logger;
-    protected $twig;
-    protected $params;
-    protected $from;
-    protected $to;
-    protected $subject;
-    protected $content;
-    protected $method;
-    protected $template;
+    protected EnvironmentService $env;
+    protected LoggerService $logger;
+    protected Environment $twig;
+    protected ParameterBagInterface $params;
+    protected string $from;
+    /** @var list<string> */
+    protected array $to = [];
+    protected string $subject = '';
+    protected string $content = '';
+    protected int $method;
+    protected ?string $template = null;
 
-    public function __construct($env, $logger, $twig, $params)
+    public function __construct(EnvironmentService $env, LoggerService $logger, Environment $twig, ParameterBagInterface $params)
     {
         $this->env = $env;
         $this->logger = $logger;
@@ -38,22 +41,24 @@ class Message
         $this->from = $this->getDefaultSender();
     }
 
-    public function setTo($to)
+    /** @param string|list<string> $to */
+    public function setTo(string|array $to): self
     {
         if (!is_array($to)) {
             $to = [$to];
         }
-        $this->to = $to;
+        $this->to = array_values($to);
 
         return $this;
     }
 
-    public function getTo()
+    /** @return list<string> */
+    public function getTo(): array
     {
         return $this->to;
     }
 
-    public function setSubject($subject)
+    public function setSubject(string $subject): self
     {
         if (!$this->env->isProd()) {
             $subject = self::TEST_SUB_PREFIX . $subject;
@@ -63,12 +68,12 @@ class Message
         return $this;
     }
 
-    public function getSubject()
+    public function getSubject(): string
     {
         return $this->subject;
     }
 
-    public function setContent($content)
+    public function setContent(string $content): self
     {
         $this->content = $content;
         $this->template = null;
@@ -76,12 +81,12 @@ class Message
         return $this;
     }
 
-    public function getContent()
+    public function getContent(): string
     {
         return $this->content;
     }
 
-    public function send()
+    public function send(): self
     {
         switch ($this->method) {
             case self::LOG_ONLY:
@@ -114,7 +119,7 @@ class Message
                 if ($this->template) {
                     $tags[] = $this->template;
                 }
-                $sendgrid = new Sendgrid($this->params->get('sendgrid_key'));
+                $sendgrid = new Sendgrid((string) $this->params->get('sendgrid_key'));
                 try {
                     $sendgrid->send($this->to, $this->from, $this->subject, $this->content, $tags);
                 } catch (\Exception $e) {
@@ -129,7 +134,8 @@ class Message
         return $this;
     }
 
-    public function render($template, $parameters)
+    /** @param array<string, mixed> $parameters */
+    public function render(string $template, array $parameters): self
     {
         $templateFile = "emails/{$template}.txt.twig";
         $content = $this->twig->render($templateFile, $parameters);
@@ -147,12 +153,12 @@ class Message
         return $this;
     }
 
-    protected function getDefaultSender()
+    protected function getDefaultSender(): string
     {
         return 'donotreply@pmi-ops.org';
     }
 
-    protected function localLog($method)
+    protected function localLog(string $method): void
     {
         if ($this->env->isLocal()) {
             $this->logger->log(

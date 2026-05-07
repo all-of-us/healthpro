@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class OrderRevertType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('revert', Type\SubmitType::class, [
             'label' => 'Revert <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>',

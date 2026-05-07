@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use Google\Cloud\Logging\Entry;
 use Google\Cloud\Logging\Logger as StackdriverLogger;
 use Google\Cloud\Logging\LoggingClient;
 use Monolog\Formatter\FormatterInterface;
@@ -14,9 +15,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class StackdriverHandler extends AbstractProcessingHandler
 {
-    private $env;
-    private $requestStack;
-    private $logger;
+    private EnvironmentService $env;
+    private RequestStack $requestStack;
+    private LoggerService $logger;
     private StackdriverLogger $stackdriverLogger;
     private NormalizerFormatter $normalizer;
 
@@ -59,6 +60,9 @@ class StackdriverHandler extends AbstractProcessingHandler
         }
     }
 
+    /**
+     * @param array<string, mixed> $clientConfig
+     */
     protected function createStackdriverLogger(array $clientConfig): StackdriverLogger
     {
         $stackdriverClient = new LoggingClient($clientConfig);
@@ -123,7 +127,7 @@ class StackdriverHandler extends AbstractProcessingHandler
     }
 
 
-    private function getTraceFromHeader($traceContext)
+    private function getTraceFromHeader(?string $traceContext): string|false
     {
         $projectId = getenv('GOOGLE_CLOUD_PROJECT');
         // trace context header has the format: TRACE_ID/SPAN_ID;o=TRACE_TRUE
@@ -134,7 +138,7 @@ class StackdriverHandler extends AbstractProcessingHandler
         return false;
     }
 
-    private function getEntryFromRecord(LogRecord $record)
+    private function getEntryFromRecord(LogRecord $record): Entry
     {
         $entryOptions = [
             'severity' => $record->level->getName(),
@@ -152,6 +156,9 @@ class StackdriverHandler extends AbstractProcessingHandler
         return $this->stackdriverLogger->entry($this->getPayloadFromRecord($record), $entryOptions);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getPayloadFromRecord(LogRecord $record): array
     {
         $payload = [
@@ -180,6 +187,11 @@ class StackdriverHandler extends AbstractProcessingHandler
         return $payload;
     }
 
+    /**
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
     private function normalizeData(array $data): array
     {
         $normalized = $this->normalizer->normalizeValue($data);

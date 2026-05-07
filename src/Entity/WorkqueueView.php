@@ -10,26 +10,26 @@ class WorkqueueView
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private $user;
+    private User $user;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $name;
+    private string $name;
 
     #[ORM\Column(type: 'boolean')]
-    private $defaultView = false;
+    private bool $defaultView = false;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTimeInterface $createdTs;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $filters;
+    private ?string $filters = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $columns;
+    private ?string $columns = null;
 
     public function getId(): ?int
     {
@@ -41,7 +41,7 @@ class WorkqueueView
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -60,7 +60,7 @@ class WorkqueueView
         return $this;
     }
 
-    public function getDefaultView(): ?bool
+    public function getDefaultView(): bool
     {
         return $this->defaultView;
     }
@@ -108,15 +108,19 @@ class WorkqueueView
         return $this;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getFiltersArray(): array
     {
         if (!empty($this->filters)) {
-            return json_decode($this->filters, true);
+            $filters = json_decode($this->filters, true);
+            return is_array($filters) ? $filters : [];
         }
         return [];
     }
 
-    public function getColumnsType($type): string
+    public function getColumnsType(string $type): string
     {
         if ($type === 'custom') {
             $columns = 'workQueueViewColumns';

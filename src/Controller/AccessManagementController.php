@@ -26,9 +26,9 @@ class AccessManagementController extends BaseController
     public const MEMBER_DOMAIN = '@pmi-ops.org';
     public const GOOGLE_ADMIN_URL = 'https://admin.google.com';
 
-    private $googleGroupsService;
-    private $loggerService;
-    private $contextTemplate;
+    private GoogleGroupsService $googleGroupsService;
+    private LoggerService $loggerService;
+    private ContextTemplateService $contextTemplate;
 
     public function __construct(
         GoogleGroupsService $googleGroupsService,
@@ -43,20 +43,21 @@ class AccessManagementController extends BaseController
     }
 
     #[Route(path: '/dashboard', name: 'access_manage_dashboard')]
-    public function index()
+    public function index(): Response
     {
         return $this->render('accessmanagement/dashboard.html.twig');
     }
 
     #[Route(path: '/user/groups', name: 'access_manage_user_groups')]
-    public function userGroups()
+    public function userGroups(): Response
     {
         return $this->render($this->contextTemplate->GetProgramTemplate('accessmanagement/groups.html.twig'));
     }
 
     #[Route(path: '/user/group/{groupId}', name: 'access_manage_user_group')]
-    public function userGroup($groupId): Response
+    public function userGroup(string $groupId): Response
     {
+        $group = null;
         if ($this->contextTemplate->isCurrentProgramHpo()) {
             $group = $this->getSecurityUser()->getGroupFromId($groupId);
         } elseif ($this->contextTemplate->isCurrentProgramNph()) {
@@ -79,8 +80,9 @@ class AccessManagementController extends BaseController
     }
 
     #[Route(path: '/user/group/{groupId}/member', name: 'access_manage_user_group_member')]
-    public function member($groupId, Request $request)
+    public function member(string $groupId, Request $request): Response
     {
+        $group = null;
         if ($this->contextTemplate->isCurrentProgramHpo()) {
             $group = $this->getSecurityUser()->getGroupFromId($groupId);
         } elseif ($this->contextTemplate->isCurrentProgramNph()) {
@@ -131,8 +133,9 @@ class AccessManagementController extends BaseController
     }
 
     #[Route(path: '/user/group/{groupId}/member/{memberId}/remove', name: 'access_manage_user_group_remove_member')]
-    public function removeMember($groupId, $memberId, Request $request, AccessManagementService $accessManagementService)
+    public function removeMember(string $groupId, string $memberId, Request $request, AccessManagementService $accessManagementService): Response
     {
+        $group = null;
         if ($this->contextTemplate->isCurrentProgramHpo()) {
             $group = $this->getSecurityUser()->getGroupFromId($groupId);
         } elseif ($this->contextTemplate->isCurrentProgramNph()) {

@@ -12,23 +12,23 @@ class PatientStatusImportRow
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $participantId;
+    private string $participantId;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $status;
+    private string $status;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $comments;
+    private ?string $comments = null;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\PatientStatusImport', inversedBy: 'PatientStatusImportRows')]
     #[ORM\JoinColumn(nullable: false)]
-    private $import;
+    private PatientStatusImport $import;
 
     #[ORM\Column(type: 'smallint', options: ['default' => 0])]
-    private $rdrStatus = 0;
+    private int $rdrStatus = 0;
 
     public function getId(): ?int
     {
@@ -52,7 +52,7 @@ class PatientStatusImportRow
         return $this->status;
     }
 
-    public function setStatus(?string $status): self
+    public function setStatus(string $status): self
     {
         $this->status = $status;
 
@@ -76,7 +76,7 @@ class PatientStatusImportRow
         return $this->import;
     }
 
-    public function setImport(?PatientStatusImport $import): self
+    public function setImport(PatientStatusImport $import): self
     {
         $this->import = $import;
 
@@ -88,7 +88,7 @@ class PatientStatusImportRow
         return $this->rdrStatus;
     }
 
-    public function setRdrStatus(?int $rdrStatus): self
+    public function setRdrStatus(int $rdrStatus): self
     {
         $this->rdrStatus = $rdrStatus;
 

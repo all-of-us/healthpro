@@ -6,9 +6,10 @@ use App\Datastore\Entity;
 
 class Cache extends Entity
 {
-    protected $excludeIndexes = ['data'];
+    /** @var list<string> */
+    protected array $excludeIndexes = ['data'];
 
-    protected static function getKind()
+    protected static function getKind(): string
     {
         return 'Cache';
     }

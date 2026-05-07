@@ -16,15 +16,16 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
+/** @implements UserProviderInterface<User> */
 class UserProvider implements UserProviderInterface
 {
-    private $userService;
-    private $requestStack;
-    private $googleGroups;
-    private $mockGoogleGroups;
-    private $env;
-    private $params;
-    private $ppscApiService;
+    private UserService $userService;
+    private RequestStack $requestStack;
+    private GoogleGroupsService $googleGroups;
+    private MockGoogleGroupsService $mockGoogleGroups;
+    private EnvironmentService $env;
+    private ParameterBagInterface $params;
+    private PpscApiService $ppscApiService;
 
     public function __construct(
         UserService $userService,
@@ -44,7 +45,7 @@ class UserProvider implements UserProviderInterface
         $this->ppscApiService = $ppscApiService;
     }
 
-    public function loadUserByIdentifier(string $identifier): UserInterface
+    public function loadUserByIdentifier(string $identifier): User
     {
         if ($this->requestStack->getSession()->get('loginType') === \App\Entity\User::SALESFORCE) {
             return $this->loadSalesforceUser($identifier);
@@ -52,12 +53,12 @@ class UserProvider implements UserProviderInterface
         return $this->loadGoogleUser($identifier);
     }
 
-    public function loadUserByUsername(string $username): UserInterface
+    public function loadUserByUsername(string $username): User
     {
         return $this->loadUserByIdentifier($username);
     }
 
-    public function refreshUser(UserInterface $user): UserInterface
+    public function refreshUser(UserInterface $user): User
     {
         if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Invalid user class "%s".', get_class($user)));
@@ -71,7 +72,7 @@ class UserProvider implements UserProviderInterface
         return User::class === $class;
     }
 
-    private function loadGoogleUser(string $username): UserInterface
+    private function loadGoogleUser(string $username): User
     {
         $googleUser = $this->userService->getGoogleUser();
         if (!$googleUser || strcasecmp($googleUser->getEmail(), $username) !== 0) {
@@ -127,7 +128,7 @@ class UserProvider implements UserProviderInterface
         return new User($googleUser, $groups, $userInfo, null, $sessionInfo);
     }
 
-    private function loadSalesforceUser(string $username): UserInterface
+    private function loadSalesforceUser(string $username): User
     {
         $salesforceUser = $this->userService->getSalesforceUser();
         if (!$salesforceUser || strcasecmp($salesforceUser->getEmail(), $username) !== 0) {

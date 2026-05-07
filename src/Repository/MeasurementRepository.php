@@ -13,6 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Measurement|null findOneBy(array $criteria, array $orderBy = null)
  * @method Measurement[]    findAll()
  * @method Measurement[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<Measurement>
  */
 class MeasurementRepository extends ServiceEntityRepository
 {
@@ -39,9 +40,9 @@ class MeasurementRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
-    public function getSiteUnfinalizedEvaluations($siteId)
+    public function getSiteUnfinalizedEvaluations(string $siteId): array
     {
         $evaluationsQuery = '
             SELECT e.*,
@@ -66,9 +67,9 @@ class MeasurementRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array
+     * @return array<int, array<string, mixed>>
      */
-    public function getSiteRecentModifiedEvaluations($siteId)
+    public function getSiteRecentModifiedEvaluations(string $siteId): array
     {
         $evaluationsQuery = '
             SELECT e.*,
@@ -94,6 +95,9 @@ class MeasurementRepository extends ServiceEntityRepository
         ]);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getUnloggedMissingMeasurements(): array
     {
         $evaluationsQuery = 'SELECT id FROM evaluations WHERE id NOT IN (SELECT record_id FROM missing_notifications_log WHERE type = :type) AND finalized_ts IS NOT NULL AND rdr_id IS NULL';
@@ -102,7 +106,7 @@ class MeasurementRepository extends ServiceEntityRepository
         ]);
     }
 
-    public function getMeasurement($measurementId, $participantId)
+    public function getMeasurement(int $measurementId, string $participantId): ?Measurement
     {
         $parentIds = $this->createQueryBuilder('m')
             ->select('m.parentId')
@@ -126,7 +130,10 @@ class MeasurementRepository extends ServiceEntityRepository
         return !empty($measurement) ? $measurement[0] : null;
     }
 
-    public function getMeasurementsWithoutParent($participantId): array
+    /**
+     * @return array<int, Measurement>
+     */
+    public function getMeasurementsWithoutParent(string $participantId): array
     {
         $parentIds = $this->createQueryBuilder('m')
             ->select('m.parentId')
@@ -187,7 +194,10 @@ class MeasurementRepository extends ServiceEntityRepository
         return null;
     }
 
-    public function getProtocolModificationCount($modificationType, $minAge, $maxAge): array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getProtocolModificationCount(string $modificationType, int $minAge, int $maxAge): array
     {
         $query = 'SELECT count(*) as count, q.modification as modificationType FROM
                     (
@@ -216,7 +226,10 @@ class MeasurementRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
-    public function getActiveAlertsReportData($minAge, $maxAge): array
+    /**
+     * @return array<int, Measurement>
+     */
+    public function getActiveAlertsReportData(int $minAge, int $maxAge): array
     {
         $query = $this->createQueryBuilder('m')
             ->andWhere('m.ageInMonths >= :minAge')
@@ -247,7 +260,10 @@ class MeasurementRepository extends ServiceEntityRepository
         $conn->executeStatement($dropTempTable);
     }
 
-    public function getCompleteMeasurementsForPediatrictotalsReport(string $field, int $minAge, int $maxAge)
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getCompleteMeasurementsForPediatrictotalsReport(string $field, int $minAge, int $maxAge): array
     {
         $query = '
         select count(DISTINCT participant_id) as participant_count from(
@@ -280,7 +296,10 @@ class MeasurementRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
-    public function getAnyMeasurementsForPediatrictotalsReport(string $field, int $minAge, int $maxAge)
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getAnyMeasurementsForPediatrictotalsReport(string $field, int $minAge, int $maxAge): array
     {
         $query = '
         select count(DISTINCT participant_id) as participant_count from(
@@ -320,7 +339,10 @@ class MeasurementRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
-    public function getThridMeasurementsForPediatrictotalsReport(string $field, int $minAge, int $maxAge)
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getThridMeasurementsForPediatrictotalsReport(string $field, int $minAge, int $maxAge): array
     {
         $query = '
         select count(DISTINCT participant_id) as participant_count from(
@@ -346,6 +368,9 @@ class MeasurementRepository extends ServiceEntityRepository
         return $result->fetchAllAssociative();
     }
 
+    /**
+     * @return array<int, Measurement>
+     */
     public function getMissingSexAtBirthPediatricMeasurements(): array
     {
         return $this->createQueryBuilder('m')

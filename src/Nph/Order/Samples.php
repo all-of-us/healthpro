@@ -2,9 +2,23 @@
 
 namespace App\Nph\Order;
 
+/**
+ * @phpstan-type AliquotDocument array{title: string, filename: string}
+ * @phpstan-type AliquotInfo array<string, mixed>
+ * @phpstan-type SampleInfo array{
+ *     label: string,
+ *     type: string,
+ *     identifier: string,
+ *     placeholder?: mixed,
+ *     typeDisplayName?: string,
+ *     collectionVolume?: string,
+ *     aliquots?: array<string, AliquotInfo>
+ * }
+ */
 class Samples
 {
-    public static $aliquotDocuments = [
+    /** @var array<string, AliquotDocument> */
+    public static array $aliquotDocuments = [
         'blood' => [
             'title' => 'HPRO Blood Aliquoting Instructions',
             'filename' => 'HPRO Blood Aliquoting Instructions.pdf'
@@ -42,29 +56,41 @@ class Samples
             'filename' => 'HPRO Module 3 Saliva Aliquoting Instructions.pdf'
         ]
     ];
-    private $visitObj;
+    private TimePoints $visitObj;
 
-    public function __construct($module, $visit)
+    public function __construct(int $module, string $visit)
     {
         $visitClass = 'App\Nph\Order\Visits\Visit' . $visit;
         $this->visitObj = new $visitClass($module);
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getTimePoints(): array
     {
         return $this->visitObj->getTimePoints();
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getRdrTimePoints(): array
     {
         return $this->visitObj->getRdrTimePoints();
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     public function getTimePointSamples(): array
     {
         return $this->visitObj->getTimePointSamples();
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getSamples(): array
     {
         $samplesInfo = $this->getSamplesInformation();
@@ -75,7 +101,10 @@ class Samples
         return $samples;
     }
 
-    public function getSamplesByType($type): array
+    /**
+     * @return list<string>
+     */
+    public function getSamplesByType(string $type): array
     {
         $samplesInfo = $this->getSamplesInformation();
         $samples = [];
@@ -87,7 +116,7 @@ class Samples
         return $samples;
     }
 
-    public function getSampleType($sampleIdentifier): string
+    public function getSampleType(string $sampleIdentifier): string
     {
         $samplesInfo = $this->getSamplesInformation();
         foreach ($samplesInfo as $sampleCode => $sample) {
@@ -98,7 +127,7 @@ class Samples
         return '';
     }
 
-    public function getSampleTypeDisplayName($sampleIdentifier): string
+    public function getSampleTypeDisplayName(string $sampleIdentifier): string
     {
         $samplesInfo = $this->getSamplesInformation();
         foreach ($samplesInfo as $sampleCode => $sample) {
@@ -112,6 +141,9 @@ class Samples
         return '';
     }
 
+    /**
+     * @return array<string, AliquotInfo>|null
+     */
     public function getAliquots(string $sampleIdentifier): ?array
     {
         $samplesInfo = $this->getSamplesInformation();
@@ -123,6 +155,9 @@ class Samples
         return null;
     }
 
+    /**
+     * @return array<string, SampleInfo>
+     */
     public function getSamplesInformation(): array
     {
         return $this->visitObj->getSamplesInformation();

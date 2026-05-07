@@ -11,9 +11,10 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 class MockGoogleGroupsService
 {
-    public static $groups = [];
-    private $params;
-    private $env;
+    /** @var array<string, list<Group>> */
+    public static array $groups = [];
+    private ParameterBagInterface $params;
+    private EnvironmentService $env;
 
     public function __construct(ParameterBagInterface $params, EnvironmentService $env)
     {
@@ -21,7 +22,10 @@ class MockGoogleGroupsService
         $this->env = $env;
     }
 
-    public function getGroups($userEmail = null)
+    /**
+     * @return list<Group>
+     */
+    public function getGroups(?string $userEmail = null): array
     {
         // use fixtures when using gaBypass in dev
         if ($userEmail && !$this->env->values['isUnitTest'] && empty(self::$groups[$userEmail])) {
@@ -41,15 +45,22 @@ class MockGoogleGroupsService
             self::setGroups($userEmail, $groups);
         }
 
+        if ($userEmail === null) {
+            return [];
+        }
+
         return isset(self::$groups[$userEmail]) ? self::$groups[$userEmail] : [];
     }
 
-    public function getRole($userEmail, $groupEmail)
+    public function getRole(string $userEmail, string $groupEmail): string
     {
         return 'MEMBER';
     }
 
-    public static function setGroups($userEmail, $groups)
+    /**
+     * @param list<Group> $groups
+     */
+    public static function setGroups(string $userEmail, array $groups): void
     {
         self::$groups[$userEmail] = $groups;
     }

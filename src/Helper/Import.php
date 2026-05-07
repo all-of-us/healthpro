@@ -15,7 +15,10 @@ class Import
     public const COMPLETE_WITH_ERRORS = 2;
 
 
-    public static function hasDuplicateParticipantId($imports, $participantId): bool
+    /**
+     * @param list<array{participant_id: string}> $imports
+     */
+    public static function hasDuplicateParticipantId(array $imports, string $participantId): bool
     {
         foreach ($imports as $import) {
             if ($import['participant_id'] === $participantId) {
@@ -25,12 +28,12 @@ class Import
         return false;
     }
 
-    public static function isValidParticipantId($participantId): bool
+    public static function isValidParticipantId(string $participantId): bool
     {
-        return preg_match("/^P\d{9}+$/", $participantId);
+        return preg_match("/^P\d{9}+$/", $participantId) === 1;
     }
 
-    public static function isValidEmail($email): bool
+    public static function isValidEmail(string $email): bool
     {
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $parts = explode('@', $email);
@@ -40,7 +43,7 @@ class Import
         return false;
     }
 
-    public static function isValidDate($date): bool
+    public static function isValidDate(string $date): bool
     {
         return (bool) strtotime($date);
     }

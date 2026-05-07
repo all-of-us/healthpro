@@ -9,11 +9,11 @@ use Symfony\Component\Cache\PruneableInterface;
 
 class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
 {
-    private $marshaller;
+    private DefaultMarshaller $marshaller;
 
-    private $limit;
+    private int $limit;
 
-    public function __construct($limit)
+    public function __construct(int $limit)
     {
         $this->marshaller = new DefaultMarshaller();
         $this->limit = $limit;
@@ -29,6 +29,11 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
         return true;
     }
 
+    /**
+     * @param list<string> $ids
+     *
+     * @return array<string, mixed>
+     */
     protected function doFetch(array $ids): iterable
     {
         $values = [];
@@ -50,6 +55,9 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
         return (bool) $this->doFetch([$id]);
     }
 
+    /**
+     * @param list<string> $ids
+     */
     protected function doDelete(array $ids): bool
     {
         foreach ($ids as $id) {
@@ -60,6 +68,11 @@ class DatastoreAdapter extends AbstractAdapter implements PruneableInterface
         return true;
     }
 
+    /**
+     * @param array<string, mixed> $values
+     *
+     * @return list<string>|bool
+     */
     protected function doSave(array $values, int $lifetime): array|bool
     {
         $failed = []; // Overwritten in method below (passed by reference)

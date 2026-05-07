@@ -34,6 +34,9 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
         return !empty($nphSampleProcessingStatus) ? $nphSampleProcessingStatus[0] : null;
     }
 
+    /**
+     * @return array<int, NphSampleProcessingStatus>|null
+     */
     public function getSampleProcessingStatusByModule(string $participantId): ?array
     {
         $nphSampleProcessingStatus = $this->createQueryBuilder('n')
@@ -59,6 +62,9 @@ class NphSampleProcessingStatusRepository extends ServiceEntityRepository
         return !empty($nphSampleProcessingStatus);
     }
 
+    /**
+     * @return array<int, NphSampleProcessingStatus>
+     */
     public function getAuditReport(?\DateTime $startDate, ?\DateTime $endDate): array
     {
         $nphSampleProcessingStatus = $this->createQueryBuilder('n')

@@ -25,9 +25,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class BiobankController extends BaseController
 {
     protected PpscApiService $ppscApiService;
-    protected $orderService;
-    protected $loggerService;
-    protected $params;
+    protected OrderService $orderService;
+    protected LoggerService $loggerService;
+    protected ParameterBagInterface $params;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -141,7 +141,12 @@ class BiobankController extends BaseController
                     $finalizeForm['finalizedNotes']->addError(new FormError("Please remove participant $label \"$type[1]\""));
                 }
                 // Check if centrifuge type is required or not
-                if ($finalizeForm->has('processedCentrifugeType') && empty($finalizeForm['processedCentrifugeType']->getData()) && !empty($finalizeForm['finalizedSamples']->getData()) && $order->requireCentrifugeType($finalizeForm['finalizedSamples']->getData())) {
+                if (
+                    $finalizeForm->has('processedCentrifugeType')
+                    && empty($finalizeForm['processedCentrifugeType']->getData())
+                    && !empty($finalizeForm['finalizedSamples']->getData())
+                    && count(array_intersect($finalizeForm['finalizedSamples']->getData(), Order::$samplesRequiringCentrifugeType)) > 0
+                ) {
                     $finalizeForm['processedCentrifugeType']->addError(new FormError('Please select centrifuge type'));
                 }
                 if ($finalizeForm->isValid()) {

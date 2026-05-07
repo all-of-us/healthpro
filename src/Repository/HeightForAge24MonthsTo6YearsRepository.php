@@ -39,7 +39,10 @@ class HeightForAge24MonthsTo6YearsRepository extends ServiceEntityRepository
         }
     }
 
-    public function getChartsData($sex): ?array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getChartsData(?string $sex = null): array
     {
         $queryBuilder = $this->createQueryBuilder('hfa');
         if ($sex) {

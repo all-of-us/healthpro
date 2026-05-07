@@ -21,7 +21,11 @@ class Sendgrid
         ]);
     }
 
-    public function send(array $to, string $from, string $subject, string $content, $tags = null): bool
+    /**
+     * @param list<string> $to
+     * @param list<string>|null $tags
+     */
+    public function send(array $to, string $from, string $subject, string $content, ?array $tags = null): bool
     {
         $data = [
             'personalizations' => [
@@ -47,7 +51,7 @@ class Sendgrid
 
         try {
             $response = $this->post('mail/send', $data);
-            if ($response->getStatusCode() == 202) {
+            if ($response->getStatusCode() === 202) {
                 return true;
             }
             error_log('SendGrid API Error: ' . $response->getStatusCode() . ' ' . $response->getBody()->getContents());
@@ -58,6 +62,9 @@ class Sendgrid
         }
     }
 
+    /**
+     * @param array<string, mixed> $data
+     */
     protected function post(string $endpoint, array $data = []): ResponseInterface
     {
         return $this->client->request('POST', $endpoint, [

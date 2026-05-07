@@ -24,15 +24,15 @@ use Twig\Environment;
 
 class GoogleGroupsAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface
 {
-    private $auth;
-    private $urlGenerator;
-    private $userService;
-    private $params;
-    private $env;
-    private $twig;
-    private $requestStack;
-    private $authEmail;
-    private $authFailureReason;
+    private AuthService $auth;
+    private UrlGeneratorInterface $urlGenerator;
+    private UserService $userService;
+    private ContainerBagInterface $params;
+    private EnvironmentService $env;
+    private Environment $twig;
+    private RequestStack $requestStack;
+    private ?string $authEmail = null;
+    private ?string $authFailureReason = null;
 
     public function __construct(AuthService $auth, UrlGeneratorInterface $urlGenerator, ContainerBagInterface $params, EnvironmentService $env, UserService $userService, Environment $twig, RequestStack $requestStack)
     {

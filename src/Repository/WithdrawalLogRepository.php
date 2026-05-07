@@ -6,6 +6,9 @@ use App\Entity\WithdrawalLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<WithdrawalLog>
+ */
 class WithdrawalLogRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -13,6 +16,9 @@ class WithdrawalLogRepository extends ServiceEntityRepository
         parent::__construct($registry, WithdrawalLog::class);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getWithdrawalNotifications(): array
     {
         return $this->createQueryBuilder('w')
@@ -24,6 +30,9 @@ class WithdrawalLogRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getLatestAwardees(): array
     {
         return $this->createQueryBuilder('w')

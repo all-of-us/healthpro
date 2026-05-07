@@ -4,6 +4,7 @@ namespace App\Drc;
 
 class CodeBook
 {
+    /** @var array<string, string> */
     protected static $map = [
         'UNSET' => '',
         'UNMAPPED' => '',
@@ -137,9 +138,12 @@ class CodeBook
         'ON_SITE' => 'On Site'
     ];
 
-    public static function display($code)
+    public static function display(mixed $code): mixed
     {
         if (is_bool($code) || is_object($code) || is_array($code)) {
+            return $code;
+        }
+        if (!is_string($code)) {
             return $code;
         }
         if (array_key_exists($code, self::$map)) {
@@ -150,7 +154,10 @@ class CodeBook
         return $code;
     }
 
-    public static function ageRangeToDob($range): array
+    /**
+     * @return list<string>
+     */
+    public static function ageRangeToDob(string $range): array
     {
         $parameters = [];
         if (!preg_match('/^(\d+)-(\d+)?$/', $range, $matches)) {

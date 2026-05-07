@@ -10,19 +10,58 @@ use stdClass;
 class Fhir
 {
     public const CURRENT_VERSION = 2;
+
+    /** @var object */
     protected $data;
+
+    /** @var stdClass */
     protected $schema;
+
+    /** @var string */
     protected $patient;
+
+    /** @var string */
     protected $version;
+
+    /** @var string */
     protected $date;
+
+    /** @var array<string, string> */
     protected $metricUrns;
+
+    /** @var string|null */
     protected $parentRdr;
+
+    /** @var string */
     protected $createdUser;
+
+    /** @var string */
     protected $createdSite;
+
+    /** @var string|null */
     protected $finalizedUser;
+
+    /** @var string|null */
     protected $finalizedSite;
+
+    /** @var array<string, mixed> */
     protected $summary;
 
+    /**
+     * @param array{
+     *     data: object,
+     *     schema: stdClass,
+     *     patient: string,
+     *     version: string,
+     *     datetime: \DateTimeInterface,
+     *     parent_rdr: string|null,
+     *     created_user: string,
+     *     created_site: string,
+     *     finalized_user: string|null,
+     *     finalized_site: string|null,
+     *     summary: array<string, mixed>
+     * } $options
+     */
     public function __construct(array $options)
     {
         $this->data = $options['data'];
@@ -31,8 +70,13 @@ class Fhir
         $this->version = $options['version'];
         // Convert DateTime object to UTC timestamp
         // (can't use 'c' ISO 8601 format because that results in +00:00 instead of Z)
-        $date = clone $options['datetime'];
-        $date->setTimezone(new DateTimeZone('UTC'));
+        $date = $options['datetime'];
+        if ($date instanceof \DateTimeImmutable) {
+            $date = $date->setTimezone(new DateTimeZone('UTC'));
+        } else {
+            $date = clone $date;
+            $date->setTimezone(new DateTimeZone('UTC'));
+        }
         $this->date = $date->format('Y-m-d\TH:i:s\Z');
         $this->parentRdr = $options['parent_rdr'];
         $this->createdUser = $options['created_user'];
@@ -43,7 +87,7 @@ class Fhir
         $this->metricUrns = $this->getMetricUrns();
     }
 
-    public function toObject()
+    public function toObject(): stdClass
     {
         $fhir = new StdClass();
         $fhir->entry = [];
@@ -60,7 +104,7 @@ class Fhir
         return $fhir;
     }
 
-    protected static function ordinalLabel($text, $replicate)
+    protected static function ordinalLabel(string $text, int $replicate): string
     {
         switch ($replicate) {
             case 1:
@@ -79,11 +123,16 @@ class Fhir
      * URNs for each
      */
 
+    /**
+     * @return array<string, string>
+     */
     protected function getMetricUrns(): array
     {
         $metrics = [];
+        /** @var array<int, stdClass> $fields */
+        $fields = $this->schema->fields;
         /** @var stdClass $field */
-        foreach ($this->schema->fields as $field) {
+        foreach ($fields as $field) {
             if (preg_match('/^blood-pressure-/', $field->name)) {
                 if (!preg_match('/^blood-pressure-(systolic|protocol-modification)/', $field->name)) {
                     // only add systolic and modifications for now, will process the rest below
@@ -253,7 +302,10 @@ class Fhir
         return $metricUrns;
     }
 
-    protected function getComposition()
+    /**
+     * @return array<string, mixed>
+     */
+    protected function getComposition(): array
     {
         $references = [];
         foreach (array_values($this->metricUrns) as $urn) {
@@ -319,7 +371,12 @@ class Fhir
         return $composition;
     }
 
-    protected function simpleMetric($metric, $value, $display, $unit, $codes, $effectiveDateTime = null)
+    /**
+     * @param array<int, array<string, string>> $codes
+     *
+     * @return array<string, mixed>
+     */
+    protected function simpleMetric(string $metric, mixed $value, string $display, string $unit, array $codes, ?string $effectiveDateTime = null): array
     {
         if (empty($effectiveDateTime)) {
             $effectiveDateTime = $this->date;
@@ -381,7 +438,13 @@ class Fhir
         return $entry;
     }
 
-    protected function valueMetric($metric, $value, $display, $codeCodes, $valueCodes)
+    /**
+     * @param array<int, array<string, string>> $codeCodes
+     * @param array<int, array<string, string>> $valueCodes
+     *
+     * @return array<string, mixed>
+     */
+    protected function valueMetric(string $metric, mixed $value, string $display, array $codeCodes, array $valueCodes): array
     {
         return [
             'fullUrl' => $this->metricUrns[$metric],
@@ -404,7 +467,12 @@ class Fhir
         ];
     }
 
-    protected function stringMetric($metric, $value, $display, $codes)
+    /**
+     * @param array<int, array<string, string>> $codes
+     *
+     * @return array<string, mixed>
+     */
+    protected function stringMetric(string $metric, mixed $value, string $display, array $codes): array
     {
         $entry = [
             'fullUrl' => $this->metricUrns[$metric],
@@ -427,7 +495,10 @@ class Fhir
         return $entry;
     }
 
-    protected function protocolModification($metric, $replicate = null)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function protocolModification(string $metric, ?int $replicate = null): array
     {
         $codeDisplay = ucfirst(str_replace('-', ' ', $metric)) . ' protocol modifications';
         if (is_null($replicate)) {
@@ -482,7 +553,10 @@ class Fhir
         ];
     }
 
-    protected function protocolModificationManual($metric, $replicate = null)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function protocolModificationManual(string $metric, ?int $replicate = null): array
     {
         $codeDisplay = ucfirst(str_replace('-', ' ', $metric)) . ' protocol modifications';
         $conceptCode = 'manual-' . $metric;
@@ -521,7 +595,10 @@ class Fhir
         ];
     }
 
-    protected function height($replicate = null): array
+    /**
+     * @return array<string, mixed>
+     */
+    protected function height(?int $replicate = null): array
     {
         $metricName = $replicate ? 'height-' . $replicate : 'height';
         $value = $replicate ? $this->data->height[$replicate - 1] : $this->data->height;
@@ -554,7 +631,10 @@ class Fhir
         return $entry;
     }
 
-    protected function weight($replicate = null)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function weight(?int $replicate = null): array
     {
         $metricName = $replicate ? 'weight-' . $replicate : 'weight';
         $value = $replicate ? $this->data->weight[$replicate - 1] : $this->data->weight;
@@ -581,7 +661,10 @@ class Fhir
         );
     }
 
-    protected function weightprepregnancy()
+    /**
+     * @return array<string, mixed>
+     */
+    protected function weightprepregnancy(): array
     {
         return $this->simpleMetric(
             'weight-prepregnancy',
@@ -596,10 +679,13 @@ class Fhir
         );
     }
 
-    protected function pregnant()
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function pregnant(): ?array
     {
         if (!$this->data->pregnant) {
-            return;
+            return null;
         }
         return $this->valueMetric(
             'pregnant',
@@ -632,10 +718,13 @@ class Fhir
         );
     }
 
-    protected function wheelchair()
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function wheelchair(): ?array
     {
         if (!$this->data->wheelchair) {
-            return;
+            return null;
         }
         return $this->valueMetric(
             'wheelchair',
@@ -654,10 +743,13 @@ class Fhir
         );
     }
 
-    protected function bmi()
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function bmi(): ?array
     {
         if (!isset($this->summary['bmi'])) {
-            return;
+            return null;
         }
         $entry = $this->simpleMetric(
             'bmi',
@@ -695,7 +787,10 @@ class Fhir
         return $entry;
     }
 
-    protected function heartrate($replicate = null)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function heartrate(int $replicate): array
     {
         $entry = $this->simpleMetric(
             'heart-rate-' . $replicate,
@@ -781,7 +876,10 @@ class Fhir
         return $entry;
     }
 
-    protected function hipcircumference($replicate)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function hipcircumference(int $replicate): array
     {
         return $this->simpleMetric(
             'hip-circumference-' . $replicate,
@@ -804,7 +902,10 @@ class Fhir
         );
     }
 
-    protected function waistcircumference($replicate)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function waistcircumference(int $replicate): array
     {
         $entry = $this->simpleMetric(
             'waist-circumference-' . $replicate,
@@ -831,7 +932,10 @@ class Fhir
         return $entry;
     }
 
-    protected function getBpBodySite($location)
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function getBpBodySite(string $location): ?array
     {
         switch ($location) {
             case 'Left arm':
@@ -864,7 +968,10 @@ class Fhir
         ];
     }
 
-    protected function getWaistCircumferenceBodySite()
+    /**
+     * @return array<string, mixed>
+     */
+    protected function getWaistCircumferenceBodySite(): array
     {
         $locationSnomed = $this->data->{'waist-circumference-location'};
         $locationDisplay = ucfirst(str_replace('-', ' ', $locationSnomed));
@@ -879,7 +986,10 @@ class Fhir
     }
 
     // $replicate can be integer for replicate number OR 'mean'
-    protected function getBpComponent($component, $replicate)
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function getBpComponent(string $component, int|string $replicate): ?array
     {
         switch ($component) {
             case 'systolic':
@@ -942,7 +1052,10 @@ class Fhir
         ];
     }
 
-    protected function bloodpressure($replicate)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function bloodpressure(int $replicate): array
     {
         $components = [
             $this->getBpComponent('systolic', $replicate),
@@ -1008,42 +1121,68 @@ class Fhir
         return $entry;
     }
 
-    protected function bloodpressureprotocolmodification($replicate)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function bloodpressureprotocolmodification(int $replicate): array
     {
         return $this->protocolModification('blood-pressure', $replicate);
     }
 
-    protected function manualbloodpressure($replicate)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function manualbloodpressure(int $replicate): array
     {
         return $this->protocolModificationManual('blood-pressure', $replicate);
     }
 
-    protected function manualheartrate($replicate)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function manualheartrate(int $replicate): array
     {
         return $this->protocolModificationManual('heart-rate', $replicate);
     }
 
-    protected function hipcircumferenceprotocolmodification($replicate)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function hipcircumferenceprotocolmodification(int $replicate): array
     {
         return $this->protocolModification('hip-circumference', $replicate);
     }
 
-    protected function waistcircumferenceprotocolmodification($replicate)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function waistcircumferenceprotocolmodification(int $replicate): array
     {
         return $this->protocolModification('waist-circumference', $replicate);
     }
 
-    protected function heightprotocolmodification($replicate = null)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function heightprotocolmodification(?int $replicate = null): array
     {
         return $this->protocolModification('height', $replicate);
     }
 
-    protected function weightprotocolmodification($replicate = null)
+    /**
+     * @return array<string, mixed>
+     */
+    protected function weightprotocolmodification(?int $replicate = null): array
     {
         return $this->protocolModification('weight', $replicate);
     }
 
-    protected function meanProtocolModifications($replicates, $modificationMetric, $modificationMetricManual = null)
+    /**
+     * @param list<int> $replicates
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    protected function meanProtocolModifications(array $replicates, string $modificationMetric, ?string $modificationMetricManual = null): array
     {
         $related = [];
         foreach ($replicates as $replicate) {
@@ -1071,7 +1210,10 @@ class Fhir
         return $related;
     }
 
-    protected function bloodpressuremean()
+    /**
+     * @return array<string, mixed>
+     */
+    protected function bloodpressuremean(): array
     {
         $components = [
             $this->getBpComponent('systolic', 'mean'),
@@ -1114,7 +1256,10 @@ class Fhir
         return $entry;
     }
 
-    protected function heartratemean()
+    /**
+     * @return array<string, mixed>
+     */
+    protected function heartratemean(): array
     {
         $displayText = $this->isPediatricForm() ? 'Computed heart rate, mean of closest two measures' : 'Computed heart rate, mean of 2nd and 3rd measures';
         $entry = $this->simpleMetric(
@@ -1171,7 +1316,10 @@ class Fhir
         return $entry;
     }
 
-    protected function hipcircumferencemean()
+    /**
+     * @return array<string, mixed>
+     */
+    protected function hipcircumferencemean(): array
     {
         $entry = $this->simpleMetric(
             'hip-circumference-mean',
@@ -1197,7 +1345,10 @@ class Fhir
         return $entry;
     }
 
-    protected function waistcircumferencemean()
+    /**
+     * @return array<string, mixed>
+     */
+    protected function waistcircumferencemean(): array
     {
         $entry = $this->simpleMetric(
             'waist-circumference-mean',
@@ -1226,10 +1377,13 @@ class Fhir
         return $entry;
     }
 
-    protected function notes()
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function notes(): ?array
     {
         if (!$this->data->notes) {
-            return;
+            return null;
         }
         return $this->stringMetric(
             'notes',
@@ -1243,7 +1397,10 @@ class Fhir
         );
     }
 
-    protected function getEntry($metric)
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function getEntry(string $metric): ?array
     {
         if (preg_match('/^(.+)-(\d+)$/', $metric, $m)) {
             $replicate = $m[2];
@@ -1259,9 +1416,11 @@ class Fhir
             }
             return $this->$method($replicate);
         }
+
+        return null;
     }
 
-    protected function getEffectiveDateTime($field, $replicate = 1)
+    protected function getEffectiveDateTime(string $field, int $replicate = 1): string
     {
         if (isset($this->data->{$field}) && $this->data->{$field} === 'ehr' && !empty($this->data->{$field . '-ehr-date'}) && $replicate == 1) {
             if (is_string($this->data->{$field . '-ehr-date'})) {
@@ -1278,6 +1437,9 @@ class Fhir
         return str_contains($this->version, 'peds');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getPediatricComponent(string $propertyName): array
     {
         $propertyValue = $this->data->{$propertyName};
@@ -1306,6 +1468,9 @@ class Fhir
         return $component;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function headcircumference(int $replicate): array
     {
         return $this->simpleMetric(
@@ -1329,22 +1494,34 @@ class Fhir
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileweightforage(): array
     {
         return $this->getGrowthpercentileweightforage();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileweightforageMale(): array
     {
         return $this->getGrowthpercentileweightforage('male');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileweightforageFemale(): array
     {
         return $this->getGrowthpercentileweightforage('female');
     }
 
-    private function getGrowthpercentileweightforage(string $sex = null): array
+    /**
+     * @return array<string, mixed>
+     */
+    private function getGrowthpercentileweightforage(?string $sex = null): array
     {
         $sexKey = $sex ? "-{$sex}" : '';
         $sexValue = $sex ?? '';
@@ -1369,22 +1546,34 @@ class Fhir
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileheightforage(): array
     {
         return $this->getGrowthpercentileheightforage();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileheightforageMale(): array
     {
         return $this->getGrowthpercentileheightforage('male');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileheightforageFemale(): array
     {
         return $this->getGrowthpercentileheightforage('female');
     }
 
-    private function getGrowthpercentileheightforage(string $sex = null): array
+    /**
+     * @return array<string, mixed>
+     */
+    private function getGrowthpercentileheightforage(?string $sex = null): array
     {
         $sexKey = $sex ? "-{$sex}" : '';
         $sexValue = $sex ?? '';
@@ -1409,23 +1598,35 @@ class Fhir
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileweightforlength(): array
     {
         return $this->getGrowthpercentileweightforlength();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileweightforlengthMale(): array
     {
         return $this->getGrowthpercentileweightforlength('male');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileweightforlengthFemale(): array
     {
         return $this->getGrowthpercentileweightforlength('female');
     }
 
 
-    private function getGrowthpercentileweightforlength(string $sex = null): array
+    /**
+     * @return array<string, mixed>
+     */
+    private function getGrowthpercentileweightforlength(?string $sex = null): array
     {
         $sexKey = $sex ? "-{$sex}" : '';
         $sexValue = $sex ?? '';
@@ -1450,22 +1651,34 @@ class Fhir
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileheadcircumferenceforage(): array
     {
         return $this->getGrowthpercentileheadcircumferenceforage();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileheadcircumferenceforageMale(): array
     {
         return $this->getGrowthpercentileheadcircumferenceforage('male');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentileheadcircumferenceforageFemale(): array
     {
         return $this->getGrowthpercentileheadcircumferenceforage('female');
     }
 
-    private function getGrowthpercentileheadcircumferenceforage(string $sex = null): array
+    /**
+     * @return array<string, mixed>
+     */
+    private function getGrowthpercentileheadcircumferenceforage(?string $sex = null): array
     {
         $sexKey = $sex ? "-{$sex}" : '';
         $sexValue = $sex ?? '';
@@ -1490,22 +1703,34 @@ class Fhir
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentilebmiforage(): array
     {
         return $this->getGrowthpercentilebmiforage();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentilebmiforageMale(): array
     {
         return $this->getGrowthpercentilebmiforage('male');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function growthpercentilebmiforageFemale(): array
     {
         return $this->getGrowthpercentilebmiforage('female');
     }
 
-    private function getGrowthpercentilebmiforage(string $sex = null): array
+    /**
+     * @return array<string, mixed>
+     */
+    private function getGrowthpercentilebmiforage(?string $sex = null): array
     {
         $sexKey = $sex ? "-{$sex}" : '';
         $sexValue = $sex ?? '';
@@ -1530,6 +1755,9 @@ class Fhir
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function headcircumferencemean(): array
     {
         $entry = $this->simpleMetric(
@@ -1556,6 +1784,9 @@ class Fhir
         return $entry;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function heightmean(): array
     {
         $entry = $this->simpleMetric(
@@ -1582,6 +1813,9 @@ class Fhir
         return $entry;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function weightmean(): array
     {
         $entry = $this->simpleMetric(

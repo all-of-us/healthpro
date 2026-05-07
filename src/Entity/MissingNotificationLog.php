@@ -14,16 +14,16 @@ class MissingNotificationLog
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'integer')]
-    private $recordId;
+    private int $recordId;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $type;
+    private ?string $type = null;
 
     #[ORM\Column(type: 'datetime')]
-    private $insertTs;
+    private \DateTimeInterface $insertTs;
 
     public function getId(): ?int
     {

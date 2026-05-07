@@ -7,6 +7,7 @@ use App\Service\DebugToolsService;
 use App\Service\EnvironmentService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(path: '/admin/debug')]
@@ -18,7 +19,7 @@ class DebugToolsController extends BaseController
     }
 
     #[Route(path: '/participants', name: 'admin_debug_participants')]
-    public function participantsAction(Request $request, EnvironmentService $env, DebugToolsService $debugToolsService)
+    public function participantsAction(Request $request, EnvironmentService $env, DebugToolsService $debugToolsService): Response
     {
         $participantLookupForm = $this->createForm(DebugParticipantLookupType::class);
         $participantLookupForm->handleRequest($request);
@@ -36,7 +37,7 @@ class DebugToolsController extends BaseController
     }
 
     #[Route(path: '/participant/{id}', name: 'admin_debug_participant')]
-    public function participantAction($id, EnvironmentService $env, DebugToolsService $debugToolsService)
+    public function participantAction(string $id, EnvironmentService $env, DebugToolsService $debugToolsService): Response
     {
         $participant = $debugToolsService->getParticipantById($id);
         if (!$participant) {

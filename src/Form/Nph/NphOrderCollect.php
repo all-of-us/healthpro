@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints;
 
 class NphOrderCollect extends NphOrderForm
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $samples = $options['samples'];
         $orderType = $options['orderType'];
@@ -76,8 +76,6 @@ class NphOrderCollect extends NphOrderForm
         $builder->add('samplesCheckAll', Type\CheckboxType::class, [
             'required' => false
         ]);
-
-        return $builder->getForm();
     }
 
     public function configureOptions(OptionsResolver $resolver)

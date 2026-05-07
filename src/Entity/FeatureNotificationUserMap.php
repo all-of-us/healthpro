@@ -11,18 +11,18 @@ class FeatureNotificationUserMap
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private $user;
+    private User $user;
 
     #[ORM\ManyToOne(targetEntity: FeatureNotification::class)]
     #[ORM\JoinColumn(nullable: false)]
-    private $featureNotification;
+    private FeatureNotification $featureNotification;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTimeInterface $createdTs;
 
     public function getId(): ?int
     {
@@ -34,7 +34,7 @@ class FeatureNotificationUserMap
         return $this->user;
     }
 
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
 
@@ -46,7 +46,7 @@ class FeatureNotificationUserMap
         return $this->featureNotification;
     }
 
-    public function setFeatureNotification(?FeatureNotification $featureNotification): self
+    public function setFeatureNotification(FeatureNotification $featureNotification): self
     {
         $this->featureNotification = $featureNotification;
 

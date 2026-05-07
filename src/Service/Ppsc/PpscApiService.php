@@ -18,8 +18,8 @@ class PpscApiService
 
     public HttpClient $client;
     protected LoggerInterface $logger;
-    protected $lastError;
-    protected $lastErrorCode;
+    protected ?string $lastError = null;
+    protected ?int $lastErrorCode = null;
     private ParameterBagInterface $params;
     private RequestStack $requestStack;
     private EnvironmentService $env;
@@ -46,7 +46,7 @@ class PpscApiService
         $this->scope = $this->getParams('ppsc_scope');
     }
 
-    public function getRequestDetailsById($requestId): \stdClass|null
+    public function getRequestDetailsById(string|int|null $requestId): ?\stdClass
     {
         if (empty($requestId)) {
             return null;
@@ -154,7 +154,10 @@ class PpscApiService
         return null;
     }
 
-    public function getRawParticipantById(string $participantId): array|null
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getRawParticipantById(string $participantId): ?array
     {
         $token = $this->getAccessToken();
         $retry = true;
@@ -178,7 +181,7 @@ class PpscApiService
 
     public function getAccessToken(bool $refresh = false): string|null
     {
-        $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? $this->params->get('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
+        $dsCleanUpLimit = $this->params->has('ds_clean_up_limit') ? (int) $this->params->get('ds_clean_up_limit') : self::DS_CLEAN_UP_LIMIT;
         $cacheKey = 'ppsc_access_token';
         $cache = new \App\Cache\DatastoreAdapter($dsCleanUpLimit);
 
@@ -231,6 +234,9 @@ class PpscApiService
         }
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     public function get(string $path, array $params = []): ?ResponseInterface
     {
         $token = $this->getAccessToken();
@@ -255,6 +261,9 @@ class PpscApiService
         }
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     public function post(string $path, \stdClass $body, array $params = []): ResponseInterface
     {
         $token = $this->getAccessToken(true);
@@ -263,6 +272,9 @@ class PpscApiService
         return $this->client->request('POST', $this->endpoint . $path, $params);
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     public function put(string $path, \stdClass $body, array $params = []): ResponseInterface
     {
         $token = $this->getAccessToken(true);
@@ -271,6 +283,9 @@ class PpscApiService
         return $this->client->request('PUT', $this->endpoint . $path, $params);
     }
 
+    /**
+     * @param array<string, mixed> $params
+     */
     public function patch(string $path, \stdClass $body, array $params = []): ResponseInterface
     {
         $token = $this->getAccessToken(true);
@@ -279,7 +294,7 @@ class PpscApiService
         return $this->client->request('PATCH', $this->endpoint . $path, $params);
     }
 
-    public function logException(\Exception $e)
+    public function logException(\Exception $e): void
     {
         $this->lastError = $e->getMessage();
         if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
@@ -297,17 +312,20 @@ class PpscApiService
         }
     }
 
-    public function getLastError()
+    public function getLastError(): ?string
     {
         return $this->lastError;
     }
 
-    public function getLastErrorCode()
+    public function getLastErrorCode(): ?int
     {
         return $this->lastErrorCode;
     }
 
-    private function fetchParticipantById(string $participantId, string $token, bool $associative = false)
+    /**
+     * @return array<string, mixed>|\stdClass|null
+     */
+    private function fetchParticipantById(string $participantId, string $token, bool $associative = false): array|\stdClass|null
     {
         $response = $this->client->request('GET', $this->endpoint . 'participants/' . $participantId, [
             'headers' => ['Authorization' => 'Bearer ' . $token]
@@ -316,7 +334,7 @@ class PpscApiService
         return json_decode($response->getBody()->getContents(), $associative);
     }
 
-    private function fetchParticipantByBiobankId(string $biobankId, string $token)
+    private function fetchParticipantByBiobankId(string $biobankId, string $token): ?\stdClass
     {
         $response = $this->client->request('GET', $this->endpoint . 'participants?bioBankId=' . $biobankId, [
             'headers' => ['Authorization' => 'Bearer ' . $token]
@@ -325,13 +343,13 @@ class PpscApiService
         return json_decode($response->getBody()->getContents());
     }
 
-    private function getParams($field): string|null
+    private function getParams(string $field): ?string
     {
         $ppscEnv = $this->env->getPpscEnv($this->getSessionValue('ppscEnv'));
         return $this->params->has($ppscEnv . '_' . $field) ? $this->params->get($ppscEnv . '_' . $field) : null;
     }
 
-    private function getSessionValue(string $key)
+    private function getSessionValue(string $key): mixed
     {
         $request = $this->requestStack->getCurrentRequest();
         if ($request && $request->hasSession()) {

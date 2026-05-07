@@ -54,7 +54,7 @@ class ProblemComment
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Problem', inversedBy: 'problemComments')]
     #[ORM\JoinColumn(nullable: false)]
-    private $problem;
+    private Problem $problem;
 
     public function __construct()
     {
@@ -126,12 +126,12 @@ class ProblemComment
         return $this;
     }
 
-    public function getProblem(): ?Problem
+    public function getProblem(): Problem
     {
         return $this->problem;
     }
 
-    public function setProblem(?Problem $problem): self
+    public function setProblem(Problem $problem): self
     {
         $this->problem = $problem;
 

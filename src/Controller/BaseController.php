@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class BaseController extends AbstractController
 {
-    protected $em;
+    protected EntityManagerInterface $em;
 
     public function __construct(EntityManagerInterface $em)
     {
@@ -36,8 +36,13 @@ class BaseController extends AbstractController
         throw new \Exception('Invalid user type');
     }
 
-    protected function getParamDate($params, $key): ?\DateTime
+    /**
+     * @param array<string, mixed> $params
+     */
+    protected function getParamDate(array $params, string $key): ?\DateTime
     {
-        return !empty($params[$key]) ? \DateTime::createFromFormat('!m/d/Y', $params[$key]) : null;
+        return !empty($params[$key]) && is_string($params[$key])
+            ? \DateTime::createFromFormat('!m/d/Y', $params[$key]) ?: null
+            : null;
     }
 }

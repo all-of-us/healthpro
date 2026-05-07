@@ -10,6 +10,7 @@ use App\Service\SiteService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -19,16 +20,16 @@ use Twig\Environment as TwigEnvironment;
 
 class RequestListener
 {
-    private $logger;
-    private $em;
-    private $twig;
-    private $requestStack;
-    private $userService;
-    private $siteService;
-    private $authorizationChecker;
-    private $tokenStorage;
+    private LoggerService $logger;
+    private EntityManagerInterface $em;
+    private TwigEnvironment $twig;
+    private RequestStack $requestStack;
+    private UserService $userService;
+    private SiteService $siteService;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private TokenStorageInterface $tokenStorage;
 
-    private $request;
+    private ?Request $request = null;
 
     public function __construct(
         LoggerService $logger,
@@ -50,11 +51,11 @@ class RequestListener
         $this->tokenStorage = $tokenStorage;
     }
 
-    public function onKernelRequest(RequestEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         $this->request = $event->getRequest();
 
-        if (!$event->isMainRequest() || in_array($this->request->attributes->get('_route'), ['_wdt', '_profiler'])) {
+        if (!$event->isMainRequest() || in_array($this->request->attributes->get('_route'), ['_wdt', '_profiler'], true)) {
             return;
         }
 
@@ -80,7 +81,7 @@ class RequestListener
         }
     }
 
-    public function onKernelFinishRequest()
+    public function onKernelFinishRequest(): void
     {
         if ($this->canSetSessionVariables()) {
             $this->setSessionVariables();
@@ -91,34 +92,34 @@ class RequestListener
      * "Upkeep" routes are routes that we typically want to allow through
      * even when workflow dictates otherwise.
      */
-    public function isUpkeepRoute()
+    public function isUpkeepRoute(): bool
     {
         $route = $this->request->attributes->get('_route');
-        return (in_array($route, [
+        return in_array($route, [
             'logout',
             'timeout',
             'keep_alive',
             'client_timeout',
             'agree_usage',
             'login_openid_callback'
-        ]));
+        ], true);
     }
 
-    public function isStreamingResponseRoute()
+    public function isStreamingResponseRoute(): bool
     {
         $route = $this->request->attributes->get('_route');
-        return (in_array($route, [
+        return in_array($route, [
             'help_sopFile',
             'aliquot_instructions_file'
-        ]));
+        ], true);
     }
 
-    private function logRequest()
+    private function logRequest(): void
     {
         $this->logger->log(Log::REQUEST);
     }
 
-    private function checkPageNotices()
+    private function checkPageNotices(): ?Response
     {
         $path = $this->request->getPathInfo();
         $activeNotices = $this->em->getRepository(Notice::class)
@@ -136,18 +137,22 @@ class RequestListener
         }
 
         $this->twig->addGlobal('global_notices', $activeNotices);
+
+        return null;
     }
 
-    private function checkProgramSelect()
+    private function checkProgramSelect(): ?RedirectResponse
     {
         if (!$this->requestStack->getSession()->has('program') && $this->siteService->canSwitchProgram()) {
             if (!$this->ignoreRoutes() && !$this->isUpkeepRoute()) {
                 return new RedirectResponse('/program/select');
             }
         }
+
+        return null;
     }
 
-    private function checkSiteSelect()
+    private function checkSiteSelect(): ?RedirectResponse
     {
         if (!$this->requestStack->getSession()->has('program') && $this->canSetSessionVariables()) {
             $this->setDefaultProgramSessionVariable();
@@ -167,19 +172,23 @@ class RequestListener
                 return new RedirectResponse('/site/select');
             }
         }
+
+        return null;
     }
 
-    private function checkLoginExpired()
+    private function checkLoginExpired(): ?RedirectResponse
     {
         // log the user out if their requestStack->getSession() is expired
         if ($this->userService->isLoginExpired() && $this->request->attributes->get('_route') !== 'logout') {
             return new RedirectResponse('/logout?timeout=1');
         }
+
+        return null;
     }
 
     private function ignoreRoutes(): bool
     {
-        return preg_match(
+        return (bool) preg_match(
             '/^\/(_profiler|_wdt|cron|salesforce|ppsc\/invalid-site|admin|nph\/admin|read|nph\/help|settings|problem|biobank|review|workqueue|site|login|site_select|program|nph\/access\/manage|nph\/biobank|nph\/aliquot\/instructions)($|\/).*/',
             $this->request->getPathInfo()
         );

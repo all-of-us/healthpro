@@ -20,11 +20,11 @@ class NphReviewController extends BaseController
 {
     public const DATE_RANGE_LIMIT = 30;
 
-    protected $participantSummaryService;
+    protected NphParticipantSummaryService $participantSummaryService;
 
-    protected $reviewService;
+    protected ReviewService $reviewService;
 
-    protected $siteService;
+    protected SiteService $siteService;
 
     protected NphParticipantReviewService $nphParticipantReviewService;
 
@@ -110,7 +110,7 @@ class NphReviewController extends BaseController
     }
 
     #[Route(path: '/nph/participantname/lookup', name: 'nph_review_participant_lookup')]
-    public function getParticipantName(Request $request)
+    public function getParticipantName(Request $request): Response
     {
         $id = trim($request->query->get('id'));
         if (!$id) {
@@ -131,7 +131,7 @@ class NphReviewController extends BaseController
     }
 
     #[Route(path: '/nph/review/unfinalized', name: 'nph_review_unfinalized')]
-    public function unfinalizedOrders()
+    public function unfinalizedOrders(): Response
     {
         $site = $this->siteService->getSiteId();
         if (!$site) {
@@ -157,7 +157,7 @@ class NphReviewController extends BaseController
     }
 
     #[Route(path: '/nph/review/recentlymodified', name: 'nph_review_recently_modified')]
-    public function recentlyModifiedOrders()
+    public function recentlyModifiedOrders(): Response
     {
         $site = $this->siteService->getSiteId();
         if (!$site) {

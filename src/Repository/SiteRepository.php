@@ -12,6 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Site|null findOneBy(array $criteria, array $orderBy = null)
  * @method Site[]    findAll()
  * @method Site[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<Site>
  */
 class SiteRepository extends ServiceEntityRepository
 {
@@ -21,7 +22,7 @@ class SiteRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Site[] Returns an array of Site objects
+     * @return array<int, array<string, mixed>>
      */
     public function getOrganizations()
     {
@@ -36,7 +37,7 @@ class SiteRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Site[] Returns an array of Site objects
+     * @return array<int, array<string, mixed>>
      */
     public function getAwardees()
     {
@@ -51,9 +52,9 @@ class SiteRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Site[] Returns an array of Site objects
+     * @return array<int, array<string, int>>
      */
-    public function getDuplicateSiteGoogleGroup($googleGroup, $id)
+    public function getDuplicateSiteGoogleGroup(string $googleGroup, int $id): array
     {
         return $this->createQueryBuilder('s')
             ->select('s.id')
@@ -67,9 +68,9 @@ class SiteRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Site[] Returns an array of Site objects
+     * @return array<int, array<string, int>>
      */
-    public function getDuplicateGoogleGroup($googleGroup)
+    public function getDuplicateGoogleGroup(string $googleGroup): array
     {
         return $this->createQueryBuilder('s')
             ->select('s.id')
@@ -118,7 +119,7 @@ class SiteRepository extends ServiceEntityRepository
         }
     }
 
-    public function getActiveSiteCount($siteId): int
+    public function getActiveSiteCount(string $siteId): int
     {
         return $this->createQueryBuilder('s')
             ->select('COUNT(s.id)')

@@ -2,57 +2,64 @@
 
 namespace App\Datastore;
 
+use Google\Cloud\Datastore\EntityInterface;
+
 abstract class Entity
 {
-    protected $data = [];
+    /** @var array<string, mixed> */
+    protected array $data = [];
 
-    protected $id;
+    protected int|string|null $id = null;
 
-    protected $excludeIndexes = [];
+    /** @var list<string> */
+    protected array $excludeIndexes = [];
 
-    protected $writeLimit = 500;
+    protected int $writeLimit = 500;
 
-    public static function fetchBy()
+    /** @return iterable<int, EntityInterface> */
+    public static function fetchBy(): iterable
     {
         $datastoreClient = new DatastoreClientHelper();
         return $datastoreClient->fetchAll(static::getKind());
     }
 
-    public static function fetchOneById($id)
+    public static function fetchOneById(int|string $id): ?EntityInterface
     {
         $datastoreClient = new DatastoreClientHelper();
         return $datastoreClient->fetchById(static::getKind(), $id);
     }
 
-    public function setKeyName($id)
+    public function setKeyName(int|string $id): void
     {
         $this->id = $id;
     }
 
-    public function setData($data)
+    /** @param array<string, mixed> $data */
+    public function setData(array $data): void
     {
         $this->data = $data;
     }
 
-    public function save()
+    public function save(): EntityInterface
     {
         $datastoreClient = new DatastoreClientHelper();
         return $datastoreClient->insert(static::getKind(), $this->data, $this->excludeIndexes);
     }
 
-    public function update()
+    public function update(): EntityInterface
     {
         $datastoreClient = new DatastoreClientHelper();
         return $datastoreClient->upsert(static::getKind(), $this->id, $this->data, $this->excludeIndexes);
     }
 
-    public function delete()
+    public function delete(): bool
     {
         $datastoreClient = new DatastoreClientHelper();
         return $datastoreClient->delete(static::getKind(), $this->id);
     }
 
-    public function getBatch($property = null, $value = null, $operator = null, $limit = null)
+    /** @return iterable<int, EntityInterface> */
+    public function getBatch(?string $property = null, mixed $value = null, ?string $operator = null, ?int $limit = null): iterable
     {
         $datastoreClient = new DatastoreClientHelper();
         if ($property === null) {
@@ -64,7 +71,8 @@ abstract class Entity
         return $results;
     }
 
-    public function deleteBatch($results)
+    /** @param iterable<int, EntityInterface> $results */
+    public function deleteBatch(iterable $results): bool
     {
         $datastoreClient = new DatastoreClientHelper();
         $keys = $datastoreClient->getKeys($results);
@@ -76,5 +84,5 @@ abstract class Entity
         return true;
     }
 
-    abstract protected static function getKind();
+    abstract protected static function getKind(): string;
 }

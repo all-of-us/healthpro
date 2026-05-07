@@ -14,9 +14,12 @@ class EnvironmentService
     public const ENV_PROD = 'prod';  // production environment
     public const DEFAULT_TIMEZONE = 'America/New_York';
     public const DATASTORE_EMULATOR_HOST = 'localhost:8081';
-    public $configuration = [];
-    public $values = [];
+    /** @var array<string, mixed> */
+    public array $configuration = [];
+    /** @var array<string, mixed> */
+    public array $values = [];
 
+    /** @var array<string, string> */
     public static $timezoneOptions = [
         'America/Puerto_Rico' => 'Atlantic Standard Time',
         'America/New_York' => 'Eastern Time',
@@ -28,6 +31,7 @@ class EnvironmentService
         'Pacific/Honolulu' => 'Hawaii Time'
     ];
 
+    /** @var array<string, string> */
     public static array $hpoPpscDefaultEnvs = [
         'local' => 'qa',
         'dev' => 'dev',
@@ -37,8 +41,9 @@ class EnvironmentService
         'prod' => 'prod'
     ];
 
-    protected $name;
+    protected ?string $name = null;
 
+    /** @param array<string, mixed> $values */
     public function __construct(array $values = [])
     {
         if (!array_key_exists('env', $values)) {
@@ -65,7 +70,7 @@ class EnvironmentService
     }
 
     /** Determines the environment under which the code is running. */
-    public function determineEnv()
+    public function determineEnv(): string
     {
         $env = getenv('PMI_ENV') ?: $_SERVER['PMI_ENV'];
         if (empty($env)) {
@@ -87,49 +92,51 @@ class EnvironmentService
         throw new Exception("Bad environment: $env");
     }
 
-    public function isLocal()
+    public function isLocal(): bool
     {
         return $this->values['env'] === self::ENV_LOCAL;
     }
 
-    public function isDev()
+    public function isDev(): bool
     {
         return $this->values['env'] === self::ENV_DEV;
     }
 
-    public function isStable()
+    public function isStable(): bool
     {
         return $this->values['env'] === self::ENV_STABLE;
     }
 
-    public function isStaging()
+    public function isStaging(): bool
     {
         return $this->values['env'] === self::ENV_STAGING;
     }
 
-    public function isProd()
+    public function isProd(): bool
     {
         return $this->values['env'] === self::ENV_PROD;
     }
 
-    public function isPhpDevServer()
+    public function isPhpDevServer(): bool
     {
         return
             isset($_SERVER['SERVER_SOFTWARE']) &&
             preg_match('/^PHP [0-9\\.]+ Development Server$/', $_SERVER['SERVER_SOFTWARE']);
     }
 
-    public function getTimeZones()
+    /** @return array<string, string> */
+    public function getTimeZones(): array
     {
         return self::$timezoneOptions;
     }
 
-    public function getPpscEnv($ppscEnv): ?string
+    public function getPpscEnv(?string $ppscEnv): ?string
     {
         return $ppscEnv ?: self::$hpoPpscDefaultEnvs[$this->values['env']];
     }
 
-    protected function loadConfiguration($override = [])
+    /** @param array<string, mixed> $override */
+    protected function loadConfiguration(array $override = []): void
     {
         // default two-factor setting
         $this->configuration['enforce2fa'] = $this->isProd();
@@ -161,6 +168,7 @@ class EnvironmentService
         // unit tests don't have access to Datastore
         // local environment uses yaml file
         if (!$this->values['isUnitTest'] && !$this->isPhpDevServer() && !$this->isLocal()) {
+            /** @var iterable<int, object{key: string, value: mixed}> $configs */
             $configs = Configuration::fetchBy();
             foreach ($configs as $config) {
                 $this->configuration[$config->key] = $config->value;

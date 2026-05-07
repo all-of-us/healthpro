@@ -11,29 +11,29 @@ class OrderHistory
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\OneToOne(targetEntity: 'App\Entity\Order', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private $order;
+    private Order $order;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: ['persist', 'remove'])]
-    private $user;
+    private ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $site;
+    private string $site;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $type;
+    private string $type;
 
     #[ORM\Column(type: 'text')]
-    private $reason;
+    private string $reason;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTimeInterface $createdTs;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $createdTimezoneId;
+    private ?int $createdTimezoneId = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $samplesVersion = null;
@@ -127,7 +127,7 @@ class OrderHistory
         return $this;
     }
 
-    public function getReasonDisplayText()
+    public function getReasonDisplayText(): string
     {
         $reasonDisplayText = array_search($this->getReason(), Order::$cancelReasons);
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other (' . $this->getReason() . ')';

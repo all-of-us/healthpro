@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints;
 
 class MeasurementBloodDonorCheckType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('bloodDonor', Type\ChoiceType::class, [

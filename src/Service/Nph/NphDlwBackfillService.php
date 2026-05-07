@@ -29,19 +29,19 @@ class NphDlwBackfillService
         }
     }
 
-    public function resyncDlwCollectionWithRDR(NphDlw $dlw)
+    public function resyncDlwCollectionWithRDR(NphDlw $dlw): void
     {
         $connection = $this->em->getConnection();
         $connection->beginTransaction();
         try {
             $this->sendDLWToRdr($dlw);
             $this->loggerService->log(Log::NPH_DLW_RDR_BACKLOG_SUCCESS, $dlw->getId());
+            $connection->commit();
         } catch (\Exception $e) {
             $connection->rollBack();
             $this->loggerService->log(Log::NPH_DLW_RDR_BACKLOG_FAILURE, $e->getMessage());
             $this->loggerService->log(Log::NPH_DLW_RDR_BACKLOG_FAILURE, $dlw->getId());
         }
-        $connection->commit();
     }
 
     private function sendDLWToRdr(NphDlw $dlw): void

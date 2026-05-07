@@ -2,8 +2,12 @@
 
 namespace App\Service;
 
+use App\Drc\GoogleUser;
+use App\Drc\SalesforceUser;
 use App\Entity\User;
 use App\Helper\MockUserHelper;
+use App\Security\MockUser;
+use App\Security\User as SecurityUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -13,12 +17,12 @@ use Symfony\Component\Security\Core\Security;
 
 class UserService
 {
-    private $em;
-    private $params;
-    private $env;
-    private $requestStack;
-    private $security;
-    private $authorizationChecker;
+    private EntityManagerInterface $em;
+    private ContainerBagInterface $params;
+    private EnvironmentService $env;
+    private RequestStack $requestStack;
+    private Security $security;
+    private AuthorizationCheckerInterface $authorizationChecker;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -36,7 +40,7 @@ class UserService
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    public function getGoogleUser()
+    public function getGoogleUser(): GoogleUser|MockUser|null
     {
         if ($this->canMockLogin()) {
             return $this->requestStack->getSession()->get('mockUser');
@@ -44,17 +48,18 @@ class UserService
         return $this->requestStack->getSession()->get('googleUser');
     }
 
-    public function getSalesforceUser()
+    public function getSalesforceUser(): ?SalesforceUser
     {
         return $this->requestStack->getSession()->get('salesforceUser');
     }
 
-    public function canMockLogin()
+    public function canMockLogin(): bool
     {
         return $this->env->isLocal() && $this->params->has('local_mock_auth') && $this->params->get('local_mock_auth');
     }
 
-    public function getUserInfo($oauthUser)
+    /** @return array<string, int|string|null> */
+    public function getUserInfo(GoogleUser|SalesforceUser|MockUser $oauthUser): array
     {
         $attempts = 0;
         $maxAttempts = 3;
@@ -93,16 +98,21 @@ class UserService
         return $userInfo;
     }
 
-    public function getUser()
+    public function getUser(): ?SecurityUser
     {
         $token = $this->security->getToken();
-        if ($token && is_object($token->getUser())) {
-            return $token->getUser();
+        $user = $token?->getUser();
+        if ($user instanceof SecurityUser) {
+            return $user;
         }
         return null;
     }
 
-    public function getRoles($roles, $site, $awardee)
+    /**
+     * @param array<int, string> $roles
+     * @return array<int, string>
+     */
+    public function getRoles(array $roles, mixed $site, mixed $awardee): array
     {
         if (!empty($site)) {
             User::removeUserRoles(['ROLE_AWARDEE', 'ROLE_AWARDEE_SCRIPPS'], $roles);
@@ -135,7 +145,7 @@ class UserService
         $this->requestStack->getSession()->set('isLoginReturn', true);
     }
 
-    public function setMockUser($email): void
+    public function setMockUser(string $email): void
     {
         MockUserHelper::switchCurrentUser($email);
         $this->requestStack->getSession()->set('mockUser', MockUserHelper::getCurrentUser());
@@ -151,7 +161,7 @@ class UserService
         return $this->authorizationChecker->isGranted('IS_AUTHENTICATED_FULLY') && $remaining <= 0;
     }
 
-    public function getUserEntity()
+    public function getUserEntity(): ?User
     {
         if ($this->getUser()) {
             return $this->em->getRepository(User::class)->find($this->getUser()->getId());
@@ -159,7 +169,7 @@ class UserService
         return null;
     }
 
-    public function getUserEntityFromEmail($email): ?User
+    public function getUserEntityFromEmail(string $email): ?User
     {
         return $this->em->getRepository(User::class)->findOneBy(['email' => $email]);
     }

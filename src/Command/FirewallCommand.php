@@ -13,12 +13,16 @@ use Symfony\Component\Process\Process;
 
 class FirewallCommand extends Command
 {
-    private $appDir;
-    private $output;
+    private string $appDir;
+    private OutputInterface $output;
 
     protected function configure(): void
     {
-        $this->appDir = realpath(__DIR__ . '/../..');
+        $appDir = realpath(__DIR__ . '/../..');
+        if ($appDir === false) {
+            throw new \RuntimeException('Unable to resolve application directory.');
+        }
+        $this->appDir = $appDir;
         $this
             ->setName('pmi:firewall')
             ->setDescription('Generate rules for the GAE firewall');
@@ -84,7 +88,7 @@ class FirewallCommand extends Command
     }
 
     /** Runs a shell command, displaying output as it is generated. */
-    private function exec($cmd, $mustRun = true, $silent = false): Process
+    private function exec(string $cmd, bool $mustRun = true, bool $silent = false): Process
     {
         $process = Process::fromShellCommandline($cmd);
         $process->setTimeout(null);

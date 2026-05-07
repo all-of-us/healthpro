@@ -10,7 +10,7 @@ class Organization
 {
     #[ORM\Id]
     #[ORM\Column(type: 'string', length: 80)]
-    private $id;
+    private string $id;
 
     /**
      * @var string

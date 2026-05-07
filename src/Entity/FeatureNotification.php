@@ -11,28 +11,28 @@ class FeatureNotification
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $title;
+    private string $title;
 
     #[ORM\Column(type: 'text')]
-    private $message;
+    private string $message;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $url;
+    private ?string $url = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $startTs;
+    private ?\DateTimeInterface $startTs = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $endTs;
+    private ?\DateTimeInterface $endTs = null;
 
     #[ORM\Column(type: 'boolean')]
-    private $status = false;
+    private bool $status = false;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTimeInterface $createdTs;
 
     public function getId(): ?int
     {
@@ -99,7 +99,7 @@ class FeatureNotification
         return $this;
     }
 
-    public function getStatus(): ?bool
+    public function getStatus(): bool
     {
         return $this->status;
     }

@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints as Constraints;
 
 class ParticipantLookupSearchType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('lastName', Type\TextType::class, [

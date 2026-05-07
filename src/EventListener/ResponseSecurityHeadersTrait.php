@@ -9,7 +9,7 @@ trait ResponseSecurityHeadersTrait
 {
     private static string $frameAncestors = '*.my.site.com *.my.salesforce.com *.vf.force.com *.lightning.force.com *.joinallofus.org';
 
-    public function addSecurityHeaders(Response $response, ParameterBagInterface $params)
+    public function addSecurityHeaders(Response $response, ParameterBagInterface $params): void
     {
         $frameAncestors = $params->has('frame_ancestors') ? $params->get('frame_ancestors') : self::$frameAncestors;
         // prevent clickjacking attacks
