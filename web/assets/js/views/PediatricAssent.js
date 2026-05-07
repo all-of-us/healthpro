@@ -1,6 +1,6 @@
 $(document).ready(function () {
     const $form = $("#pediatricAssentForm");
-    const $assentSelect = $("#pediatricAssent");
+    const $assentSelect = $("#pediatric_assent_pediatricAssent");
     const $continueBtn = $("#continueBtn");
     const $acknowledgeInput = $("#acknowledgeNoAssent");
     const $errorMessage = $("#assentErrorMessage");
