@@ -26,25 +26,28 @@
             Pediatric Assent
         </div>
         <div class="card-body">
-            <form method="post" class="prevent-resubmit">
+            <form method="post" class="prevent-resubmit" id="pediatricAssentForm">
                 <div>
                     <label class="form-label" for="pediatricAssent">
                         {{ assentQuestion }}
                     </label>
-                    <select class="form-select" id="pediatricAssent" name="pediatricAssent" data-continue-values="yes,unable" data-error-values="no">
+                    <select class="form-select" id="pediatricAssent" name="pediatricAssent">
                         <option value="" selected>Select</option>
                         <option value="yes">Yes</option>
                         <option value="no">No</option>
                         <option value="unable">Participant is unable to provide assent</option>
                     </select>
-                    <div id="assentErrorMessage" class="text-danger mt-2{% if not showServerError %} d-none{% endif %}">
-                        <i class="fa fa-exclamation-circle"></i> {{ assentErrorMessage }}
-                    </div>
+                    {% if validationErrorMessage %}
+                        <div id="assentErrorMessage" class="text-danger mt-2">
+                            <i class="fa fa-exclamation-circle"></i> {{ validationErrorMessage }}
+                        </div>
+                    {% endif %}
                 </div>
                 <input type="hidden" name="_token" value="{{ csrf_token('pediatricOrderAssent') }}"/>
+                <input type="hidden" name="acknowledgeNoAssent" id="acknowledgeNoAssent" value="0"/>
                 <div class="mt-4">
                     <a href="{{ path('order_check_pediatric', { participantId: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
-                    <button type="submit" class="btn btn-primary d-none" id="continueBtn">
+                    <button type="submit" class="btn btn-primary" id="continueBtn" disabled>
                         Continue
                         <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
                     </button>
@@ -52,6 +55,7 @@
             </form>
         </div>
     </div>
+    {% include 'partials/modals/pediatric-assent-warning-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('pediatric-assent') }}

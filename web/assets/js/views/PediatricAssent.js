@@ -1,26 +1,61 @@
 $(document).ready(function () {
+    const $form = $("#pediatricAssentForm");
     const $assentSelect = $("#pediatricAssent");
     const $continueBtn = $("#continueBtn");
+    const $acknowledgeInput = $("#acknowledgeNoAssent");
     const $errorMessage = $("#assentErrorMessage");
-    const getValues = (dataKey) =>
-        ($assentSelect.data(dataKey) || "")
-            .toString()
-            .split(",")
-            .map((value) => value.trim())
-            .filter(Boolean);
-    const continueValues = getValues("continueValues");
-    const errorValues = getValues("errorValues");
-    const resetState = () => {
-        $continueBtn.addClass("d-none");
-        $errorMessage.addClass("d-none");
+    const modalElement = document.getElementById("pediatricAssentWarningModal");
+    const warningModal = modalElement ? new bootstrap.Modal(modalElement) : null;
+
+    const resetSubmittingState = () => {
+        $form.data("submitting", 0);
+        $form.find("button[type=submit], input[type=submit]").css("opacity", 1);
+        $form.find(".spinner-border").hide();
     };
-    resetState();
+
+    const toggleContinueButton = () => {
+        const hasValue = (($assentSelect.val() || "").toString()).length > 0;
+        $continueBtn.prop("disabled", !hasValue);
+    };
+
+    const shouldConfirmNoResponse = () =>
+        (($assentSelect.val() || "").toString() === "no" &&
+            ($acknowledgeInput.val() || "0").toString() !== "1");
+
+    toggleContinueButton();
+
     $assentSelect.on("change", () => {
-        const value = ($assentSelect.val() || "").toString();
-        resetState();
-        if (continueValues.includes(value)) {
-            $continueBtn.removeClass("d-none");
+        $acknowledgeInput.val("0");
+        toggleContinueButton();
+        if ($errorMessage.length) {
+            $errorMessage.addClass("d-none");
         }
-        if (errorValues.includes(value)) $errorMessage.removeClass("d-none");
     });
+
+    $continueBtn.on("click", (event) => {
+        if (shouldConfirmNoResponse()) {
+            event.preventDefault();
+            warningModal.show();
+        }
+    });
+
+    $form.on("submit", (event) => {
+        if (shouldConfirmNoResponse()) {
+            event.preventDefault();
+            resetSubmittingState();
+            warningModal.show();
+        }
+    });
+
+    $("#acknowledgeNoAssentBtn").on("click", () => {
+        $acknowledgeInput.val("1");
+        warningModal.hide();
+        $form.trigger("submit");
+    });
+
+    if (modalElement) {
+        modalElement.addEventListener("hidden.bs.modal", () => {
+            $assentSelect.trigger("focus");
+        });
+    }
 });

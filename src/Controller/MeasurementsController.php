@@ -459,8 +459,31 @@ class MeasurementsController extends BaseController
         if (!$participant->requirePediatricAssentCheck()) {
             throw $this->createAccessDeniedException();
         }
+        $validationErrorMessage = null;
+        if ($request->isMethod('POST')) {
+            if (!$this->isCsrfTokenValid('pediatricMeasurementAssent', (string) $request->request->get('_token'))) {
+                throw $this->createAccessDeniedException();
+            }
+            $assentResponse = (string) $request->request->get('pediatricAssent');
+            if (in_array($assentResponse, ['yes', 'unable'], true)) {
+                return $this->redirectToRoute('measurement', [
+                    'participantId' => $participant->id
+                ]);
+            }
+            if ($assentResponse === 'no') {
+                if ($request->request->getBoolean('acknowledgeNoAssent')) {
+                    return $this->redirectToRoute('participant', [
+                        'id' => $participant->id
+                    ]);
+                }
+                $validationErrorMessage = 'Please acknowledge the warning before proceeding.';
+            } else {
+                $validationErrorMessage = 'Please select an assent response.';
+            }
+        }
         return $this->render('measurement/pediatric-assent-check.html.twig', [
-            'participant' => $participant
+            'participant' => $participant,
+            'validationErrorMessage' => $validationErrorMessage,
         ]);
     }
 

@@ -94,12 +94,13 @@ class OrderController extends BaseController
             ]);
         }
         $assentContent = $this->getPediatricAssentContent($selection);
-        $showServerError = false;
+        $validationErrorMessage = null;
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('pediatricOrderAssent', (string) $request->request->get('_token'))) {
                 throw $this->createAccessDeniedException();
             }
-            if (in_array($request->request->get('pediatricAssent'), ['yes', 'unable'], true)) {
+            $assentResponse = (string) $request->request->get('pediatricAssent');
+            if (in_array($assentResponse, ['yes', 'unable'], true)) {
                 $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id, $participant->isPediatric);
                 if ($physicalMeasurement !== null) {
                     $measurementService->load($physicalMeasurement, $participant);
@@ -118,8 +119,16 @@ class OrderController extends BaseController
                     ]);
                 }
                 $this->addFlash('error', 'Failed to create order.');
+            } elseif ($assentResponse === 'no') {
+                if ($request->request->getBoolean('acknowledgeNoAssent')) {
+                    $this->clearPendingPediatricOrderSelection($session, $participantId);
+                    return $this->redirectToRoute('participant', [
+                        'id' => $participant->id
+                    ]);
+                }
+                $validationErrorMessage = 'Please acknowledge the warning before proceeding.';
             } else {
-                $showServerError = true;
+                $validationErrorMessage = 'Please select an assent response.';
             }
         }
 
@@ -128,8 +137,7 @@ class OrderController extends BaseController
             'siteType' => $requestStack->getSession()->get('siteType'),
             'selection' => $selection,
             'assentQuestion' => $assentContent['question'],
-            'assentErrorMessage' => $assentContent['errorMessage'],
-            'showServerError' => $showServerError,
+            'validationErrorMessage' => $validationErrorMessage,
         ]);
     }
 
@@ -895,22 +903,19 @@ class OrderController extends BaseController
     }
 
     /**
-     * @return array{question: string, errorMessage: string}
+     * @return array{question: string}
      */
     private function getPediatricAssentContent(string $selection): array
     {
         return match ($selection) {
             'blood' => [
                 'question' => 'Does the pediatric participant assent to giving a blood sample?',
-                'errorMessage' => 'The participant has not assented. You may not proceed with blood sample collection.',
             ],
             'saliva' => [
                 'question' => 'Does the pediatric participant assent to give a saliva sample today?',
-                'errorMessage' => 'The participant has not assented. You may not proceed with saliva sample collection.',
             ],
             'urine' => [
                 'question' => 'Does the pediatric participant assent to give a urine sample today?',
-                'errorMessage' => 'The participant has not assented. You may not proceed with urine sample collection.',
             ],
             default => throw new \InvalidArgumentException('Unsupported pediatric order selection.'),
         };
