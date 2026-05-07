@@ -15,6 +15,7 @@ use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\OrderService;
+use App\Service\PediatricAssentService;
 use App\Service\Ppsc\PpscApiService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -77,7 +78,8 @@ class OrderController extends BaseController
         string $participantId,
         Request $request,
         RequestStack $requestStack,
-        MeasurementService $measurementService
+        MeasurementService $measurementService,
+        PediatricAssentService $pediatricAssentService
     ): Response {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
@@ -95,12 +97,33 @@ class OrderController extends BaseController
         }
         $assentContent = $this->getPediatricAssentContent($selection);
         $validationErrorMessage = null;
+        $selectedAssentResponse = null;
+        $pediatricAssentId = null;
+        $showNoAssentModalOnLoad = false;
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('pediatricOrderAssent', (string) $request->request->get('_token'))) {
                 throw $this->createAccessDeniedException();
             }
             $assentResponse = (string) $request->request->get('pediatricAssent');
+            $selectedAssentResponse = in_array($assentResponse, ['yes', 'no', 'unable'], true) ? $assentResponse : null;
+            $existingAssentId = $request->request->getInt('pediatricAssentId') ?: null;
             if (in_array($assentResponse, ['yes', 'unable'], true)) {
+                $result = $pediatricAssentService->submitOrderAssent($participant->id, $selection, $assentResponse, $existingAssentId);
+                if (!$result['success']) {
+                    $this->addFlash('error', $result['errorMessage']);
+                    $pediatricAssentId = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
+                    return $this->render('order/assent-pediatric.html.twig', [
+                        'participant' => $participant,
+                        'siteType' => $requestStack->getSession()->get('siteType'),
+                        'selection' => $selection,
+                        'assentQuestion' => $assentContent['question'],
+                        'validationErrorMessage' => $validationErrorMessage,
+                        'selectedAssentResponse' => $selectedAssentResponse,
+                        'pediatricAssentId' => $pediatricAssentId,
+                        'showNoAssentModalOnLoad' => $showNoAssentModalOnLoad,
+                    ]);
+                }
+                $pediatricAssentId = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
                 $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id, $participant->isPediatric);
                 if ($physicalMeasurement !== null) {
                     $measurementService->load($physicalMeasurement, $participant);
@@ -121,6 +144,22 @@ class OrderController extends BaseController
                 $this->addFlash('error', 'Failed to create order.');
             } elseif ($assentResponse === 'no') {
                 if ($request->request->getBoolean('acknowledgeNoAssent')) {
+                    $result = $pediatricAssentService->submitOrderAssent($participant->id, $selection, $assentResponse, $existingAssentId);
+                    if (!$result['success']) {
+                        $this->addFlash('error', $result['errorMessage']);
+                        $pediatricAssentId = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
+                        $showNoAssentModalOnLoad = true;
+                        return $this->render('order/assent-pediatric.html.twig', [
+                            'participant' => $participant,
+                            'siteType' => $requestStack->getSession()->get('siteType'),
+                            'selection' => $selection,
+                            'assentQuestion' => $assentContent['question'],
+                            'validationErrorMessage' => $validationErrorMessage,
+                            'selectedAssentResponse' => $selectedAssentResponse,
+                            'pediatricAssentId' => $pediatricAssentId,
+                            'showNoAssentModalOnLoad' => $showNoAssentModalOnLoad,
+                        ]);
+                    }
                     $this->clearPendingPediatricOrderSelection($session, $participantId);
                     return $this->redirectToRoute('participant', [
                         'id' => $participant->id
@@ -138,6 +177,9 @@ class OrderController extends BaseController
             'selection' => $selection,
             'assentQuestion' => $assentContent['question'],
             'validationErrorMessage' => $validationErrorMessage,
+            'selectedAssentResponse' => $selectedAssentResponse,
+            'pediatricAssentId' => $pediatricAssentId,
+            'showNoAssentModalOnLoad' => $showNoAssentModalOnLoad,
         ]);
     }
 

@@ -6,6 +6,7 @@ $(document).ready(function () {
     const $errorMessage = $("#assentErrorMessage");
     const modalElement = document.getElementById("pediatricAssentWarningModal");
     const warningModal = modalElement ? new bootstrap.Modal(modalElement) : null;
+    const showNoAssentModalOnLoad = ($form.data("showNoAssentModalOnLoad") || 0).toString() === "1";
     let isAcknowledgingNoAssent = false;
 
     const resetSubmittingState = () => {
@@ -22,14 +23,14 @@ $(document).ready(function () {
         $continueBtn.removeClass("d-none").prop("disabled", false);
     };
 
-    const updateUiForSelection = () => {
+    const updateUiForSelection = (showModalForNo = false) => {
         const value = ($assentSelect.val() || "").toString();
         if (value === "yes" || value === "unable") {
             showContinueButton();
             return;
         }
         hideContinueButton();
-        if (value === "no" && warningModal) {
+        if (value === "no" && showModalForNo && warningModal) {
             warningModal.show();
         }
     };
@@ -37,12 +38,12 @@ $(document).ready(function () {
     const shouldConfirmNoResponse = () =>
         ($assentSelect.val() || "").toString() === "no" && ($acknowledgeInput.val() || "0").toString() !== "1";
 
-    hideContinueButton();
+    updateUiForSelection(showNoAssentModalOnLoad);
 
     $assentSelect.on("change", () => {
         isAcknowledgingNoAssent = false;
         $acknowledgeInput.val("0");
-        updateUiForSelection();
+        updateUiForSelection(true);
         if ($errorMessage.length) {
             $errorMessage.addClass("d-none");
         }
