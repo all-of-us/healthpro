@@ -26,26 +26,20 @@
             Pediatric Assent
         </div>
         <div class="card-body">
-            <form method="post" class="prevent-resubmit" id="pediatricAssentForm" data-show-no-assent-modal-on-load="{{ showNoAssentModalOnLoad ? '1' : '0' }}">
+            {{ form_start(assentForm, { attr: { class: 'prevent-resubmit', id: 'pediatricAssentForm', 'data-show-no-assent-modal-on-load': showNoAssentModalOnLoad ? '1' : '0' } }) }}
                 <div>
-                    <label class="form-label" for="pediatricAssent">
-                        {{ assentQuestion }}
-                    </label>
-                    <select class="form-select" id="pediatricAssent" name="pediatricAssent">
-                        <option value="" {{ selectedAssentResponse ? '' : 'selected' }}>Select</option>
-                        <option value="yes" {{ selectedAssentResponse == 'yes' ? 'selected' : '' }}>Yes</option>
-                        <option value="no" {{ selectedAssentResponse == 'no' ? 'selected' : '' }}>No</option>
-                        <option value="unable" {{ selectedAssentResponse == 'unable' ? 'selected' : '' }}>Participant is unable to provide assent</option>
-                    </select>
-                    {% if validationErrorMessage %}
+                    {{ form_label(assentForm.pediatricAssent, null, { label_attr: { class: 'form-label', for: 'pediatricAssent' } }) }}
+                    {{ form_widget(assentForm.pediatricAssent, { attr: { class: 'form-select', id: 'pediatricAssent' } }) }}
+                    {% set assentError = assentForm.pediatricAssent.vars.errors|first %}
+                    {% if assentError %}
                         <div id="assentErrorMessage" class="text-danger mt-2">
-                            <i class="fa fa-exclamation-circle"></i> {{ validationErrorMessage }}
+                            <i class="fa fa-exclamation-circle"></i> {{ assentError.message }}
                         </div>
                     {% endif %}
                 </div>
-                <input type="hidden" name="_token" value="{{ csrf_token('pediatricOrderAssent') }}"/>
-                <input type="hidden" name="acknowledgeNoAssent" id="acknowledgeNoAssent" value="0"/>
-                <input type="hidden" name="pediatricAssentId" id="pediatricAssentId" value="{{ pediatricAssentId }}"/>
+                {{ form_widget(assentForm.acknowledgeNoAssent, { attr: { id: 'acknowledgeNoAssent' } }) }}
+                {{ form_widget(assentForm.pediatricAssentId, { attr: { id: 'pediatricAssentId' } }) }}
+                {{ form_rest(assentForm) }}
                 <div class="mt-4">
                     <a href="{{ path('order_check_pediatric', { participantId: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
                     <button type="submit" class="btn btn-primary d-none" id="continueBtn" disabled>
@@ -53,7 +47,7 @@
                         <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
                     </button>
                 </div>
-            </form>
+            {{ form_end(assentForm, { render_rest: false }) }}
         </div>
     </div>
     {% include 'partials/modals/pediatric-assent-warning-modal.html.twig' %}

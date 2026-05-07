@@ -9,6 +9,7 @@ use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
 use App\Form\MeasurementRevertType;
 use App\Form\MeasurementType;
+use App\Form\PediatricAssentType;
 use App\Form\PediatricMeasurementType;
 use App\Model\Measurement\Fhir;
 use App\Service\EnvironmentService;
@@ -463,63 +464,55 @@ class MeasurementsController extends BaseController
         if (!$participant->requirePediatricAssentCheck()) {
             throw $this->createAccessDeniedException();
         }
-        $validationErrorMessage = null;
-        $selectedAssentResponse = null;
-        $pediatricAssentId = null;
         $showNoAssentModalOnLoad = false;
-        if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('pediatricMeasurementAssent', (string) $request->request->get('_token'))) {
-                throw $this->createAccessDeniedException();
-            }
-            $assentResponse = (string) $request->request->get('pediatricAssent');
-            $selectedAssentResponse = in_array($assentResponse, ['yes', 'no', 'unable'], true) ? $assentResponse : null;
-            $existingAssentId = $request->request->getInt('pediatricAssentId') ?: null;
+        $formOptions = [
+            'assentQuestion' => 'Does the pediatric participant assent to physical measures today?',
+            'csrf_token_id' => 'pediatricMeasurementAssent',
+        ];
+        $assentForm = $this->createForm(PediatricAssentType::class, [
+            'acknowledgeNoAssent' => '0',
+            'pediatricAssentId' => null,
+        ], $formOptions);
+        $assentForm->handleRequest($request);
+        if ($assentForm->isSubmitted() && $assentForm->isValid()) {
+            /** @var array{pediatricAssent?: string, acknowledgeNoAssent?: string, pediatricAssentId?: string|int|null} $formData */
+            $formData = $assentForm->getData();
+            $assentResponse = (string) ($formData['pediatricAssent'] ?? '');
+            $acknowledgeNoAssent = (string) ($formData['acknowledgeNoAssent'] ?? '0') === '1';
+            $existingAssentId = empty($formData['pediatricAssentId']) ? null : (int) $formData['pediatricAssentId'];
             if (in_array($assentResponse, ['yes', 'unable'], true)) {
                 $result = $pediatricAssentService->submitMeasurementAssent($participant->id, $assentResponse, $existingAssentId);
                 if (!$result['success']) {
                     $this->addFlash('error', $result['errorMessage']);
-                    $pediatricAssentId = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
-                    return $this->render('measurement/pediatric-assent-check.html.twig', [
-                        'participant' => $participant,
-                        'validationErrorMessage' => $validationErrorMessage,
-                        'selectedAssentResponse' => $selectedAssentResponse,
-                        'pediatricAssentId' => $pediatricAssentId,
-                        'showNoAssentModalOnLoad' => $showNoAssentModalOnLoad,
+                    $formData['pediatricAssentId'] = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
+                    $assentForm = $this->createForm(PediatricAssentType::class, $formData, $formOptions);
+                }
+                if ($result['success']) {
+                    return $this->redirectToRoute('measurement', [
+                        'participantId' => $participant->id
                     ]);
                 }
-                return $this->redirectToRoute('measurement', [
-                    'participantId' => $participant->id
-                ]);
-            }
-            if ($assentResponse === 'no') {
-                if ($request->request->getBoolean('acknowledgeNoAssent')) {
+            } else {
+                if (!$acknowledgeNoAssent) {
+                    $assentForm->get('pediatricAssent')->addError(new FormError('Please acknowledge the warning before proceeding.'));
+                } else {
                     $result = $pediatricAssentService->submitMeasurementAssent($participant->id, $assentResponse, $existingAssentId);
-                    if (!$result['success']) {
-                        $this->addFlash('error', $result['errorMessage']);
-                        $pediatricAssentId = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
-                        $showNoAssentModalOnLoad = true;
-                        return $this->render('measurement/pediatric-assent-check.html.twig', [
-                            'participant' => $participant,
-                            'validationErrorMessage' => $validationErrorMessage,
-                            'selectedAssentResponse' => $selectedAssentResponse,
-                            'pediatricAssentId' => $pediatricAssentId,
-                            'showNoAssentModalOnLoad' => $showNoAssentModalOnLoad,
+                    if ($result['success']) {
+                        return $this->redirectToRoute('participant', [
+                            'id' => $participant->id
                         ]);
                     }
-                    return $this->redirectToRoute('participant', [
-                        'id' => $participant->id
-                    ]);
+                    $this->addFlash('error', $result['errorMessage']);
+                    $formData['pediatricAssentId'] = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
+                    $formData['acknowledgeNoAssent'] = '0';
+                    $assentForm = $this->createForm(PediatricAssentType::class, $formData, $formOptions);
+                    $showNoAssentModalOnLoad = true;
                 }
-                $validationErrorMessage = 'Please acknowledge the warning before proceeding.';
-            } else {
-                $validationErrorMessage = 'Please select an assent response.';
             }
         }
         return $this->render('measurement/pediatric-assent-check.html.twig', [
             'participant' => $participant,
-            'validationErrorMessage' => $validationErrorMessage,
-            'selectedAssentResponse' => $selectedAssentResponse,
-            'pediatricAssentId' => $pediatricAssentId,
+            'assentForm' => $assentForm->createView(),
             'showNoAssentModalOnLoad' => $showNoAssentModalOnLoad,
         ]);
     }
