@@ -2,7 +2,7 @@ $(document).ready(function () {
     const $form = $("#pediatricAssentForm");
     const $assentSelect = $("#pediatric_assent_pediatricAssent");
     const $continueBtn = $("#continueBtn");
-    const $acknowledgeInput = $("#acknowledgeNoAssent");
+    const $acknowledgeInput = $("#pediatric_assent_acknowledgeNoAssent");
     const $errorMessage = $("#assentErrorMessage");
     const modalElement = document.getElementById("pediatricAssentWarningModal");
     const warningModal = modalElement ? new bootstrap.Modal(modalElement) : null;
@@ -61,7 +61,7 @@ $(document).ready(function () {
         isAcknowledgingNoAssent = true;
         $acknowledgeInput.val("1");
         warningModal.hide();
-        $form.trigger("submit");
+        $form.submit();
     });
 
     if (modalElement) {
