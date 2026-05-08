@@ -10,9 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class BiobankNightlyReportServiceTest extends ServiceTestCase
 {
-    /**
-     * @dataProvider generateNightlyReportsDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("generateNightlyReportsDataProvider")]
 
     public function testGenerateNightlyReport(bool $isProd, string $expectedBucketName)
     {
@@ -55,7 +53,7 @@ class BiobankNightlyReportServiceTest extends ServiceTestCase
         $service->generateNightlyReport();
     }
 
-    public function generateNightlyReportsDataProvider(): array
+    public static function generateNightlyReportsDataProvider(): array
     {
         return [
             'Staging environment' =>

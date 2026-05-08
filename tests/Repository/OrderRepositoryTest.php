@@ -37,9 +37,7 @@ class OrderRepositoryTest extends RepositoryTestCase
         return $order;
     }
 
-    /**
-     * @dataProvider nightlyReportOrdersDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("nightlyReportOrdersDataProvider")]
     public function testGetNightlyReportOrders(array $ordersInputData, array $expectedResult)
     {
         foreach ($ordersInputData as $data) {
@@ -55,7 +53,7 @@ class OrderRepositoryTest extends RepositoryTestCase
         $this->assertSame($nightlyReportsData[0]['finalizedTs']->format('Y-m-d H:i:s T'), $expectedResult[0]['finalizedTs']->format('Y-m-d H:i:s T'));
     }
 
-    public function nightlyReportOrdersDataProvider(): array
+    public static function nightlyReportOrdersDataProvider(): array
     {
         // Define different scenarios and their expected outputs
         $now = new \DateTime('now');

@@ -464,9 +464,7 @@ class OrderTest extends KernelTestCase
         $this->assertSame(false, $order->canUnlock());
     }
 
-    /**
-     * @dataProvider orderTypeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("orderTypeProvider")]
     public function testOrderTypeDisplayText($orderDisplayText, $orderType, $requestedSamples)
     {
         $orderData = $this->getOrderData();
@@ -477,7 +475,7 @@ class OrderTest extends KernelTestCase
         self::assertEquals($orderDisplayText, $order->getOrderTypeDisplayText());
     }
 
-    public function orderTypeProvider(): array
+    public static function orderTypeProvider(): array
     {
         return [
             ['Full Kit', 'kit', null],
@@ -489,9 +487,7 @@ class OrderTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider getBiobankChangesDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("getBiobankChangesDataProvider")]
     public function testGetBiobankChanges($data, $json)
     {
         $createdTs = new \DateTime('2022-01-01 08:00:00');
@@ -511,7 +507,7 @@ class OrderTest extends KernelTestCase
         self::assertEquals($order->getBiobankChanges(), $json);
     }
 
-    public function getBiobankChangesDataProvider(): array
+    public static function getBiobankChangesDataProvider(): array
     {
         $ts = new \DateTime('2022-01-03 08:00:00');
         return [
@@ -548,9 +544,7 @@ class OrderTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider biobankOrderDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("biobankOrderDataProvider")]
     public function testBiobankOrderChanges($data, $result)
     {
         $createdTs = new \DateTime('2022-01-01 08:00:00');
@@ -575,7 +569,7 @@ class OrderTest extends KernelTestCase
         self::assertEquals($order->getFinalizedTs(), $finalizedTs);
     }
 
-    public function biobankOrderDataProvider(): array
+    public static function biobankOrderDataProvider(): array
     {
         $createdTs = new \DateTime('2022-01-01 08:00:00');
         $ts = new \DateTime('2022-01-03 08:00:00');
@@ -625,9 +619,7 @@ class OrderTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider orderSampleVersionsDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("orderSampleVersionsDataProvider")]
     public function testOrderSampleVersion($sampleVersion, $resultSampleVersion)
     {
         $orderData = $this->getOrderData();
@@ -642,7 +634,7 @@ class OrderTest extends KernelTestCase
         $this->assertSame($resultSampleVersion, $order->getCurrentVersion());
     }
 
-    public function orderSampleVersionsDataProvider()
+    public static function orderSampleVersionsDataProvider()
     {
         return [
             ['', '1'],
@@ -653,9 +645,7 @@ class OrderTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider orderDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("orderDataProvider")]
     public function testHideTrackingFieldByDefault(?string $fedexTracking, ?string $orderType, bool $expected): void
     {
         $order = new Order();
@@ -664,7 +654,7 @@ class OrderTest extends KernelTestCase
         $this->assertEquals($expected, $order->hideTrackingFieldByDefault());
     }
 
-    public function orderDataProvider(): array
+    public static function orderDataProvider(): array
     {
         return [
             'noFedexTrackingAndTypeIsKit' => [

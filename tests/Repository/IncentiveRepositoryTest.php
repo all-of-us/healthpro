@@ -21,9 +21,7 @@ class IncentiveRepositoryTest extends KernelTestCase
 
     }
 
-    /**
-     * @dataProvider paginationDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("paginationDataProvider")]
     public function testOnsitePatientStatusPagination($start, $length, $resultCount, $resultParticipantId): void
     {
         $this->createIncentives();
@@ -36,7 +34,7 @@ class IncentiveRepositoryTest extends KernelTestCase
 
     }
 
-    public function paginationDataProvider()
+    public static function paginationDataProvider()
     {
         return [
             [0, 2, 2, 'P000000004'],
@@ -45,9 +43,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider dateFilterDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("dateFilterDataProvider")]
     public function testOnsiteIncentivesDateFilters($startDate, $endDate, $resultCount): void
     {
         $this->createIncentives();
@@ -64,7 +60,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         $this->assertEquals($resultCount, count($incentives));
     }
 
-    public function dateFilterDataProvider()
+    public static function dateFilterDataProvider()
     {
         return [
             ['2022-01-15', '2022-02-15', 2],
@@ -76,9 +72,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider participantIdDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("participantIdDataProvider")]
     public function testOnsiteIncentivesParticipantIdLookup($participantId): void
     {
         $this->createIncentives();
@@ -88,7 +82,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         $this->assertEquals($participantId, $incentives[0]['participantId']);
     }
 
-    public function participantIdDataProvider()
+    public static function participantIdDataProvider()
     {
         return [
             ['P000000000'],
@@ -99,9 +93,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider paramsCountDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("paramsCountDataProvider")]
     public function testGetOnsiteIncentivesCount($params, $resultCount): void
     {
         $this->createIncentives();
@@ -109,7 +101,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         $this->assertEquals($resultCount, $count);
     }
 
-    public function paramsCountDataProvider()
+    public static function paramsCountDataProvider()
     {
         return [
             [[], 5],

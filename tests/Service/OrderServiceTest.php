@@ -16,9 +16,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderServiceTest extends ServiceTestCase
 {
-    /**
-     * @dataProvider siteStatusProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("siteStatusProvider")]
     public function testInactiveSiteFormDisabled($status, $isActiveSite, $expectedResult): void
     {
         $mockSiteService = $this->createMock(SiteService::class);
@@ -78,7 +76,7 @@ class OrderServiceTest extends ServiceTestCase
         $this->assertFalse(in_array('1PS08', json_decode($order->getProcessedSamples())));
     }
 
-    public function siteStatusProvider(): array
+    public static function siteStatusProvider(): array
     {
         return [
             'No status, inactive site: expect true' => [null, false, true],

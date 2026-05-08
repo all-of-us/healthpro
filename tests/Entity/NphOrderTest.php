@@ -7,9 +7,7 @@ use App\Entity\NphSample;
 
 class NphOrderTest extends NphTestCase
 {
-    /**
-     * @dataProvider canCancelRestoreDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("canCancelRestoreDataProvider")]
     public function testCanCancelRestore($samples, $canCancel, $canRestore)
     {
         $orderData = $this->getOrderData();
@@ -24,7 +22,7 @@ class NphOrderTest extends NphTestCase
         $this->assertSame($canRestore, $nphOrder->canModify(NphSample::RESTORE));
     }
 
-    public function canCancelRestoreDataProvider(): array
+    public static function canCancelRestoreDataProvider(): array
     {
         return [
             [
@@ -94,9 +92,7 @@ class NphOrderTest extends NphTestCase
         ];
     }
 
-    /**
-     * @dataProvider isDisabledAndMetadataDisabledDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("isDisabledAndMetadataDisabledDataProvider")]
     public function testIsDisabledAndMetadataDisabled($samples, $isDisabled, $isMetadataFieldDisabled)
     {
         $orderData = $this->getOrderData();
@@ -109,7 +105,7 @@ class NphOrderTest extends NphTestCase
         $this->assertSame($isMetadataFieldDisabled, $nphOrder->isMetadataFieldDisabled());
     }
 
-    public function isDisabledAndMetadataDisabledDataProvider(): array
+    public static function isDisabledAndMetadataDisabledDataProvider(): array
     {
         return [
             [
@@ -160,9 +156,7 @@ class NphOrderTest extends NphTestCase
         ];
     }
 
-    /**
-     * @dataProvider getOrderStatusDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("getOrderStatusDataProvider")]
     public function testGetOrderStatus($samples, $expectedStatus)
     {
         $orderData = $this->getOrderData();
@@ -174,7 +168,7 @@ class NphOrderTest extends NphTestCase
         $this->assertSame($expectedStatus, $nphOrder->getStatus());
     }
 
-    public function getOrderStatusDataProvider(): array
+    public static function getOrderStatusDataProvider(): array
     {
         $finalizedTs = new \DateTime('2023-01-01 08:00:00');
         $collectedTs = new \DateTime('2023-01-01 08:00:00');
@@ -256,9 +250,7 @@ class NphOrderTest extends NphTestCase
         ];
     }
 
-    /**
-     * @dataProvider collectedTimeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("collectedTimeProvider")]
     public function testGetCollectedTs(array $samples, ?\DateTime $expectedCollectedTs): void
     {
         $orderData = $this->getOrderData();
@@ -270,7 +262,7 @@ class NphOrderTest extends NphTestCase
         $this->assertSame($expectedCollectedTs, $nphOrder->getCollectedTs());
     }
 
-    public function collectedTimeProvider(): array
+    public static function collectedTimeProvider(): array
     {
         $collectedTs1 = new \DateTime('2023-03-15 08:00:00');
         $collectedTs2 = new \DateTime('2023-03-16 08:00:00');
@@ -320,9 +312,7 @@ class NphOrderTest extends NphTestCase
         ];
     }
 
-    /**
-     * @dataProvider stoolTypeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("stoolTypeProvider")]
     public function testIsStoolCollectedTsDisabled(string $orderType, array $samples, bool $expectedResult): void
     {
         $orderData = $this->getOrderData();
@@ -335,7 +325,7 @@ class NphOrderTest extends NphTestCase
         $this->assertSame($expectedResult, $nphOrder->isStoolCollectedTsDisabled());
     }
 
-    public function stoolTypeProvider(): array
+    public static function stoolTypeProvider(): array
     {
         $collectedTs = new \DateTime();
         return [
@@ -397,9 +387,7 @@ class NphOrderTest extends NphTestCase
         ];
     }
 
-    /**
-     * @dataProvider metadataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("metadataProvider")]
     public function testGetMetadataArray(string $metadata, array $expected): void
     {
         $nphOrder = new NphOrder();
@@ -408,7 +396,7 @@ class NphOrderTest extends NphTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function metadataProvider(): array
+    public static function metadataProvider(): array
     {
         return [
             [

@@ -42,9 +42,7 @@ class WorkqueueViewRepositoryTest extends KernelTestCase
         $this->assertEquals(false, $workqueueView->getDefaultView());
     }
 
-    /**
-     * @dataProvider duplicateViewDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("duplicateViewDataProvider")]
     public function testCheckDuplicateName($checkId, $name, $duplicateCount): void
     {
         $this->createViews();
@@ -60,7 +58,7 @@ class WorkqueueViewRepositoryTest extends KernelTestCase
         $this->assertEquals($duplicateCount, $workqueueViewCount);
     }
 
-    public function duplicateViewDataProvider(): array
+    public static function duplicateViewDataProvider(): array
     {
         return [
             [false, 'Test View 1', 1],

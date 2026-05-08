@@ -7,16 +7,14 @@ use PHPUnit\Framework\TestCase;
 
 class ImportTest extends TestCase
 {
-    /**
-     * @dataProvider participantIdProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("participantIdProvider")]
     public function testValidParticipantId($participantId, $isValid): void
     {
         $result = Import::isValidParticipantId($participantId);
         $this->assertEquals($result, $isValid);
     }
 
-    public function participantIdProvider()
+    public static function participantIdProvider()
     {
         return [
             ['P000000000', true],
@@ -28,16 +26,14 @@ class ImportTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider emailDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("emailDataProvider")]
     public function testValidEmail($email, $isValid): void
     {
         $result = Import::isValidEmail($email);
         $this->assertEquals($result, $isValid);
     }
 
-    public function emailDataProvider()
+    public static function emailDataProvider()
     {
         return [
             ['test-1@pmi-ops.org', true],
@@ -48,16 +44,14 @@ class ImportTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dateProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("dateProvider")]
     public function testValidDate($date, $isValid): void
     {
         $result = Import::isValidDate($date);
         $this->assertEquals($result, $isValid);
     }
 
-    public function dateProvider()
+    public static function dateProvider()
     {
         return [
             ['02/01/2022', true],
@@ -69,16 +63,14 @@ class ImportTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider duplicateParticipantIDProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("duplicateParticipantIDProvider")]
     public function testDuplicateParticipantId($imports, $participantId, $isDuplicate): void
     {
         $result = Import::hasDuplicateParticipantId($imports, $participantId);
         $this->assertEquals($result, $isDuplicate);
     }
 
-    public function duplicateParticipantIDProvider()
+    public static function duplicateParticipantIDProvider()
     {
         return [
             [[['participant_id' => 'P01'], ['participant_id' => 'P01'], ['participant_id' => 'P03']], 'P01', true],

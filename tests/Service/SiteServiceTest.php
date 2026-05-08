@@ -120,9 +120,7 @@ class SiteServiceTest extends ServiceTestCase
         self::assertSame('TEST_AWARDEE_' . $this->id, $this->service->getSiteAwardeeId());
     }
 
-    /**
-     * @dataProvider siteDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("siteDataProvider")]
     public function testIsValidSite($program, $mayoLinkAccount, $switchSiteName, $checkSiteName, $expectedResult): void
     {
         // set env to stable to test isValidSite status
@@ -151,7 +149,7 @@ class SiteServiceTest extends ServiceTestCase
         $this->assertEquals($expectedResult, $this->service->isValidSite($checkSiteEmail));
     }
 
-    public function siteDataProvider(): array
+    public static function siteDataProvider(): array
     {
         return [
             'valid mayolink account number and site email' => [User::PROGRAM_HPO, '123456789', 'hpo-site-test', 'hpo-site-test', true],
@@ -163,9 +161,7 @@ class SiteServiceTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider siteStatusProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("siteStatusProvider")]
     public function testIsActiveSite($activeSiteCount, $expectedResult): void
     {
         $siteId = 'test-123456'; // Replace with an actual site ID
@@ -195,7 +191,7 @@ class SiteServiceTest extends ServiceTestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function siteStatusProvider(): array
+    public static function siteStatusProvider(): array
     {
         return [
             'Active site' => [1, true],

@@ -46,9 +46,7 @@ class MeasurementServiceTest extends ServiceTestCase
         self::assertTrue($this->measurementService->requireBloodDonorCheck());
     }
 
-    /**
-     * @dataProvider siteStatusProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("siteStatusProvider")]
     public function testInactiveSiteFormDisabled($parentId, $isActiveSite, $expectedResult): void
     {
         $mockSiteService = $this->createMock(SiteService::class);
@@ -79,7 +77,7 @@ class MeasurementServiceTest extends ServiceTestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function siteStatusProvider(): array
+    public static function siteStatusProvider(): array
     {
         return [
             'No parent ID, inactive site: expect true' => [null, false, true],
@@ -89,9 +87,7 @@ class MeasurementServiceTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider backfillMeasurementsProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("backfillMeasurementsProvider")]
     public function testBackfillMeasurementsSexAtBirth($participantData, $expectsSetSexAtBirth, $expectsPersist, $expectsApiErrorLog)
     {
         $measurement = $this->createMock(Measurement::class);
@@ -142,7 +138,7 @@ class MeasurementServiceTest extends ServiceTestCase
         $measurementService->backfillMeasurementsSexAtBirth();
     }
 
-    public function backfillMeasurementsProvider(): array
+    public static function backfillMeasurementsProvider(): array
     {
         return [
             'Valid sexAtBirth data' => [

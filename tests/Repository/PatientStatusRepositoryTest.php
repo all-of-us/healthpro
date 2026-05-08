@@ -21,9 +21,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         $this->repo = static::getContainer()->get(PatientStatusRepository::class);
     }
 
-    /**
-     * @dataProvider paginationDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("paginationDataProvider")]
     public function testOnsitePatientStatusPagination($start, $length, $resultCount, $resultParticipantId): void
     {
         $this->createPatientStatus();
@@ -35,7 +33,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         $this->assertEquals($resultParticipantId, $patientStatuses[0]['participantId']);
     }
 
-    public function paginationDataProvider()
+    public static function paginationDataProvider()
     {
         return [
             [0, 2, 2, 'P000000004'],
@@ -44,9 +42,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider dateFilterDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("dateFilterDataProvider")]
     public function testOnsitePatientStatusDateFilters($startDate, $endDate, $resultCount): void
     {
         $this->createPatientStatus();
@@ -57,7 +53,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         $this->assertEquals($resultCount, count($patientStatuses));
     }
 
-    public function dateFilterDataProvider()
+    public static function dateFilterDataProvider()
     {
         return [
             ['2022-01-15', '2022-02-15', 2],
@@ -69,9 +65,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider participantIdDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("participantIdDataProvider")]
     public function testOnsitePatientStatusParticipantIdLookup($participantId): void
     {
         $this->createPatientStatus();
@@ -81,7 +75,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         $this->assertEquals($participantId, $patientStatuses[0]['participantId']);
     }
 
-    public function participantIdDataProvider()
+    public static function participantIdDataProvider()
     {
         return [
             ['P000000000'],
@@ -99,9 +93,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         $this->assertCount(1, $sites);
     }
 
-    /**
-     * @dataProvider paramsCountDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("paramsCountDataProvider")]
     public function testGetOnsitePatientStatusesCount($params, $resultCount): void
     {
         $this->createPatientStatus();
@@ -109,7 +101,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         $this->assertEquals($resultCount, $count);
     }
 
-    public function paramsCountDataProvider()
+    public static function paramsCountDataProvider()
     {
         return [
             [[], 5],

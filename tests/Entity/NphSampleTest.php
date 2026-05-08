@@ -6,9 +6,7 @@ use App\Entity\NphSample;
 
 class NphSampleTest extends NphTestCase
 {
-    /**
-     * @dataProvider canUnlockDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("canUnlockDataProvider")]
 
     public function testCanUnlock($sample, $canUnlock)
     {
@@ -19,7 +17,7 @@ class NphSampleTest extends NphTestCase
         $this->assertSame($canUnlock, $nphSample->canUnlock());
     }
 
-    public function canUnlockDataProvider(): array
+    public static function canUnlockDataProvider(): array
     {
         $finalizedTs = new \DateTime('2023-01-08 08:00:00');
         return [
@@ -59,9 +57,7 @@ class NphSampleTest extends NphTestCase
         ];
     }
 
-    /**
-     * @dataProvider aliquotDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("aliquotDataProvider")]
     public function testGetNphAliquotsStatus($aliquotData)
     {
         $sample = $this->createOrderAndSample();
@@ -76,7 +72,7 @@ class NphSampleTest extends NphTestCase
         $this->assertSame($expectedAliquotIds, $sample->getNphAliquotIds());
     }
 
-    public function aliquotDataProvider(): array
+    public static function aliquotDataProvider(): array
     {
         return [
             [
@@ -132,9 +128,7 @@ class NphSampleTest extends NphTestCase
         $this->assertSame($expectedAliquotSampleObj, $sample->getRdrAliquotsSampleObj($aliquotInfo));
     }
 
-    /**
-     * @dataProvider isDisabledDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("isDisabledDataProvider")]
     public function testIsDisabled($rdrId, $modifyType, $expectedResult): void
     {
         $nphSample = new NphSample();
@@ -145,7 +139,7 @@ class NphSampleTest extends NphTestCase
         $this->assertEquals($expectedResult, $nphSample->isDisabled());
     }
 
-    public function isDisabledDataProvider(): array
+    public static function isDisabledDataProvider(): array
     {
         $finalizedTs = new \DateTime('2023-03-06 08:00:00');
         return [
@@ -161,9 +155,7 @@ class NphSampleTest extends NphTestCase
         ];
     }
 
-    /**
-     * @dataProvider isUnlockedDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("isUnlockedDataProvider")]
     public function testIsUnlocked($modifyType, $expectedResult): void
     {
         $nphSample = new NphSample();
@@ -171,7 +163,7 @@ class NphSampleTest extends NphTestCase
         $this->assertEquals($expectedResult, $nphSample->isUnlocked());
     }
 
-    public function isUnlockedDataProvider(): array
+    public static function isUnlockedDataProvider(): array
     {
         return [
             [NphSample::REVERT, false],
@@ -182,9 +174,7 @@ class NphSampleTest extends NphTestCase
         ];
     }
 
-    /**
-     * @dataProvider sampleMetadataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("sampleMetadataProvider")]
     public function testGetSampleMetadataArray(string $sampleMetadata, array $expected)
     {
         $nphSample = new NphSample();
@@ -193,7 +183,7 @@ class NphSampleTest extends NphTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function sampleMetadataProvider(): array
+    public static function sampleMetadataProvider(): array
     {
         return [
             [

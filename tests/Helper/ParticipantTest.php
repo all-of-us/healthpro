@@ -401,7 +401,7 @@ class ParticipantTest extends TestCase
         $this->assertSame('deactivated', $participant->activityStatus);
     }
 
-    public function getPediatricWeightBreakpointProvider()
+    public static function getPediatricWeightBreakpointProvider()
     {
         return
             [
@@ -419,9 +419,7 @@ class ParticipantTest extends TestCase
             ];
     }
 
-    /**
-     * @dataProvider getPediatricWeightBreakpointProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("getPediatricWeightBreakpointProvider")]
     public function testGetPediatricWeightBreakpoint($expectedResult, $weight)
     {
         $participant = new Participant((object) [

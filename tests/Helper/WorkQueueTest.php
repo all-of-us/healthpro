@@ -575,15 +575,13 @@ class WorkQueueTest extends ServiceTestCase
         $this->assertSame($filterLabelOptionPairs, WorkQueue::getFilterLabelOptionPairs($advancedFilters));
     }
 
-    /**
-     * @dataProvider getIncentivesDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("getIncentivesDataProvider")]
     public function testGetParticipantIncentiveDateGiven($incentives, $incentiveDate): void
     {
         $this->assertSame($incentiveDate, WorkQueue::getParticipantIncentiveDateGiven($incentives));
     }
 
-    public function getIncentivesDataProvider(): array
+    public static function getIncentivesDataProvider(): array
     {
         return [
             [
@@ -657,7 +655,7 @@ class WorkQueueTest extends ServiceTestCase
         $this->assertSame('', WorkQueue::csvHealthDataSharingStatus(null, 'healthDataSharingStatus', true, 'America/Chicago'));
     }
 
-    public function getNphStudyStatusDataProvider(): array
+    public static function getNphStudyStatusDataProvider(): array
     {
         return [
             [
@@ -679,16 +677,14 @@ class WorkQueueTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider getNphStudyStatusDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("getNphStudyStatusDataProvider")]
     public function testGetNphStudyStatus($rdrData, $expected): void
     {
         $participant = $this->testSetup->generateParticipant(null, null, null, null, $rdrData);
         $this->assertSame($expected, WorkQueue::getNphStudyStatus($participant, 'America/Chicago'));
     }
 
-    public function getCsvNphStudyStatusDataProvider(): array
+    public static function getCsvNphStudyStatusDataProvider(): array
     {
         return [
             [
@@ -709,9 +705,7 @@ class WorkQueueTest extends ServiceTestCase
             ]
         ];
     }
-    /**
-     * @dataProvider getCsvNphStudyStatusDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("getCsvNphStudyStatusDataProvider")]
     public function testGetCsvNphStudyStatus($rdrData, $expected): void
     {
         $participant = $this->testSetup->generateParticipant(null, null, null, null, $rdrData);
@@ -721,7 +715,7 @@ class WorkQueueTest extends ServiceTestCase
         }
     }
 
-    public function samplesDataProvider(): array
+    public static function samplesDataProvider(): array
     {
         return [
             [true, [
@@ -754,15 +748,13 @@ class WorkQueueTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider samplesDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("samplesDataProvider")]
     public function testGetSamples(bool $isPediatric, array $expectedResult): void
     {
         $this->assertEquals($expectedResult, WorkQueue::getParticipantSummarySamples($isPediatric));
     }
 
-    public function surveysDataProvider(): array
+    public static function surveysDataProvider(): array
     {
         return [
             [true, [
@@ -796,9 +788,7 @@ class WorkQueueTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider surveysDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider("surveysDataProvider")]
     public function testGetSurveys(bool $isPediatric, array $expectedResult)
     {
         $this->assertEquals($expectedResult, WorkQueue::getParticipantSummarySurveys($isPediatric));
