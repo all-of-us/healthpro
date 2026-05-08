@@ -31,21 +31,21 @@ class NphTestCase extends KernelTestCase
     protected function createNphOrder($params = []): NphOrder
     {
         $order = new NphOrder();
-        $this->setData($order, $params);
+        $this->populateEntity($order, $params);
         return $order;
     }
 
     protected function createNphSample($params = []): NphSample
     {
         $sample = new NphSample();
-        $this->setData($sample, $params);
+        $this->populateEntity($sample, $params);
         return $sample;
     }
 
     protected function createNphAliquot($params = []): NphAliquot
     {
         $aliquot = new NphAliquot();
-        $this->setData($aliquot, $params);
+        $this->populateEntity($aliquot, $params);
         return $aliquot;
     }
 
@@ -94,7 +94,7 @@ class NphTestCase extends KernelTestCase
         ];
     }
 
-    private function setData($obj, $params): void
+    private function populateEntity($obj, $params): void
     {
         foreach ($params as $key => $value) {
             $obj->{'set' . ucfirst($key)}($value);
