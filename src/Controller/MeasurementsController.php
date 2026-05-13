@@ -466,7 +466,7 @@ class MeasurementsController extends BaseController
         }
         $showNoAssentModalOnLoad = false;
         $formOptions = [
-            'assentQuestion' => 'Does the pediatric participant assent to physical measures today?',
+            'assentQuestion' => 'Does the pediatric participant assent to physical measurements today?',
             'csrf_token_id' => 'pediatricMeasurementAssent',
         ];
         $assentForm = $this->createForm(PediatricAssentType::class, [
