@@ -30,7 +30,7 @@ class VisitLMT extends TimePoints
         'postLMT' => ['urine']
     ];
 
-    public function __construct($module)
+    public function __construct(int $module)
     {
         $this->module = $module;
     }

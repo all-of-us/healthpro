@@ -28,7 +28,7 @@ class DefaultController extends BaseController
 
     #[Route(path: '/', name: 'home')]
     #[Route(path: '/nph', name: 'nph_home')]
-    public function index(Request $request, ContextTemplateService $contextTemplate, PpscApiService $ppscApiService)
+    public function index(Request $request, ContextTemplateService $contextTemplate, PpscApiService $ppscApiService): Response
     {
         $program = $request->getSession()->get('program');
         if ($program === User::PROGRAM_NPH && $request->attributes->get('_route') === self::HPO_HOME_ROUTE) {
@@ -65,7 +65,7 @@ class DefaultController extends BaseController
     }
 
     #[Route(path: '/admin', name: 'admin_home')]
-    public function adminIndex()
+    public function adminIndex(): Response
     {
         return $this->render('admin/index.html.twig');
     }
@@ -91,7 +91,7 @@ class DefaultController extends BaseController
     }
 
     #[Route(path: '/site/select', name: 'site_select')]
-    public function siteSelectAction(Request $request, SiteService $siteService)
+    public function siteSelectAction(Request $request, SiteService $siteService): Response
     {
         if ($request->request->has('site')) {
             if (!$this->isCsrfTokenValid('siteSelect', $request->request->get('csrf_token'))) {
@@ -110,7 +110,7 @@ class DefaultController extends BaseController
         return $this->render('site-select.html.twig');
     }
     #[Route(path: '/keepalive', name: 'keep_alive')]
-    public function keepAliveAction(Request $request, LoggerService $loggerService)
+    public function keepAliveAction(Request $request, LoggerService $loggerService): Response
     {
         if (!$this->isCsrfTokenValid('keepAlive', $request->request->get('csrf_token'))) {
             $loggerService->log(Log::CSRF_TOKEN_MISMATCH, [
@@ -124,7 +124,7 @@ class DefaultController extends BaseController
     }
 
     #[Route(path: '/agree', name: 'agree_usage')]
-    public function agreeUsageAction(Request $request)
+    public function agreeUsageAction(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('agreeUsage', $request->request->get('csrf_token'))) {
             throw $this->createAccessDeniedException();
@@ -134,7 +134,7 @@ class DefaultController extends BaseController
     }
 
     #[Route(path: '/client-timeout', name: 'client_timeout')]
-    public function clientTimeoutAction(Request $request)
+    public function clientTimeoutAction(Request $request): Response
     {
         // if we got to this point, then the beforeCallback() has
         // already checked the user's session is not expired - simply reload the page
@@ -145,7 +145,7 @@ class DefaultController extends BaseController
     }
 
     #[Route(path: '/hide-tz-warning', name: 'hide_tz_warning')]
-    public function hideTZWarningAction(Request $request)
+    public function hideTZWarningAction(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('hideTZWarning', $request->request->get('csrf_token'))) {
             throw $this->createAccessDeniedException();
@@ -155,7 +155,7 @@ class DefaultController extends BaseController
     }
 
     #[Route(path: '/timeout', name: 'timeout')]
-    public function timeoutAction(Request $request)
+    public function timeoutAction(Request $request): Response
     {
         return $this->render('timeout.html.twig', ['source' => $request->get('source')]);
     }
@@ -167,26 +167,27 @@ class DefaultController extends BaseController
         SessionInterface $session,
         AuthService $authService,
         TokenStorageInterface $tokenStorage
-    ) {
+    ): Response {
         $timeout = $request->get('timeout');
         $source = $request->get('source');
+        $logoutUrl = $authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home') ?? $this->generateUrl('home');
         $loggerService->log(Log::LOGOUT);
         $isSalesforceUser = $session->get('loginType') === User::SALESFORCE;
         $tokenStorage->setToken(null);
         $session->invalidate();
         // Redirects based on source and timeout conditions
         if ($source === 'aou') {
-            return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
+            return $this->redirect($logoutUrl);
         }
         if ($isSalesforceUser || $source === 'ppsc') {
             return $timeout ? $this->redirect('timeout?source=ppsc') : $this->render('logout.html.twig');
         }
         // Default redirect
-        return $this->redirect($authService->getGoogleLogoutUrl($timeout ? 'timeout' : 'home'));
+        return $this->redirect($logoutUrl);
     }
 
     #[Route(path: '/imports', name: 'imports_home')]
-    public function importsIndex()
+    public function importsIndex(): Response
     {
         return $this->render('imports/index.html.twig');
     }

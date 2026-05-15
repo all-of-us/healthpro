@@ -11,26 +11,26 @@ class MeasurementHistory
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\OneToOne(targetEntity: 'App\Entity\Measurement', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private $evaluation;
+    private Measurement $evaluation;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User', cascade: ['persist', 'remove'])]
-    private $user;
+    private ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $site;
+    private string $site;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $type;
+    private string $type;
 
     #[ORM\Column(type: 'text')]
-    private $reason;
+    private string $reason;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTimeInterface $createdTs;
 
 
     public function getId(): ?int

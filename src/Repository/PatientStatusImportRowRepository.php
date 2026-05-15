@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method PatientStatusImportRow|null findOneBy(array $criteria, array $orderBy = null)
  * @method PatientStatusImportRow[]    findAll()
  * @method PatientStatusImportRow[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<PatientStatusImportRow>
  */
 class PatientStatusImportRowRepository extends ServiceEntityRepository
 {
@@ -19,7 +20,7 @@ class PatientStatusImportRowRepository extends ServiceEntityRepository
         parent::__construct($registry, PatientStatusImportRow::class);
     }
 
-    public function deleteUnconfirmedImportData($date)
+    public function deleteUnconfirmedImportData(string $date): void
     {
         $query = 'DELETE psir FROM patient_status_import_rows psir inner join patient_status_import psi on psir.import_id = psi.id where psi.created_ts < :date and psi.confirm = :confirm';
         $params = ['date' => $date, 'confirm' => 0];
@@ -27,7 +28,10 @@ class PatientStatusImportRowRepository extends ServiceEntityRepository
         $statement->execute($params);
     }
 
-    public function getPatientStatusImportRows($limit): array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getPatientStatusImportRows(int $limit): array
     {
         $query = '
             SELECT psir.*,

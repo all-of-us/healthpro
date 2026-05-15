@@ -10,6 +10,7 @@ use App\Service\LoggerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class NoticeController extends BaseController
@@ -21,7 +22,7 @@ class NoticeController extends BaseController
 
     #[Route(path: '/admin/notices', name: 'admin_notices')]
     #[Route(path: '/nph/admin/notices', name: 'nph_admin_notices')]
-    public function index(Request $request, NoticeRepository $noticeRepository)
+    public function index(Request $request, NoticeRepository $noticeRepository): Response
     {
         $routePrefix = $request->attributes->get('_route') === 'nph_admin_notices' ? Notice::NPH_ROUTE_PREFIX : '';
         $type = $routePrefix === Notice::NPH_ROUTE_PREFIX ? Notice::NPH_TYPE : Notice::AOU_TYPE;
@@ -34,7 +35,7 @@ class NoticeController extends BaseController
 
     #[Route(path: '/admin/notices/notice/{id}', name: 'admin_notice')]
     #[Route(path: '/nph/admin/notices/notice/{id}', name: 'nph_admin_notice')]
-    public function edit(NoticeRepository $noticeRepository, LoggerService $loggerService, Request $request, $id = null)
+    public function edit(NoticeRepository $noticeRepository, LoggerService $loggerService, Request $request, ?int $id = null): Response
     {
         $routePrefix = $request->attributes->get('_route') === 'nph_admin_notice' ? Notice::NPH_ROUTE_PREFIX : '';
         if ($id) {

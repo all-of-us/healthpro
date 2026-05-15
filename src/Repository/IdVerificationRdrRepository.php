@@ -21,6 +21,9 @@ class IdVerificationRdrRepository extends ServiceEntityRepository
         parent::__construct($registry, IdVerificationRdr::class);
     }
 
+    /**
+     * @return array<int, IdVerificationRdr>
+     */
     public function getIdVerificationsRdr(int $limit): array
     {
         return $this->createQueryBuilder('ivr')

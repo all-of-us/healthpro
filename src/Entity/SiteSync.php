@@ -10,14 +10,14 @@ class SiteSync
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\OneToOne(targetEntity: 'App\Entity\Site', inversedBy: 'siteSync', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
-    private $site;
+    private Site $site;
 
     #[ORM\Column(type: 'datetime')]
-    private $adminEmailsAt;
+    private \DateTimeInterface $adminEmailsAt;
 
     public function getId(): ?int
     {

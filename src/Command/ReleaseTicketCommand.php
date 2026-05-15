@@ -12,16 +12,30 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment as Templating;
 
+/**
+ * @phpstan-type ReleaseIssue object{
+ *     id: string,
+ *     title: string,
+ *     type: string,
+ *     status: string,
+ *     assignee: string
+ * }
+ */
 class ReleaseTicketCommand extends Command
 {
-    private $jira;
-    private $io;
-    private $templating;
+    private JiraService $jira;
+    private SymfonyStyle $io;
+    private Templating $templating;
 
-    private $targetReleaseDate;
-    private $defaultAccountIds = []; // defined by jira_account_ids config
-    private $developerAccountIds = []; // all assignees of tickets
+    private ?\DateTime $targetReleaseDate = null;
 
+    /** @var array<string, list<string>> defined by jira_account_ids config */
+    private array $defaultAccountIds = [];
+
+    /** @var list<string> all assignees of tickets */
+    private array $developerAccountIds = [];
+
+    /** @var array<string, string> */
     private static $appIds = [
         'Stable' => 'pmi-hpo-test',
         'Production' => 'healthpro-prod'
@@ -31,8 +45,10 @@ class ReleaseTicketCommand extends Command
     {
         $this->jira = $jira;
         $this->templating = $templating;
-        if ($params->has('jira_account_ids')) {
-            $this->defaultAccountIds = $params->get('jira_account_ids');
+        if ($params->has('jira_account_ids') && is_array($params->get('jira_account_ids'))) {
+            /** @var array<string, list<string>> $jiraAccountIds */
+            $jiraAccountIds = $params->get('jira_account_ids');
+            $this->defaultAccountIds = $jiraAccountIds;
         }
         parent::__construct();
     }
@@ -143,7 +159,7 @@ class ReleaseTicketCommand extends Command
         return $version;
     }
 
-    private function selectComponent(): ?string
+    private function selectComponent(): string
     {
         $this->io->section('Components List');
         $components = $this->jira->getComponents();
@@ -168,7 +184,7 @@ class ReleaseTicketCommand extends Command
         return $component;
     }
 
-    private function selectEnvironment(): ?string
+    private function selectEnvironment(): string
     {
         return $this->io->choice('Please select environment', ['Stable', 'Production']);
     }
@@ -183,6 +199,9 @@ class ReleaseTicketCommand extends Command
         return null;
     }
 
+    /**
+     * @return list<ReleaseIssue>|null
+     */
     private function getIssues(string $version): ?array
     {
         $this->io->section(sprintf('Tickets for release %s', $version));
@@ -192,6 +211,7 @@ class ReleaseTicketCommand extends Command
         $tableRows = [];
         $issues = [];
         foreach ($jiraIssues as $jiraIssue) {
+            /** @var ReleaseIssue $issue */
             $issue = (object) [
                 'id' => $jiraIssue->key,
                 'title' => $jiraIssue->fields->summary ?? '',
@@ -211,7 +231,7 @@ class ReleaseTicketCommand extends Command
                 $this->developerAccountIds[] = $jiraIssue->fields->assignee->accountId;
             }
         }
-        $this->developerAccountIds = array_unique($this->developerAccountIds);
+        $this->developerAccountIds = array_values(array_unique($this->developerAccountIds));
         $this->io->table($tableHeaders, $tableRows);
 
         if ($this->io->confirm('Does this look right?')) {
@@ -220,6 +240,9 @@ class ReleaseTicketCommand extends Command
         return null;
     }
 
+    /**
+     * @param list<ReleaseIssue> $issues
+     */
     private function createTicket(string $version, array $issues, string $componentId): int
     {
         if (!$this->targetReleaseDate) {
@@ -257,7 +280,7 @@ class ReleaseTicketCommand extends Command
         return 1;
     }
 
-    private function createApprovalRequestComment($ticketId): int
+    private function createApprovalRequestComment(string $ticketId): int
     {
         $businessApprovalIds = $this->defaultAccountIds['business'];
         $securityApprovalIds = $this->defaultAccountIds['security'];
@@ -280,7 +303,7 @@ class ReleaseTicketCommand extends Command
         return 1;
     }
 
-    private function createDeployComment($ticketId, $env, $deployFileName): bool
+    private function createDeployComment(string $ticketId, string $env, string $deployFileName): bool
     {
         $commentJson = $this->templating->render('jira/deploy-output-comment.json.twig', [
             'env' => $env,
@@ -290,7 +313,7 @@ class ReleaseTicketCommand extends Command
         return $this->jira->createComment($ticketId, $comment);
     }
 
-    private function attachDeployOutput($version, $env, $file, $ticketId): int
+    private function attachDeployOutput(string $version, string $env, string $file, string $ticketId): int
     {
         $appDir = realpath(__DIR__ . '/../..');
         $path = $appDir . "/{$file}";

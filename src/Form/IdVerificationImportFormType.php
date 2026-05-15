@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints\File;
 
 class IdVerificationImportFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('id_verification_csv', Type\FileType::class, [

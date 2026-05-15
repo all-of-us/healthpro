@@ -21,6 +21,9 @@ class HttpClient implements ClientInterface
     private static bool $removeHost = false;
     private ClientInterface $client;
 
+    /**
+     * @param array<string, mixed> $config
+     */
     public function __construct(array $config = [])
     {
         /**
@@ -47,32 +50,47 @@ class HttpClient implements ClientInterface
         $this->client = new Client($config);
     }
 
-    public function __call(string $name, array $arguments)
+    /**
+     * @param list<mixed> $arguments
+     */
+    public function __call(string $name, array $arguments): mixed
     {
         return $this->client->{$name}(...$arguments);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function send(RequestInterface $request, array $options = []): ResponseInterface
     {
         return $this->client->send($request, $options);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function sendAsync(RequestInterface $request, array $options = []): PromiseInterface
     {
         return $this->client->sendAsync($request, $options);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function request(string $method, $uri = '', array $options = []): ResponseInterface
     {
         return $this->client->request($method, $uri, $options);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function requestAsync(string $method, $uri = '', array $options = []): PromiseInterface
     {
         return $this->client->requestAsync($method, $uri, $options);
     }
 
-    public function getConfig(?string $option = null)
+    public function getConfig(?string $option = null): mixed
     {
         return $this->client->getConfig($option);
     }

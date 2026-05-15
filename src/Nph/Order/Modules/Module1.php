@@ -8,24 +8,29 @@ class Module1 extends Samples
 {
     public const SAMPLE_CONSENT_TYPE_HAIR = ['HAIR'];
     public const SAMPLE_CONSENT_TYPE_NAIL = ['NAILL', 'NAILB'];
-    private static $module = 1;
+    private static int $module = 1;
 
-    private static $visitTypes = [
+    /** @var array<string, string> */
+    private static array $visitTypes = [
         'LMT' => 'LMT'
     ];
 
+    /** @var array<string, string> */
     private static array $visitDietMapper = [
         'LMT' => 'LMT'
     ];
 
-    public function __construct($visit)
+    public function __construct(string $visit)
     {
         parent::__construct(self::$module, $visit);
-        if (!in_array($visit, array_keys(self::$visitTypes))) {
+        if (!array_key_exists($visit, self::$visitTypes)) {
             throw new \Exception('Visit Type not supported');
         }
     }
 
+    /**
+     * @return array<string, string>
+     */
     public static function getVisitTypes(): array
     {
         return self::$visitTypes;

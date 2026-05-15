@@ -13,35 +13,36 @@ class NphAliquot
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 100)]
-    private $aliquotId;
+    private string $aliquotId;
 
     #[ORM\ManyToOne(targetEntity: NphSample::class, inversedBy: 'nphAliquots')]
     #[ORM\JoinColumn(nullable: false)]
-    private $nphSample;
+    private NphSample $nphSample;
 
     #[ORM\Column(type: 'datetime')]
-    private $aliquotTs;
+    private \DateTime $aliquotTs;
 
     #[ORM\Column(type: 'string', length: 100)]
-    private $aliquotCode;
+    private string $aliquotCode;
 
     #[ORM\Column(type: 'float', nullable: true)]
-    private $volume;
+    private ?float $volume = null;
 
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
-    private $units;
+    private ?string $units = null;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $status;
+    private ?string $status = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $aliquotTimezoneId;
+    private ?int $aliquotTimezoneId = null;
 
+    /** @var array<string, mixed> */
     #[ORM\Column(type: 'json', nullable: true)]
-    private $aliquotMetadata = [];
+    private array $aliquotMetadata = [];
 
     public function getId(): ?int
     {
@@ -65,7 +66,7 @@ class NphAliquot
         return $this->nphSample;
     }
 
-    public function setNphSample(?NphSample $nphSample): self
+    public function setNphSample(NphSample $nphSample): self
     {
         $this->nphSample = $nphSample;
         $nphSample->addNphAliquot($this);
@@ -144,14 +145,20 @@ class NphAliquot
         return $this;
     }
 
-    public function getAliquotMetadata(): ?array
+    /**
+     * @return array<string, mixed>
+     */
+    public function getAliquotMetadata(): array
     {
         return $this->aliquotMetadata;
     }
 
+    /**
+     * @param array<string, mixed>|null $aliquotMetadata
+     */
     public function setAliquotMetadata(?array $aliquotMetadata): self
     {
-        $this->aliquotMetadata = $aliquotMetadata;
+        $this->aliquotMetadata = $aliquotMetadata ?? [];
 
         return $this;
     }

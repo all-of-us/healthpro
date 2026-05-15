@@ -28,7 +28,7 @@ class NphParticipantSummaryController extends BaseController
 {
     #[Route(path: '/{participantId}', name: 'nph_participant_summary')]
     public function index(
-        $participantId,
+        string $participantId,
         Request $request,
         SessionInterface $session,
         LoggerService $loggerService,
@@ -88,7 +88,7 @@ class NphParticipantSummaryController extends BaseController
             ]);
         }
         $sampleProcessingStatusByModule = $this->em->getRepository(NphSampleProcessingStatus::class)->getSampleProcessingStatusByModule($participantId);
-        $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participantId, $participant->module);
+        $moduleDietPeriodsStatus = $nphOrderService->getModuleDietPeriodsStatus($participantId, (string) $participant->module);
 
         $orderGenerateWarningLogForm = $this->createForm(NphGenerateOrderWarningLogType::class, null);
         $orderGenerateWarningLogForm->handleRequest($request);
@@ -100,8 +100,8 @@ class NphParticipantSummaryController extends BaseController
         $generateOrderWarningLogByModule = $this->em->getRepository(NphGenerateOrderWarningLog::class)
             ->getGenerateOrderWarningLogByModule($participantId);
 
-        $activeDietPeriod = $nphOrderService->getActiveDietPeriod($moduleDietPeriodsStatus, $participant->module);
-        $activeModule = $nphOrderService->getActiveModule($moduleDietPeriodsStatus, $participant->module);
+        $activeDietPeriod = $nphOrderService->getActiveDietPeriod($moduleDietPeriodsStatus, (string) $participant->module);
+        $activeModule = $nphOrderService->getActiveModule($moduleDietPeriodsStatus, (string) $participant->module);
         $combined = $nphProgramSummaryService->separateStoolSamples($combined);
         return $this->render('program/nph/participant/index.html.twig', [
             'participant' => $participant,

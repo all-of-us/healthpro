@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints\File;
 
 class IncentiveImportFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('incentive_csv', Type\FileType::class, [

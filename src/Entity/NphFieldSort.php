@@ -10,13 +10,13 @@ class NphFieldSort
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 100)]
-    private $fieldValue;
+    private string $fieldValue;
 
     #[ORM\Column(type: 'integer')]
-    private $sortOrder;
+    private int $sortOrder;
 
     public function getId(): ?int
     {

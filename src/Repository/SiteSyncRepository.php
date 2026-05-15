@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method SiteSync|null findOneBy(array $criteria, array $orderBy = null)
  * @method SiteSync[]    findAll()
  * @method SiteSync[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<SiteSync>
  */
 class SiteSyncRepository extends ServiceEntityRepository
 {

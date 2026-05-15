@@ -11,31 +11,31 @@ class MeasurementQueue
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'integer')]
-    private $evaluationId;
+    private int $evaluationId;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $evaluationParentId;
+    private ?int $evaluationParentId = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $oldRdrId;
+    private string $oldRdrId;
 
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
-    private $newRdrId;
+    private ?string $newRdrId = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
-    private $fhirVersion;
+    private ?int $fhirVersion = null;
 
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private $queuedTs;
+    private \DateTimeInterface $queuedTs;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $sentTs;
+    private ?\DateTimeInterface $sentTs = null;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $attemptedTs;
+    private ?\DateTimeInterface $attemptedTs = null;
 
     public function getId(): ?int
     {

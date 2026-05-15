@@ -7,12 +7,15 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class HelpService
 {
     public const ENGLISH_LANGUAGE_CODE = 'en';
-    public static $SupportedLanguages = [
+
+    /** @var list<string> */
+    public static array $SupportedLanguages = [
         'en',
         'es'
     ];
 
-    public static $documentGroups = [
+    /** @var list<array<string, mixed>> */
+    public static array $documentGroups = [
         [
             'title' => 'Physical Measurements for DVs and HPOs',
             'documents' => [
@@ -263,6 +266,7 @@ class HelpService
         ]
     ];
 
+    /** @var list<array<string, mixed>> */
     public static array $nphDocumentGroups = [
         [
             'title' => 'NPH Application SOPs',
@@ -286,11 +290,13 @@ class HelpService
         ]
     ];
 
+    /** @var array<string, string> */
     public static array $nphVideoPlaylists = [
         'downtime-reference' => 'vyHrkt_GG7w'
     ];
 
-    public static $videoPlaylists = [
+    /** @var array<string, mixed> */
+    public static array $videoPlaylists = [
         'biobank-hpo' => [
             'tab_title' => 'HPO Biobank',
             'title' => 'Biobank Video Tutorials for Healthcare Provider Organizations (HPO)',
@@ -335,35 +341,41 @@ class HelpService
         ]
     ];
 
-    public static $faqs = [
+    /** @var array<string, string> */
+    public static array $faqs = [
         'web_link' => 'https://docs.google.com/document/d/e/2PACX-1vTA0q5gjIvLjX23Dj-XaXBgMxRVFeyQEhzvo5JcfAa61fbvXO9wflZnttN-EXhzyrE1SW5ht97frxwA/pub'
     ];
 
-    public static $confluenceResources = [
+    /** @var array<string, string> */
+    public static array $confluenceResources = [
         'ops_data_api' => 'https://www.aoucollaborations.net/x/sQB4G',
         'data_dictionaries' => 'https://www.aoucollaborations.net/x/a8U_/',
         'release_notes' => 'https://www.aoucollaborations.net/x/2AAs'
     ];
 
+    /** @var array<string, string> */
     public static array $nphResources = [
         'program_mop' => 'https://nutritionforprecisionhealth.org/secure/documents/mops',
         'moodle_resources' => 'https://moodle.nutritionforprecisionhealth.org/course/view.php?id=14',
         'release_notes' => 'https://moodle.nutritionforprecisionhealth.org/mod/forum/view.php?id=264'
     ];
 
-    protected $params;
+    protected ParameterBagInterface $params;
 
     public function __construct(ParameterBagInterface $params)
     {
         $this->params = $params;
     }
 
-    public function getStoragePath()
+    public function getStoragePath(): string
     {
         return $this->params->has('help_storage_path') ? $this->params->get('help_storage_path') : 'https://docsallofus.atlassian.net/wiki/download/attachments/44357';
     }
 
-    public function getDocumentInfo(string $id, string $documentGroup = 'hpo')
+    /**
+     * @return array<string, mixed>|false
+     */
+    public function getDocumentInfo(string $id, string $documentGroup = 'hpo'): array|false
     {
         $documentGroups = $documentGroup === 'nph' ? self::$nphDocumentGroups : self::$documentGroups;
         foreach ($documentGroups as $documentGroup) {
@@ -374,6 +386,9 @@ class HelpService
         return false;
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function getDocumentTitlesList(): array
     {
         $documentTitles = [];

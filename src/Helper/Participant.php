@@ -18,43 +18,44 @@ use App\Util;
  */
 class Participant
 {
-    public $status = true;
-    public $statusReason;
-    public $id;
-    public $gender;
-    public $dob;
-    public $cacheTime;
-    public $rdrData;
-    public $evaluationFinalizedSite;
-    public $orderCreatedSite;
-    public $age;
-    public $ageInMonths;
-    public $patientStatus;
-    public $isCoreParticipant = false;
-    public $isCoreMinusPMParticipant = false;
-    public $activityStatus;
-    public $isSuspended = false;
-    public $isWithdrawn = false;
-    public $consentCohortText;
-    public $editExistingOnly = false;
-    public $siteSuffix;
-    public $enrollmentSiteSuffix;
-    public $participantIncentiveDateGiven;
-    public $nphWithdrawal = false;
-    public $nphWithdrawalAuthored = '';
-    public $nphDeactivation = false;
-    public $nphDeactivationAuthored = '';
-    public $consentForNphModule1 = false;
-    public $consentForNphModule1Authored = '';
-    public int $sexAtBirth;
+    public bool $status = true;
+    public ?string $statusReason = null;
+    public ?string $id = null;
+    public ?string $gender = null;
+    public ?\DateTime $dob = null;
+    public ?\DateTime $cacheTime = null;
+    public ?\stdClass $rdrData = null;
+    public ?string $evaluationFinalizedSite = null;
+    public ?string $orderCreatedSite = null;
+    public ?int $age = null;
+    public ?int $ageInMonths = null;
+    public ?string $patientStatus = null;
+    public bool $isCoreParticipant = false;
+    public bool $isCoreMinusPMParticipant = false;
+    public ?string $activityStatus = null;
+    public bool $isSuspended = false;
+    public bool $isWithdrawn = false;
+    public ?string $consentCohortText = null;
+    public bool $editExistingOnly = false;
+    public ?string $siteSuffix = null;
+    public ?string $enrollmentSiteSuffix = null;
+    public string $participantIncentiveDateGiven = '';
+    public bool $nphWithdrawal = false;
+    public string $nphWithdrawalAuthored = '';
+    public bool $nphDeactivation = false;
+    public string $nphDeactivationAuthored = '';
+    public bool $consentForNphModule1 = false;
+    public string $consentForNphModule1Authored = '';
+    public int $sexAtBirth = 0;
     public bool $isPediatric = false;
-    public string $pediatricMeasurementsVersionType;
+    public string $pediatricMeasurementsVersionType = '';
     public string|null $enrollmentStatusV3_2Time = null;
 
-    private $disableTestAccess;
-    private $cohortOneLaunchTime;
-    private $siteType;
+    private bool $disableTestAccess = false;
+    private ?string $cohortOneLaunchTime = null;
+    private ?string $siteType = null;
 
+    /** @var array<string, string> */
     private static $consentCohortValues = [
         'COHORT_1' => 'Cohort 1',
         'COHORT_2' => 'Cohort 2',
@@ -62,15 +63,19 @@ class Participant
         'COHORT_3' => 'Cohort 3'
     ];
 
+    /** @var list<string> */
     private static $withdrawalStatusValues = [
         'NO_USE',
         'EARLY_OUT'
     ];
 
+    /** @var list<string> */
     private static $deceasedStatusValues = [
         'PENDING',
         'APPROVED'
     ];
+
+    /** @var list<float> */
     private static $pediatricWeightBreakpoints = [
         9999,
         16.4,
@@ -78,6 +83,7 @@ class Participant
         2.5
     ];
 
+    /** @var array<string, array{0: int, 1: int}> */
     private static array $pediatricAgeRangeMeasurementVersions = [
         'peds-1' => [0, 23],
         'peds-2' => [24, 35],
@@ -85,7 +91,7 @@ class Participant
         'peds-4' => [60, 83],
     ];
 
-    public function __construct($rdrParticipant = null)
+    public function __construct(?\stdClass $rdrParticipant = null)
     {
         if (is_object($rdrParticipant)) {
             if (!empty($rdrParticipant->cacheTime)) {
@@ -106,7 +112,7 @@ class Participant
     /**
      * Magic methods for RDR data
      */
-    public function __get($key)
+    public function __get(string $key): mixed
     {
         if (isset($this->rdrData->{$key})) {
             return CodeBook::display($this->rdrData->{$key});
@@ -117,25 +123,25 @@ class Participant
         return null;
     }
 
-    public function __isset($key)
+    public function __isset(string $key): bool
     {
         return true;
     }
 
-    public function getShortId()
+    public function getShortId(): ?string
     {
-        if (strlen($this->id) >= 36) {
+        if ($this->id !== null && strlen($this->id) >= 36) {
             return strtoupper(Util::shortenUuid($this->id));
         }
         return $this->id;
     }
 
-    public function getMayolinkDob()
+    public function getMayolinkDob(): \DateTime
     {
         return new \DateTime('1933-03-03');
     }
 
-    public function getAddress($multiline = false)
+    public function getAddress(bool $multiline = false): string
     {
         $address = '';
         if ($this->streetAddress) {
@@ -162,7 +168,7 @@ class Participant
         return trim($address);
     }
 
-    public function getAge()
+    public function getAge(): ?int
     {
         if (!$this->dob) {
             return null;
@@ -172,7 +178,10 @@ class Participant
             ->y;
     }
 
-    public function checkIdentifiers($notes)
+    /**
+     * @return array<int, string>|false
+     */
+    public function checkIdentifiers(?string $notes): array|bool
     {
         if (empty($notes)) {
             return false;
@@ -286,12 +295,8 @@ class Participant
         return $yearsInMonths + $months;
     }
 
-    private function parseRdrParticipant($participant)
+    private function parseRdrParticipant(\stdClass $participant): void
     {
-        if (!is_object($participant)) {
-            return;
-        }
-
         // Use participant id as id
         if (isset($participant->participantId)) {
             $this->id = $participant->participantId;
@@ -505,12 +510,12 @@ class Participant
         }
     }
 
-    private function getSiteSuffix($site)
+    private function getSiteSuffix(string $site): string
     {
         return str_replace(\App\Security\User::SITE_PREFIX, '', $site);
     }
 
-    private function getActivityStatus($participant)
+    private function getActivityStatus(\stdClass $participant): string
     {
         // Withdrawn
         if (in_array($participant->withdrawalStatus, self::$withdrawalStatusValues, true)) {
@@ -531,7 +536,7 @@ class Participant
         return 'active';
     }
 
-    private function getConsentCohortText($participant)
+    private function getConsentCohortText(\stdClass $participant): string
     {
         if ($participant->consentCohort === 'COHORT_2' && isset($participant->cohort2PilotFlag) && $participant->cohort2PilotFlag === 'COHORT_2_PILOT') {
             return self::$consentCohortValues[$participant->cohort2PilotFlag];
@@ -539,6 +544,9 @@ class Participant
         return self::$consentCohortValues[$participant->consentCohort] ?? $participant->consentCohort;
     }
 
+    /**
+     * @param array<int, \stdClass>|mixed $participantIncentives
+     */
     private function getParticipantIncentiveDateGiven($participantIncentives): string
     {
         if ($participantIncentives && is_array($participantIncentives)) {

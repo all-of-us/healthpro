@@ -16,6 +16,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method NphOrder|null findOneBy(array $criteria, array $orderBy = null)
  * @method NphOrder[]    findAll()
  * @method NphOrder[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<NphOrder>
  */
 class NphOrderRepository extends ServiceEntityRepository
 {
@@ -24,7 +25,10 @@ class NphOrderRepository extends ServiceEntityRepository
         parent::__construct($registry, NphOrder::class);
     }
 
-    public function getOrdersByVisitType($participantId, $visitPeriod, $module): array
+    /**
+     * @return array<int, NphOrder>
+     */
+    public function getOrdersByVisitType(string $participantId, string $visitPeriod, string $module): array
     {
         return $this->createQueryBuilder('no')
             ->where('no.participantId = :participantId')
@@ -38,6 +42,9 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<int, NphOrder>
+     */
     public function getOrdersBySampleGroup(string $participantId, string $sampleGroup): array
     {
         return $this->createQueryBuilder('no')
@@ -51,6 +58,9 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<int, NphOrder>
+     */
     public function getRecentOrdersBySite(string $siteId): array
     {
         return $this->createQueryBuilder('no')
@@ -63,6 +73,9 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getOrdersByDateRange(string $siteId, DateTime $startDate, DateTime $endDate): array
     {
         $queryBuilder = $this->createQueryBuilder('no')
@@ -88,6 +101,9 @@ class NphOrderRepository extends ServiceEntityRepository
         return $queryBuilder->getResult();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getSampleCollectionStatsByDate(string $siteId, DateTime $startDate, DateTime $endDate): array
     {
         return $this->createQueryBuilder('no')
@@ -101,6 +117,9 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getUnfinalizedSampleCollectionStats(string $siteId): array
     {
         return $this->createQueryBuilder('no')
@@ -114,6 +133,9 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getUnfinalizedSamples(string $site): array
     {
         return $this->createQueryBuilder('no')
@@ -129,6 +151,9 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getRecentlyModifiedSamples(string $site, DateTime $modifiedTs): array
     {
         return $this->createQueryBuilder('no')
@@ -143,6 +168,9 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<int, NphOrder>
+     */
     public function getOrdersByParticipantId(string $participantId): array
     {
         return $this->createQueryBuilder('no')
@@ -154,6 +182,9 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getTodaysBiobankOrders(string $timezone): array
     {
         $startDate = new \DateTime('today', new \DateTimeZone($timezone));
@@ -171,6 +202,9 @@ class NphOrderRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getUnfinalizedBiobankSamples(): array
     {
         $queryBuilder = $this->createQueryBuilder('no')
@@ -184,6 +218,9 @@ class NphOrderRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getUnlockedBiobankSamples(): array
     {
         $queryBuilder = $this->createQueryBuilder('no')
@@ -198,6 +235,9 @@ class NphOrderRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getRecentlyModifiedBiobankSamples(string $timezone): array
     {
         $endDate = new \DateTime('-7 days', new \DateTimeZone($timezone));
@@ -214,7 +254,10 @@ class NphOrderRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function getDownTimeGeneratedOrdersByModuleAndVisit(string $ParticipantId, string $Module, String $Visit): array
+    /**
+     * @return array<int, NphOrder>
+     */
+    public function getDownTimeGeneratedOrdersByModuleAndVisit(string $ParticipantId, string $Module, string $Visit): array
     {
         $queryBuild = $this->createQueryBuilder('no')
             ->where('no.participantId = :participantId')
@@ -230,6 +273,9 @@ class NphOrderRepository extends ServiceEntityRepository
         return $queryBuild->getQuery()->getResult();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getDowntimeOrders(?DateTime $startDate = null, ?DateTime $endDate = null): array
     {
         $queryBuilder = $this->createQueryBuilder('no')
@@ -250,6 +296,9 @@ class NphOrderRepository extends ServiceEntityRepository
         return $queryBuilder->getQuery()->getResult();
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getOrderSamplesByModule(string $participantId): array
     {
         return $this->createQueryBuilder('no')
@@ -261,6 +310,9 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_ARRAY);
     }
 
+    /**
+     * @return array<int, NphOrder>
+     */
     public function getParticipantNotInCronSampleProcessingStatusLog(string $backfillTs): array
     {
         return $this->createQueryBuilder('no')
@@ -274,6 +326,9 @@ class NphOrderRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<int, NphOrder>
+     */
     public function getOrdersByParticipantAndPeriod(string $participantId, string $module, string $visitPeriod): array
     {
         return $this->createQueryBuilder('no')

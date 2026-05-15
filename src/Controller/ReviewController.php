@@ -13,6 +13,7 @@ use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(path: '/ppsc/review')]
@@ -39,7 +40,7 @@ class ReviewController extends BaseController
     }
 
     #[Route(path: '/', name: 'review_today')]
-    public function today(Request $request)
+    public function today(Request $request): Response
     {
         $site = $this->siteService->getSiteId();
         if (!$site) {
@@ -108,7 +109,7 @@ class ReviewController extends BaseController
     }
 
     #[Route(path: '/orders', name: 'participant_review_unfinalized_orders')]
-    public function unfinalizedOrders(Request $request, OrderRepository $orderRepository)
+    public function unfinalizedOrders(Request $request, OrderRepository $orderRepository): Response
     {
         $site = $this->siteService->getSiteId();
         if (!$site) {
@@ -125,7 +126,7 @@ class ReviewController extends BaseController
     }
 
     #[Route(path: '/measurements', name: 'participant_review_unfinalized_measurements')]
-    public function unfinalizedMeasurements(Request $request, MeasurementRepository $measurementRepository)
+    public function unfinalizedMeasurements(Request $request, MeasurementRepository $measurementRepository): Response
     {
         $site = $this->siteService->getSiteId();
         if (!$site) {
@@ -140,7 +141,7 @@ class ReviewController extends BaseController
     }
 
     #[Route(path: '/orders/recent/modify', name: 'participant_review_modified_orders')]
-    public function modifiedOrders(Request $request, OrderRepository $orderRepository)
+    public function modifiedOrders(Request $request, OrderRepository $orderRepository): Response
     {
         $site = $this->siteService->getSiteId();
         if (!$site) {
@@ -155,7 +156,7 @@ class ReviewController extends BaseController
     }
 
     #[Route(path: '/measurements/recent/modify', name: 'participant_review_modified_measurements')]
-    public function modifiedMeasurements(Request $request, MeasurementRepository $measurementRepository)
+    public function modifiedMeasurements(Request $request, MeasurementRepository $measurementRepository): Response
     {
         $site = $this->siteService->getSiteId();
         if (!$site) {
@@ -170,9 +171,9 @@ class ReviewController extends BaseController
     }
 
     #[Route(path: '/participant/lookup', name: 'participant_review_name_lookup')]
-    public function nameLookup(Request $request)
+    public function nameLookup(Request $request): Response
     {
-        $id = trim($request->query->get('id'));
+        $id = trim((string) $request->query->get('id'));
         if (!$id) {
             return $this->json(null);
         }

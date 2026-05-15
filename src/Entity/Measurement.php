@@ -32,23 +32,27 @@ class Measurement
     public const EVALUATION_RESTORE_STATUS = 'final';
     private const ZSCORE_0_01 = 0.50399;
 
+    /** @var array<string, string> */
     public static $cancelReasons = [
         'Data entered for wrong participant' => 'PM_CANCEL_WRONG_PARTICIPANT',
         'Other' => 'OTHER'
     ];
 
+    /** @var array<string, string> */
     public static $restoreReasons = [
         'Physical Measurements cancelled for wrong participant' => 'PM_RESTORE_WRONG_PARTICIPANT',
         'Physical Measurements can be amended instead of cancelled' => 'PM_RESTORE_AMEND',
         'Other' => 'OTHER'
     ];
 
+    /** @var list<string> */
     public static $bloodPressureFields = [
         'blood-pressure-systolic',
         'blood-pressure-diastolic',
         'heart-rate'
     ];
 
+    /** @var list<string> */
     public static $protocolModificationNotesFields = [
         'blood-pressure-protocol-modification-notes',
         'height-protocol-modification-notes',
@@ -57,6 +61,7 @@ class Measurement
         'waist-circumference-protocol-modification-notes'
     ];
 
+    /** @var list<string> */
     public static $measurementSourceFields = [
         'blood-pressure-source',
         'height-source',
@@ -65,6 +70,7 @@ class Measurement
         'hip-circumference-source'
     ];
 
+    /** @var list<string> */
     public static $ehrProtocolDateFields = [
         'blood-pressure-source-ehr-date',
         'height-source-ehr-date',
@@ -73,68 +79,95 @@ class Measurement
         'hip-circumference-source-ehr-date'
     ];
 
+    public bool $canCancel = false;
+    public bool $canRestore = false;
+    public string $reasonDisplayText = '';
+
+    /** @var string|null */
     protected $finalizedUserEmail;
 
+    /** @var string|null */
     protected $finalizedSiteInfo;
 
+    /** @var string|null */
     private $currentVersion;
 
+    /** @var stdClass */
     private $fieldData;
 
+    /** @var stdClass */
     private $schema;
 
+    /** @var array<string, array<int, array<string, mixed>>> */
     private array $growthCharts = [];
 
+    /** @var int|null */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    /** @var User|null */
     #[ORM\OneToOne(targetEntity: 'App\Entity\User')]
     private $user;
 
+    /** @var string */
     #[ORM\Column(type: 'string', length: 50)]
     private $site;
 
+    /** @var string */
     #[ORM\Column(type: 'string', length: 50)]
     private $participantId;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $rdrId;
 
+    /** @var int|null */
     #[ORM\Column(type: 'integer', nullable: true)]
     private $parentId;
 
+    /** @var \DateTimeInterface */
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $createdTs;
 
+    /** @var \DateTimeInterface */
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $updatedTs;
 
+    /** @var User|null */
     #[ORM\OneToOne(targetEntity: 'App\Entity\User')]
     private $finalizedUser;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $finalizedSite;
 
+    /** @var \DateTimeInterface|null */
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $finalizedTs;
 
+    /** @var string */
     #[ORM\Column(type: 'string', nullable: false, length: 10)]
     private $version;
 
+    /** @var int|null */
     #[ORM\Column(type: 'integer', nullable: true)]
     private $fhirVersion;
 
+    /** @var string */
     #[ORM\Column(type: 'text')]
     private $data;
 
+    /** @var MeasurementHistory|null */
     #[ORM\OneToOne(targetEntity: 'App\Entity\MeasurementHistory', cascade: ['persist', 'remove'])]
     private $history;
 
+    /** @var float|null */
     #[ORM\Column(type: 'float', nullable: true)]
     private $ageInMonths;
 
+    /** @var int|null */
     #[ORM\Column(type: 'integer', nullable: true)]
     private $sexAtBirth;
 
@@ -351,11 +384,17 @@ class Measurement
         return $this;
     }
 
+    /**
+     * @return array<string, array<int, array<string, mixed>>>
+     */
     public function getGrowthCharts(): array
     {
         return $this->growthCharts;
     }
 
+    /**
+     * @param array<string, array<int, array<string, mixed>>> $growthCharts
+     */
     public function setGrowthCharts(array $growthCharts): self
     {
         $this->growthCharts = $growthCharts;
@@ -363,7 +402,7 @@ class Measurement
         return $this;
     }
 
-    public function loadFromAObject($finalizedUserEmail = null, $finalizedSite = null)
+    public function loadFromAObject(?string $finalizedUserEmail = null, ?string $finalizedSite = null): void
     {
         if (empty($this->currentVersion) && empty($this->version)) {
             $this->currentVersion = self::CURRENT_VERSION;
@@ -381,7 +420,7 @@ class Measurement
         $this->normalizeData();
     }
 
-    public function formatEhrProtocolDateFields()
+    public function formatEhrProtocolDateFields(): void
     {
         foreach (self::$ehrProtocolDateFields as $ehrProtocolDateField) {
             if (!empty($this->fieldData->{$ehrProtocolDateField})) {
@@ -390,12 +429,12 @@ class Measurement
         }
     }
 
-    public function getSchema()
+    public function getSchema(): stdClass
     {
         return $this->schema;
     }
 
-    public function getAssociativeSchema()
+    public function getAssociativeSchema(): stdClass
     {
         $schema = clone $this->schema;
         $associativeFields = [];
@@ -406,7 +445,7 @@ class Measurement
         return $schema;
     }
 
-    public function loadSchema()
+    public function loadSchema(): void
     {
         $file = __DIR__ . "/../Model/Measurement/versions/{$this->getFormVersion()}.json";
         if (!file_exists($file)) {
@@ -423,7 +462,7 @@ class Measurement
         }
     }
 
-    public function getFhir($datetime, $parentRdr = null)
+    public function getFhir(\DateTimeInterface $datetime, ?string $parentRdr = null): stdClass
     {
         $fhir = new Fhir([
             'data' => $this->fieldData,
@@ -441,26 +480,29 @@ class Measurement
         return $fhir->toObject();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSummary(): array
     {
         return $this->isPediatricForm() ? $this->getPediatricSummary() : $this->getAdultSummary();
     }
 
-    public function canCancel()
+    public function canCancel(): bool
     {
         return $this->getHistoryType() !== self::EVALUATION_CANCEL
             && !$this->isEvaluationUnlocked()
             && !$this->isEvaluationFailedToReachRDR();
     }
 
-    public function canRestore()
+    public function canRestore(): bool
     {
         return $this->getHistoryType() === self::EVALUATION_CANCEL
             && !$this->isEvaluationUnlocked()
             && !$this->isEvaluationFailedToReachRDR();
     }
 
-    public function getHistoryType()
+    public function getHistoryType(): ?string
     {
         if (!empty($this->getHistory())) {
             return $this->getHistory()->getType();
@@ -468,53 +510,56 @@ class Measurement
         return null;
     }
 
-    public function isEvaluationCancelled()
+    public function isEvaluationCancelled(): bool
     {
         return $this->getHistoryType() === self::EVALUATION_CANCEL ? true : false;
     }
 
-    public function isEvaluationUnlocked()
+    public function isEvaluationUnlocked(): bool
     {
         return !empty($this->getParentId()) && empty($this->getFinalizedTs());
     }
 
-    public function isEvaluationFailedToReachRDR()
+    public function isEvaluationFailedToReachRDR(): bool
     {
         return !empty($this->getFinalizedTs()) && empty($this->getRdrId());
     }
 
-    public function getReasonDisplayText()
+    public function getReasonDisplayText(): string
     {
         if (empty($this->getHistory())) {
-            return null;
+            return '';
         }
         // Check only cancel reasons
         $reasonDisplayText = array_search($this->getHistory()->getReason(), self::$cancelReasons);
         return !empty($reasonDisplayText) ? $reasonDisplayText : 'Other';
     }
 
-    public function setFieldData($fieldData)
+    public function setFieldData(object $fieldData): void
     {
         $this->fieldData = $fieldData;
         $this->normalizeData('save');
     }
 
-    public function getFieldData()
+    public function getFieldData(): object
     {
         return $this->fieldData;
     }
 
-    public function isBloodDonorForm()
+    public function isBloodDonorForm(): bool
     {
         return strpos($this->getFormVersion(), self::BLOOD_DONOR) !== false;
     }
 
-    public function isEhrProtocolForm()
+    public function isEhrProtocolForm(): bool
     {
         return strpos($this->getFormVersion(), self::EHR_PROTOCOL_MODIFICATION) !== false;
     }
 
-    public function getWarnings()
+    /**
+     * @return array<string, array<int|string, mixed>>
+     */
+    public function getWarnings(): array
     {
         $warnings = [];
         /** @var stdClass $metric */
@@ -526,7 +571,10 @@ class Measurement
         return $warnings;
     }
 
-    public function getConversions()
+    /**
+     * @return array<string, mixed>
+     */
+    public function getConversions(): array
     {
         $conversions = [];
         /** @var stdClass $metric */
@@ -538,7 +586,10 @@ class Measurement
         return $conversions;
     }
 
-    public function getRecordUserValues()
+    /**
+     * @return array<string, bool>
+     */
+    public function getRecordUserValues(): array
     {
         $recordUserValues = [];
         /** @var stdClass $metric */
@@ -550,7 +601,7 @@ class Measurement
         return $recordUserValues;
     }
 
-    public function getLatestFormVersion()
+    public function getLatestFormVersion(): string
     {
         if ($this->isBloodDonorForm()) {
             return self::BLOOD_DONOR_CURRENT_VERSION;
@@ -561,14 +612,14 @@ class Measurement
         return self::CURRENT_VERSION;
     }
 
-    public function addBloodDonorProtocolModificationForRemovedFields()
+    public function addBloodDonorProtocolModificationForRemovedFields(): void
     {
         $this->addBloodDonorProtocolModificationForWaistandHip();
         $this->addBloodDonorProtocolModificationForBloodPressure();
         $this->addBloodDonorProtocolModificationForHeight();
     }
 
-    public function addEhrProtocolModifications()
+    public function addEhrProtocolModifications(): void
     {
         if ($this->fieldData->{'blood-pressure-source'} === 'ehr') {
             $this->fieldData->{'blood-pressure-protocol-modification'}[0] = self::EHR_PROTOCOL_MODIFICATION;
@@ -596,14 +647,14 @@ class Measurement
         }
     }
 
-    public function addBloodDonorProtocolModificationForWaistandHip()
+    public function addBloodDonorProtocolModificationForWaistandHip(): void
     {
         foreach (['waist-circumference-protocol-modification', 'hip-circumference-protocol-modification'] as $field) {
             $this->fieldData->{$field} = array_fill(0, 2, self::BLOOD_DONOR_PROTOCOL_MODIFICATION);
         }
     }
 
-    public function addBloodDonorProtocolModificationForBloodPressure()
+    public function addBloodDonorProtocolModificationForBloodPressure(): void
     {
         for ($reading = 1; $reading <= 2; $reading++) {
             foreach (self::$bloodPressureFields as $field) {
@@ -616,17 +667,20 @@ class Measurement
         }
     }
 
-    public function addBloodDonorProtocolModificationForHeight()
+    public function addBloodDonorProtocolModificationForHeight(): void
     {
         $this->fieldData->{'height-protocol-modification'} = self::BLOOD_DONOR_PROTOCOL_MODIFICATION;
     }
 
+    /**
+     * @return array<int, string|array{string, int}>
+     */
     public function getFinalizeErrors(): array
     {
         return $this->isPediatricForm() ? $this->getPediatricFinalizeErrors() : $this->getAdultFinalizeErrors();
     }
 
-    public function getFormFieldErrorMessage($field = null, $replicate = null)
+    public function getFormFieldErrorMessage(?string $field = null, ?int $replicate = null): string
     {
         if (($this->isBloodDonorForm() && in_array($field, self::$bloodPressureFields) && $replicate === 1) ||
             ($this->isEhrProtocolForm() && in_array($field, array_merge(self::$ehrProtocolDateFields, self::$measurementSourceFields))) ||
@@ -637,7 +691,7 @@ class Measurement
         return 'Please complete or add protocol modification.';
     }
 
-    public function canAutoModify()
+    public function canAutoModify(): bool
     {
         if ($this->isBloodDonorForm()) {
             return false;
@@ -652,7 +706,7 @@ class Measurement
         return true;
     }
 
-    public function getFormVersion()
+    public function getFormVersion(): string
     {
         return empty($this->version) ? $this->currentVersion : $this->version;
     }
@@ -689,7 +743,10 @@ class Measurement
         throw new Exception('Division by zero error');
     }
 
-    public function calculatePercentile(float $z, array $zScores): float|null
+    /**
+     * @param array<int, array<string, float|int>> $zScores
+     */
+    public function calculatePercentile(float $z, array $zScores): ?float
     {
         $decimalPoints = [
             'Z_0' => 0.00,
@@ -726,6 +783,9 @@ class Measurement
         return null;
     }
 
+    /**
+     * @return array<string, class-string|null>
+     */
     public function getGrowthChartsByAge(int $ageInMonths): array
     {
         $growthChartsByAgeList = [
@@ -769,7 +829,10 @@ class Measurement
         return $selectedGrowthCharts;
     }
 
-    public function calculateMeanFromValues($values): ?float
+    /**
+     * @param array<int, float|int> $values
+     */
+    public function calculateMeanFromValues(array $values): ?float
     {
         if (count($values) > 0) {
             if (count($values) === 3) {
@@ -780,9 +843,9 @@ class Measurement
         return null;
     }
 
-    protected function normalizeData($type = null)
+    protected function normalizeData(?string $type = null): void
     {
-        foreach ($this->fieldData as $key => $value) {
+        foreach (get_object_vars($this->fieldData) as $key => $value) {
             if ($value === 0) {
                 $this->fieldData->$key = null;
             }
@@ -814,7 +877,7 @@ class Measurement
         }
     }
 
-    protected static function cmToFtIn($cm)
+    protected static function cmToFtIn(float|int $cm): string
     {
         $inches = self::cmToIn($cm);
         $feet = floor($inches / 12);
@@ -822,17 +885,17 @@ class Measurement
         return "$feet ft $inches in";
     }
 
-    protected static function cmToIn($cm)
+    protected static function cmToIn(float|int $cm): float
     {
         return round($cm * 0.3937, 1);
     }
 
-    protected static function kgToLb($kg)
+    protected static function kgToLb(float|int $kg): float
     {
         return round($kg * 2.2046, 1);
     }
 
-    protected function calculateMean($field)
+    protected function calculateMean(string $field): ?float
     {
         $secondThirdFields = [
             'blood-pressure-systolic',
@@ -858,7 +921,7 @@ class Measurement
         return null;
     }
 
-    protected static function calculateBmi($height, $weight)
+    protected static function calculateBmi(float|int $height, float|int $weight): float|false
     {
         if ($height && $weight) {
             return $weight / (($height / 100) * ($height / 100));
@@ -866,11 +929,14 @@ class Measurement
         return false;
     }
 
-    protected function isMinVersion($minVersion)
+    protected function isMinVersion(string $minVersion): bool
     {
         return Util::versionIsAtLeast($this->version, $minVersion);
     }
 
+    /**
+     * @param array<int, float|int> $values
+     */
     private function calculateThreeValuesMean(array &$values): void
     {
         sort($values);
@@ -881,7 +947,7 @@ class Measurement
         }
     }
 
-    private function calculatePediatricMean($field): ?float
+    private function calculatePediatricMean(string $field): ?float
     {
         $values = array_filter($this->fieldData->{$field});
         if (count($values) > 0) {
@@ -893,6 +959,9 @@ class Measurement
         return null;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getAdultSummary(): array
     {
         $summary = [];
@@ -937,6 +1006,9 @@ class Measurement
         return $summary;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getPediatricSummary(): array
     {
         $summary = [];
@@ -1001,6 +1073,9 @@ class Measurement
         return $summary;
     }
 
+    /**
+     * @param array<string, mixed> $summary
+     */
     private function addGrowthPercentileForAge(array &$summary, float $value, string $field, string $chartType): void
     {
         $sexAtBirth = $this->getSexAtBirth();
@@ -1012,6 +1087,9 @@ class Measurement
         }
     }
 
+    /**
+     * @param array<string, mixed> $summary
+     */
     private function addGrowthPercentileForLength(array &$summary, float $value1, float $value2, string $field, string $chartType): void
     {
         $sexAtBirth = $this->getSexAtBirth();
@@ -1023,6 +1101,9 @@ class Measurement
         }
     }
 
+    /**
+     * @return array<int, string|array{string, int}>
+     */
     private function getAdultFinalizeErrors(): array
     {
         $errors = [];
@@ -1103,6 +1184,9 @@ class Measurement
         return $errors;
     }
 
+    /**
+     * @return array<int, string|array{string, int}>
+     */
     private function getPediatricFinalizeErrors(): array
     {
         $errors = [];
@@ -1204,6 +1288,9 @@ class Measurement
         return null;
     }
 
+    /**
+     * @return array<string, float|int>
+     */
     private function getLMSValuesFromAge(string $chartType, int $sexAtBirth): array
     {
         $ageInMonths = $this->ageInMonths;
@@ -1220,6 +1307,9 @@ class Measurement
         return $lmsValues;
     }
 
+    /**
+     * @return array<string, float|int>
+     */
     private function getLMSValuesFromLength(string $chartType, float $length, int $sexAtBrith): array
     {
         $lmsValues = [];

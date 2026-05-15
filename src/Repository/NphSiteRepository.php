@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method NphSite|null findOneBy(array $criteria, array $orderBy = null)
  * @method NphSite[]    findAll()
  * @method NphSite[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<NphSite>
  */
 class NphSiteRepository extends ServiceEntityRepository
 {
@@ -20,9 +21,9 @@ class NphSiteRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return NphSite[] Returns an array of NphSite objects
+     * @return array<int, array<string, int>>
      */
-    public function getDuplicateGoogleGroup($googleGroup, $id = null)
+    public function getDuplicateGoogleGroup(string $googleGroup, ?int $id = null): array
     {
         $queryBuilder = $this->createQueryBuilder('ns')
             ->select('ns.id');

@@ -6,9 +6,10 @@ use App\Datastore\Entity;
 
 class Configuration extends Entity
 {
-    protected $excludeIndexes = ['value'];
+    /** @var list<string> */
+    protected array $excludeIndexes = ['value'];
 
-    protected static function getKind()
+    protected static function getKind(): string
     {
         return 'Configuration';
     }

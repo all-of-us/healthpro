@@ -12,9 +12,9 @@ use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
 {
-    private $requestStack;
-    private $router;
-    private $params;
+    private RequestStack $requestStack;
+    private RouterInterface $router;
+    private ParameterBagInterface $params;
 
     public function __construct(RouterInterface $router, RequestStack $requestStack, ParameterBagInterface $params)
     {
@@ -23,6 +23,9 @@ class AppExtension extends AbstractExtension
         $this->params = $params;
     }
 
+    /**
+     * @return array<int, TwigFunction>
+     */
     public function getFunctions(): array
     {
         return [
@@ -35,15 +38,15 @@ class AppExtension extends AbstractExtension
         ];
     }
 
-    public function checkPath($name)
+    public function checkPath(string $name): bool
     {
         return !is_null($this->router->getRouteCollection()->get($name));
     }
 
-    public function asset($asset)
+    public function asset(string $asset): string
     {
-        $basePath = $this->requestStack->getCurrentRequest()->getBasePath();
-        if (in_array($basePath, ['/web'])) {
+        $basePath = $this->requestStack->getCurrentRequest()?->getBasePath() ?? '';
+        if ($basePath === '/web') {
             // The combination of GAE's routing handlers and the Symfony Request object
             // base path logic results in an incorrect basepath for requests that start
             // with /web because the prefix is the same as the web root's directory name.
@@ -54,14 +57,14 @@ class AppExtension extends AbstractExtension
         return $basePath . ltrim($asset, '/');
     }
 
-    public function slugify($text)
+    public function slugify(string $text): string
     {
         $output = trim(strtolower($text));
-        $output = preg_replace('/[^a-z0-9]/', '-', $output);
+        $output = preg_replace('/[^a-z0-9]/', '-', $output) ?? '';
         return $output;
     }
 
-    public function timezoneDisplay(?string $timezone): string
+    public function timezoneDisplay(?string $timezone): ?string
     {
         $tsService = new TimezoneService();
         return $tsService->getTimezoneDisplay($timezone);
@@ -72,11 +75,14 @@ class AppExtension extends AbstractExtension
         return CodeBook::display($code);
     }
 
-    public function displayMessage($name, $type = false, $options = [])
+    /**
+     * @param array{closeButton?: bool} $options
+     */
+    public function displayMessage(string $name, string|false $type = false, array $options = []): string
     {
         $configPrefix = 'messaging_';
-        $message = $this->params->has($configPrefix . $name) ? $this->params->get($configPrefix . $name) : '';
-        if (empty($message)) {
+        $message = $this->params->has($configPrefix . $name) ? (string) $this->params->get($configPrefix . $name) : '';
+        if ($message === '') {
             return '';
         }
         switch ($type) {

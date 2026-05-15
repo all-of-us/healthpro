@@ -15,28 +15,28 @@ class Notice
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     #[ORM\GeneratedValue]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(name: 'url', type: 'string', length: 255, nullable: false)]
-    private $url;
+    private string $url;
 
     #[ORM\Column(name: 'message', type: 'text', length: 65535, nullable: false)]
-    private $message;
+    private string $message;
 
     #[ORM\Column(name: 'full_page', type: 'boolean', nullable: false)]
-    private $fullPage = false;
+    private bool $fullPage = false;
 
     #[ORM\Column(name: 'start_ts', type: 'datetime', nullable: true)]
-    private $startTs;
+    private ?\DateTimeInterface $startTs = null;
 
     #[ORM\Column(name: 'end_ts', type: 'datetime', nullable: true)]
-    private $endTs;
+    private ?\DateTimeInterface $endTs = null;
 
     #[ORM\Column(name: 'status', type: 'boolean', nullable: false)]
-    private $status = false;
+    private bool $status = false;
 
     #[ORM\Column(name: 'type', type: 'string', length: 50, nullable: true)]
-    private $type;
+    private ?string $type = null;
 
     public function getId(): ?int
     {
@@ -67,7 +67,7 @@ class Notice
         return $this;
     }
 
-    public function getFullPage(): ?bool
+    public function getFullPage(): bool
     {
         return $this->fullPage;
     }
@@ -103,7 +103,7 @@ class Notice
         return $this;
     }
 
-    public function getStatus(): ?bool
+    public function getStatus(): bool
     {
         return $this->status;
     }

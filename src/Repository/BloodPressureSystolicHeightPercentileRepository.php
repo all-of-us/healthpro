@@ -39,7 +39,10 @@ class BloodPressureSystolicHeightPercentileRepository extends ServiceEntityRepos
         }
     }
 
-    public function getChartsData(): ?array
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    public function getChartsData(): array
     {
         return $this->createQueryBuilder('bshp')
             ->getQuery()

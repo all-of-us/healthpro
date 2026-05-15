@@ -11,19 +11,19 @@ use Twig\Environment;
 
 class MayolinkOrderService
 {
-    protected $params;
-    protected $em;
-    protected $twig;
-    protected $logger;
-    protected $client;
-    protected $ordersEndpoint;
+    protected ParameterBagInterface $params;
+    protected EntityManagerInterface $em;
+    protected Environment $twig;
+    protected LoggerInterface $logger;
+    protected HttpClient $client;
+    protected string $ordersEndpoint;
     // This namespace is the same across all environments, regardless of the endpoint.
     // Also, note that this is just an XML namespace and is never used to make a request
-    protected $nameSpace = 'http://orders.mayomedicallaboratories.com';
-    protected $labelPdf = 'orders/labels.xml';
-    protected $createOrder = 'orders/create.xml';
-    protected $userName;
-    protected $password;
+    protected string $nameSpace = 'http://orders.mayomedicallaboratories.com';
+    protected string $labelPdf = 'orders/labels.xml';
+    protected string $createOrder = 'orders/create.xml';
+    protected string $userName;
+    protected string $password;
 
 
     public function __construct(ParameterBagInterface $params, EntityManagerInterface $em, Environment $twig, LoggerInterface $logger)
@@ -37,7 +37,10 @@ class MayolinkOrderService
         }
     }
 
-    public function createOrder($options)
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function createOrder(array $options): string|false
     {
         $samples = $this->getSamples('collected', $options);
         $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples];
@@ -55,13 +58,16 @@ class MayolinkOrderService
         if ($response->getStatusCode() !== 201) {
             return false;
         }
-        $xmlResponse = $response->getBody();
+        $xmlResponse = $response->getBody()->getContents();
         $xmlObj = simplexml_load_string($xmlResponse);
-        $mayoId = $xmlObj->order->number;
+        $mayoId = (string) $xmlObj->order->number;
         return $mayoId;
     }
 
-    public function getLabelsPdf($options)
+    /**
+     * @param array<string, mixed> $options
+     */
+    public function getLabelsPdf(array $options): string|false
     {
         $samples = $this->getSamples('requested', $options);
         $parameters = ['mayoUrl' => $this->nameSpace, 'options' => $options, 'samples' => $samples];
@@ -79,13 +85,13 @@ class MayolinkOrderService
         if ($response->getStatusCode() !== 200) {
             return false;
         }
-        $xmlResponse = $response->getBody();
+        $xmlResponse = $response->getBody()->getContents();
         $xmlObj = simplexml_load_string($xmlResponse);
-        $pdf = base64_decode($xmlObj->order->labels);
+        $pdf = base64_decode((string) $xmlObj->order->labels);
         return $pdf;
     }
 
-    public function getRequisitionPdf($id)
+    public function getRequisitionPdf(string $id): string|false
     {
         try {
             $response = $this->client->request('GET', "{$this->ordersEndpoint}/orders/{$id}.xml", [
@@ -98,13 +104,17 @@ class MayolinkOrderService
         if ($response->getStatusCode() !== 200) {
             return false;
         }
-        $xmlResponse = $response->getBody();
+        $xmlResponse = $response->getBody()->getContents();
         $xmlObj = simplexml_load_string($xmlResponse);
-        $pdf = base64_decode($xmlObj->order->requisition);
+        $pdf = base64_decode((string) $xmlObj->order->requisition);
         return $pdf;
     }
 
-    public function getSamples($type, $options)
+    /**
+     * @param array<string, mixed> $options
+     * @return list<array<string, mixed>>
+     */
+    public function getSamples(string $type, array $options): array
     {
         if (isset($options['type']) && $options['type'] === 'saliva') {
             $tests = $options['salivaTests'];
@@ -149,12 +159,12 @@ class MayolinkOrderService
         return $mayoSamples;
     }
 
-    private function setMayoCredentials()
+    private function setMayoCredentials(): void
     {
         $this->client = new HttpClient(['cookies' => true]);
-        $this->ordersEndpoint = $this->params->get('ml_orders_endpoint');
-        $this->userName = $this->params->get('ml_username');
-        $this->password = $this->params->get('ml_password');
+        $this->ordersEndpoint = (string) $this->params->get('ml_orders_endpoint');
+        $this->userName = (string) $this->params->get('ml_username');
+        $this->password = (string) $this->params->get('ml_password');
         if (empty($this->ordersEndpoint) || empty($this->userName) || empty($this->password)) {
             throw new \Exception('MayoLINK connection is not configured.');
         }

@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method DeceasedLog|null findOneBy(array $criteria, array $orderBy = null)
  * @method DeceasedLog[]    findAll()
  * @method DeceasedLog[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<DeceasedLog>
  */
 class DeceasedLogRepository extends ServiceEntityRepository
 {
@@ -20,9 +21,9 @@ class DeceasedLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return DeceasedLog[] Returns an array of DeceasedLog objects
+     * @return array<int, array<string, string|null>>
      */
-    public function getLatestOrganizations($status)
+    public function getLatestOrganizations(?string $status): array
     {
         return $this->createQueryBuilder('d')
             ->select('d.organizationId, max(d.deceasedTs) as ts')

@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class IncentiveImportConfirmFormType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('Confirm', Type\SubmitType::class, [

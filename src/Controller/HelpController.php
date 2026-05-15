@@ -30,7 +30,7 @@ class HelpController extends BaseController
     }
 
     #[Route(path: '/sop/{id}/{language}', name: 'help_nph_sopView')]
-    public function nphSopViewAction($id, $language, HelpService $helpService): Response
+    public function nphSopViewAction(string $id, string $language, HelpService $helpService): Response
     {
         $document = $helpService->getDocumentInfo($id, 'nph');
         if (!$document) {
@@ -45,7 +45,7 @@ class HelpController extends BaseController
     }
 
     #[Route(path: '/sop/file/{id}/{language}/{documentGroup}', name: 'help_sopFile')]
-    public function sopFileAction(string $id, string $language, HelpService $helpService, string $documentGroup = 'hpo')
+    public function sopFileAction(string $id, string $language, HelpService $helpService, string $documentGroup = 'hpo'): Response
     {
         $document = $helpService->getDocumentInfo($id, $documentGroup);
         if (!$document) {

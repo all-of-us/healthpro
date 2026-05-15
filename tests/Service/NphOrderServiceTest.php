@@ -31,22 +31,22 @@ class NphOrderServiceTest extends ServiceTestCase
         $siteService = static::getContainer()->get(SiteService::class);
         $siteService->switchSite('nph-site-test' . '@' . self::GROUP_DOMAIN);
         $mockRdrApiService = $this->createMock(RdrApiService::class);
-        $mockRdrApiService->method('post')->willReturn($this->returnCallback(
+        $mockRdrApiService->method('post')->willReturnCallback(
             function ($arg) {
                 if ($arg === "rdr/v1/api/v1/nph/Participant/P0000000003/DlwDosage") {
                     return $this->getGuzzleResponse('12345');
                 } else {
                     return $this->getGuzzleResponse($this->getMockRdrResponseData());
                 }
-        }));
-        $mockRdrApiService->method('put')->willReturn($this->returnCallback(
+        });
+        $mockRdrApiService->method('put')->willReturnCallback(
             function ($arg) {
                 if ($arg === "rdr/v1/api/v1/nph/Participant/P0000000003/DlwDosage") {
                     return $this->getGuzzleResponse('12345');
                 } else {
                     return $this->getGuzzleResponse($this->getMockRdrResponseData());
                 }
-            }));
+            });
         $this->service = new NphOrderService(
             static::getContainer()->get(EntityManagerInterface::class),
             static::getContainer()->get(UserService::class),

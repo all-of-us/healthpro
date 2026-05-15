@@ -14,7 +14,10 @@ class DebugToolsService
         $this->api = $api;
     }
 
-    public function getParticipantById($participantId): array|null
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getParticipantById(string $participantId): ?array
     {
         try {
             return $this->api->getRawParticipantById($participantId);

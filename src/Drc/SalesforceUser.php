@@ -9,9 +9,9 @@ class SalesforceUser
 {
     private string $id;
     private string $email;
-    private string $timezone;
+    private ?string $timezone;
 
-    public function __construct($id, $email, $timezone)
+    public function __construct(string $id, string $email, ?string $timezone)
     {
         $this->id = $id;
         $this->email = $email;
@@ -33,7 +33,7 @@ class SalesforceUser
         return $this->getId();
     }
 
-    public function getTimezone(): string
+    public function getTimezone(): ?string
     {
         return $this->timezone;
     }

@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints;
 
 class OrderType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $disabled = $options['order']->isFormDisabled();
         switch ($options['step']) {
@@ -309,7 +309,6 @@ class OrderType extends AbstractType
                 'constraints' => new Constraints\Type('string')
             ]);
         }
-        return $builder->getForm();
     }
 
     public function configureOptions(OptionsResolver $resolver)

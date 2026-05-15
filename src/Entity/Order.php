@@ -34,10 +34,13 @@ class Order
     public const PEDIATRIC_SALIVA_SAMPLE_DEFAULT = '1SAL2';
     public const PEDIATRIC_SALIVA_SAMPLE_HIDE = '2SAL0';
 
+    /** @var list<string> */
     public static $samplesRequiringProcessing = ['1SST8', '1PST8', '1SS08', '1PS08', 'PS04A', 'PS04B'];
 
+    /** @var list<string> */
     public static $samplesRequiringCentrifugeType = ['1SS08', '1PS08', 'PS04A', 'PS04B'];
 
+    /** @var array<string, string> */
     public static $identifierLabel = [
         'name' => 'name',
         'dob' => 'date of birth',
@@ -46,15 +49,19 @@ class Order
         'email' => 'email address'
     ];
 
+    /** @var array<string, string> */
     public static $centrifugeType = [
         'swinging_bucket' => 'Swinging Bucket',
         'fixed_angle' => 'Fixed Angle'
     ];
 
+    /** @var list<string> */
     public static $sst = ['1SST8', '1SS08'];
 
+    /** @var list<string> */
     public static $pst = ['1PST8', '1PS08', 'PS04A', 'PS04B'];
 
+    /** @var array<string, string> */
     public static $sampleMessageLabels = [
         '1SST8' => 'sst',
         '1SS08' => 'sst',
@@ -66,10 +73,13 @@ class Order
         'PS04B' => 'pst'
     ];
 
+    /** @var list<string> */
     public static $nonBloodSamples = ['1UR10', '1UR90', '1SAL', '1SAL2', '2SAL0'];
 
+    /** @var list<string> */
     public static $urineSamples = ['1UR10', '1UR90'];
 
+    /** @var array<string, array<string, string>> */
     public static $mapRdrSamples = [
         '1SST8' => [
             'code' => '1SS08',
@@ -105,6 +115,7 @@ class Order
         ],
     ];
 
+    /** @var array<string, array<string, string>> */
     public static array $hpoToRdrSampleConversions = [
         '1SS08' => ['fixed_angle' => '2SST8', 'swinging_bucket' => '1SST8'],
         '1PS08' => ['fixed_angle' => '2PST8', 'swinging_bucket' => '1PST8'],
@@ -112,6 +123,7 @@ class Order
         'PS04B' => ['fixed_angle' => '2PS4B', 'swinging_bucket' => '1PS4B']
     ];
 
+    /** @var array<string, string> */
     public static $cancelReasons = [
         'Order created in error' => 'ORDER_CANCEL_ERROR',
         'Order created for wrong participant' => 'ORDER_CANCEL_WRONG_PARTICIPANT',
@@ -119,6 +131,7 @@ class Order
         'Other' => 'OTHER'
     ];
 
+    /** @var array<string, string> */
     public static $unlockReasons = [
         'Add/Remove collected or processed samples' => 'ORDER_AMEND_SAMPLES',
         'Change collection or processing timestamps' => 'ORDER_AMEND_TIMESTAMPS',
@@ -126,159 +139,224 @@ class Order
         'Other' => 'OTHER'
     ];
 
+    /** @var array<string, string> */
     public static $restoreReasons = [
         'Order cancelled for wrong participant' => 'ORDER_RESTORE_WRONG_PARTICIPANT',
         'Order can be amended instead of cancelled' => 'ORDER_RESTORE_AMEND',
         'Other' => 'OTHER'
     ];
 
-    private $params;
-    private $samples;
-    private $samplesInformation;
-    private $salivaSamples;
-    private $salivaSamplesInformation;
-    private $salivaInstructions;
+    /** @var array<string, mixed> */
+    private $params = [];
+
+    /** @var array<string, string> */
+    private $samples = [];
+
+    /** @var array<string, array<string, mixed>> */
+    private $samplesInformation = [];
+
+    /** @var array<string, string> */
+    private $salivaSamples = [];
+
+    /** @var array<string, array<string, mixed>> */
+    private $salivaSamplesInformation = [];
+
+    /** @var string */
+    private $salivaInstructions = '';
+
+    /** @var string|null */
     private $currentVersion;
+
+    /** @var string|null */
     private $origin;
 
+    /** @var int|null */
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private $id;
 
+    /** @var User|null */
     #[ORM\OneToOne(targetEntity: 'App\Entity\User', cascade: ['persist', 'remove'])]
     private $user;
 
+    /** @var string */
     #[ORM\Column(type: 'string', length: 50)]
     private $site;
 
+    /** @var string */
     #[ORM\Column(type: 'string', length: 50)]
     private $participantId;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $rdrId;
 
+    /** @var string */
     #[ORM\Column(type: 'string', length: 50)]
     private $biobankId;
 
+    /** @var DateTime */
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $createdTs;
 
+    /** @var string */
     #[ORM\Column(type: 'string', length: 100)]
     private $orderId;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private $mayoId;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $requestedSamples;
 
+    /** @var DateTimeInterface|null */
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $printedTs;
 
+    /** @var User|null */
     #[ORM\OneToOne(targetEntity: 'App\Entity\User', cascade: ['persist', 'remove'])]
     private $collectedUser;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $collectedSite;
 
+    /** @var DateTime|null */
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $collectedTs;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $collectedSamples;
 
+    /** @var string|null */
     #[ORM\Column(type: 'text', nullable: true)]
     private $collectedNotes;
 
+    /** @var User|null */
     #[ORM\OneToOne(targetEntity: 'App\Entity\User', cascade: ['persist', 'remove'])]
     private $processedUser;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $processedSite;
 
+    /** @var DateTimeInterface|null */
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $processedTs;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private $processedSamples;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', nullable: true)]
     private $processedSamplesTs;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $processedCentrifugeType;
 
+    /** @var string|null */
     #[ORM\Column(type: 'text', nullable: true)]
     private $processedNotes;
 
+    /** @var User|null */
     #[ORM\OneToOne(targetEntity: 'App\Entity\User', cascade: ['persist', 'remove'])]
     private $finalizedUser;
 
+    /** @var DateTimeInterface|null */
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $finalizedTs;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $finalizedSamples;
 
+    /** @var string|null */
     #[ORM\Column(type: 'text', nullable: true)]
     private $finalizedNotes;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $fedexTracking;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 20, nullable: true)]
     private $type;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 10, nullable: true)]
     private $version;
 
+    /** @var bool|null */
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $biobankFinalized = false;
 
+    /** @var string|null */
     #[ORM\Column(type: 'text', nullable: true)]
     private $biobankChanges;
 
+    /** @var OrderHistory|null */
     #[ORM\OneToOne(targetEntity: 'App\Entity\OrderHistory', cascade: ['persist', 'remove'])]
     private $history;
 
+    /** @var string|null */
     #[ORM\Column(type: 'string', length: 50, nullable: true)]
     private $finalizedSite;
 
+    /** @var int|null */
     #[ORM\Column(type: 'integer', nullable: true)]
     private $createdTimezoneId;
 
+    /** @var int|null */
     #[ORM\Column(type: 'integer', nullable: true)]
     private $collectedTimezoneId;
 
+    /** @var int|null */
     #[ORM\Column(type: 'integer', nullable: true)]
     private $processedTimezoneId;
 
+    /** @var int|null */
     #[ORM\Column(type: 'integer', nullable: true)]
     private $finalizedTimezoneId;
 
+    /** @var DateTimeInterface|null */
     #[ORM\Column(type: 'datetime', nullable: true)]
     private $submissionTs;
 
+    /** @var int|null */
     #[ORM\Column(type: 'integer', nullable: true)]
     private $ageInMonths;
 
+    /** @var string|null */
     private $quanumCollectedUser;
 
+    /** @var string|null */
     private $quanumProcessedUser;
 
+    /** @var string|null */
     private $quanumFinalizedUser;
 
+    /** @var string|null */
     private $collectedSiteName;
 
+    /** @var string|null */
     private $processedSiteName;
 
+    /** @var string|null */
     private $finalizedSiteName;
 
+    /** @var string|null */
     private $collectedSiteAddress;
 
+    /** @var string|null */
     private $quanumFinalizedSamples;
 
+    /** @var string|null */
     private $quanumOrderStatus;
 
 
@@ -885,37 +963,49 @@ class Order
         return $this->quanumOrderStatus;
     }
 
-    public function getSamples()
+    /**
+     * @return array<string, string>
+     */
+    public function getSamples(): array
     {
         return $this->samples;
     }
 
-    public function getSamplesInformation()
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    public function getSamplesInformation(): array
     {
         return $this->samplesInformation;
     }
 
-    public function getSalivaSamples()
+    /**
+     * @return array<string, string>
+     */
+    public function getSalivaSamples(): array
     {
         return $this->salivaSamples;
     }
 
-    public function getSalivaSamplesInformation()
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    public function getSalivaSamplesInformation(): array
     {
         return $this->salivaSamplesInformation;
     }
 
-    public function getSalivaInstructions()
+    public function getSalivaInstructions(): string
     {
         return $this->salivaInstructions;
     }
 
-    public function getCurrentVersion()
+    public function getCurrentVersion(): ?string
     {
         return $this->currentVersion;
     }
 
-    public function getAgeInMonths(): int
+    public function getAgeInMonths(): ?int
     {
         return $this->ageInMonths;
     }
@@ -927,7 +1017,10 @@ class Order
         return $this;
     }
 
-    public function loadSamplesSchema($params = [], PpscParticipant $participant = null, Measurement $physicalMeasurement = null)
+    /**
+     * @param array<string, mixed> $params
+     */
+    public function loadSamplesSchema(array $params = [], ?PpscParticipant $participant = null, ?Measurement $physicalMeasurement = null): void
     {
         $this->currentVersion = $this->getVersion();
         if ($participant) {
@@ -979,12 +1072,15 @@ class Order
         }
         $this->salivaSamples = $salivaSamples;
 
+        if (!isset($schema['salivaInstructions']) || !is_string($schema['salivaInstructions'])) {
+            throw new \Exception('Invalid samples schema');
+        }
         $this->salivaInstructions = $schema['salivaInstructions'];
 
         $this->setSampleIds();
     }
 
-    public function setSampleIds()
+    public function setSampleIds(): void
     {
         foreach ($this->samplesInformation as $sample => $sampleInformation) {
             $sampleId = $sample;
@@ -1002,7 +1098,7 @@ class Order
         }
     }
 
-    public function getRdrObject()
+    public function getRdrObject(): \StdClass
     {
         $obj = new \StdClass();
         $obj->subject = 'Patient/' . $this->getParticipantId();
@@ -1069,7 +1165,7 @@ class Order
         return $obj;
     }
 
-    public function getEditRdrObject()
+    public function getEditRdrObject(): \StdClass
     {
         $obj = $this->getRdrObject();
         $obj->amendedReason = $this->getHistory()->getReason();
@@ -1079,7 +1175,7 @@ class Order
         return $obj;
     }
 
-    public function getOrderUser($user)
+    public function getOrderUser(?User $user): string
     {
         if ($this->getBiobankFinalized() && empty($user)) {
             return 'BiobankUser';
@@ -1088,12 +1184,18 @@ class Order
         return $user->getEmail() ?? '';
     }
 
-    public function getOrderSite($site)
+    public function getOrderSite(?string $site): ?string
     {
         return $site ?: $this->getSite();
     }
 
-    public function getOrderUserSiteData($user, $site)
+    /**
+     * @return array{
+     *     author: array{system: string, value: string},
+     *     site: array{system: string, value: ?string}
+     * }
+     */
+    public function getOrderUserSiteData(string $user, ?string $site): array
     {
         return [
             'author' => [
@@ -1107,62 +1209,67 @@ class Order
         ];
     }
 
-    public function getStatus()
+    public function getStatus(): ?string
     {
         $history = $this->getHistory();
         if (!empty($history)) {
             return !empty($history->getType()) ? $history->getType() : self::ORDER_ACTIVE;
         }
+
+        return null;
     }
 
-    public function isExpired()
+    public function isExpired(): bool
     {
         return empty($this->getFinalizedTs()) && empty($this->getVersion()) && $this->getType() !== self::TUBE_SELECTION_TYPE;
     }
 
     // Finalized form is only disabled when rdr_id is set
-    public function isDisabled()
+    public function isDisabled(): bool
     {
         return ($this->getRdrId() || $this->isExpired() || $this->isCancelled()) && $this->getStatus() !== 'unlock';
     }
 
     // Except finalize form all forms are disabled when finalized_ts is set
-    public function isFormDisabled()
+    public function isFormDisabled(): bool
     {
         return ($this->getFinalizedTs() || $this->isExpired() || $this->isCancelled()) && $this->getStatus() !== 'unlock';
     }
 
-    public function isCancelled()
+    public function isCancelled(): bool
     {
         return $this->getStatus() === self::ORDER_CANCEL;
     }
 
-    public function isUnlocked()
+    public function isUnlocked(): bool
     {
         return $this->getStatus() === self::ORDER_UNLOCK;
     }
 
-    public function isFailedToReachRdr()
+    public function isFailedToReachRdr(): bool
     {
         return !empty($this->getFinalizedTs()) && !empty($this->getMayoId()) && empty($this->getRdrId());
     }
 
-    public function canCancel()
+    public function canCancel(): bool
     {
         return !$this->isCancelled() && !$this->isUnlocked() && !$this->isFailedToReachRdr();
     }
 
-    public function canRestore()
+    public function canRestore(): bool
     {
         return !$this->isExpired() && $this->isCancelled() && !$this->isUnlocked() && !$this->isFailedToReachRdr();
     }
 
-    public function canUnlock()
+    public function canUnlock(): bool
     {
         return !$this->isExpired() && !empty($this->getRdrId()) && !$this->isUnlocked() && !$this->isCancelled() && !empty($this->getVersion());
     }
 
-    public function hasBloodSample($samples)
+    /**
+     * @param array<int, string> $samples
+     */
+    public function hasBloodSample(array $samples): bool
     {
         foreach ($samples as $sampleCode) {
             if (!in_array($sampleCode, self::$nonBloodSamples)) {
@@ -1172,7 +1279,7 @@ class Order
         return false;
     }
 
-    public function getUrineSample()
+    public function getUrineSample(): ?string
     {
         foreach ($this->samples as $sample) {
             if (in_array($sample, self::$nonBloodSamples)) {
@@ -1183,7 +1290,10 @@ class Order
     }
 
     // Returns sample's code and display text
-    public function getCustomRequestedSamples()
+    /**
+     * @return array<string, string>
+     */
+    public function getCustomRequestedSamples(): array
     {
         if ($this->getType() == 'saliva') {
             return $this->salivaSamples;
@@ -1197,7 +1307,10 @@ class Order
         return $this->samples;
     }
 
-    public function getEnabledSamples($set)
+    /**
+     * @return array<int, string>
+     */
+    public function getEnabledSamples(string $set): array
     {
         if ($this->getCollectedSamples() &&
             ($collectedArray = json_decode($this->getCollectedSamples())) &&
@@ -1235,7 +1348,7 @@ class Order
         }
     }
 
-    public function getCurrentStep()
+    public function getCurrentStep(): string
     {
         $columns = [
             'print_labels' => 'Printed',
@@ -1268,7 +1381,10 @@ class Order
         return $step;
     }
 
-    public function getAvailableSteps()
+    /**
+     * @return list<string>
+     */
+    public function getAvailableSteps(): array
     {
         $columns = [
             'print_labels' => 'Printed',
@@ -1301,7 +1417,10 @@ class Order
         return $steps;
     }
 
-    public function getWarnings()
+    /**
+     * @return array<string, string>
+     */
+    public function getWarnings(): array
     {
         $warnings = [];
         if ($this->getType() !== 'saliva' && !empty($this->getCollectedTs()) && !empty($this->getProcessedSamplesTs())) {
@@ -1332,7 +1451,10 @@ class Order
         return $warnings;
     }
 
-    public function getErrors()
+    /**
+     * @return array<string, string>
+     */
+    public function getErrors(): array
     {
         $errors = [];
         if (!empty($this->getCollectedTs()) && !empty($this->getProcessedSamplesTs())) {
@@ -1358,7 +1480,7 @@ class Order
         return $errors;
     }
 
-    public function getProcessTabClass()
+    public function getProcessTabClass(): string
     {
         $class = 'fa fa-check-circle text-success';
         if (!empty($this->getErrors())) {
@@ -1369,7 +1491,10 @@ class Order
         return $class;
     }
 
-    public function getBiobankChangesDetails($timeZone)
+    /**
+     * @return array<string, mixed>
+     */
+    public function getBiobankChangesDetails(string $timeZone): array
     {
         $samplesInfo = $this->getType() === 'saliva' ? $this->salivaSamplesInformation : $this->samplesInformation;
         if ($this->getType() === 'saliva') {
@@ -1434,7 +1559,12 @@ class Order
         return $biobankChanges;
     }
 
-    public function getFinalizedProcessSamples($samples)
+    /**
+     * @param array<int, string> $samples
+     *
+     * @return array<int, string>
+     */
+    public function getFinalizedProcessSamples(array $samples): array
     {
         $processSamples = [];
         foreach ($samples as $sample) {
@@ -1445,7 +1575,10 @@ class Order
         return $processSamples;
     }
 
-    public function checkBiobankChanges($collectedTs, $finalizedTs, $finalizedSamples, $finalizedNotes, $centrifugeType, $timezoneId)
+    /**
+     * @param array<int, string> $finalizedSamples
+     */
+    public function checkBiobankChanges(?DateTimeInterface $collectedTs, DateTimeInterface $finalizedTs, array $finalizedSamples, ?string $finalizedNotes, ?string $centrifugeType, ?int $timezoneId): void
     {
         $biobankChanges = [];
         $collectedSamples = !empty($this->getCollectedSamples()) ? json_decode($this->getCollectedSamples(), true) : [];
@@ -1570,6 +1703,9 @@ class Order
                 === self::ORDER_TYPE_DIVERSION);
     }
 
+    /**
+     * @return list<string>
+     */
     public function getPediatricBloodSamples(): array
     {
         $samples = [];
@@ -1581,6 +1717,9 @@ class Order
         return $samples;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getPediatricUrineSamples(): array
     {
         $samples = [];
@@ -1592,6 +1731,9 @@ class Order
         return $samples;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getPediatricSalivaSamples(): array
     {
         return [self::PEDIATRIC_SALIVA_SAMPLE_DEFAULT];
@@ -1607,7 +1749,7 @@ class Order
         return false;
     }
 
-    protected function getSampleTime($set, $sample)
+    protected function getSampleTime(string $set, string $sample): string|false|null
     {
         $samples = json_decode($this->{'get' . $set . 'Samples'}());
         if (!is_array($samples) || !in_array($sample, $samples)) {
@@ -1630,9 +1772,21 @@ class Order
                 return $time->format('Y-m-d\TH:i:s\Z');
             }
         }
+
+        return null;
     }
 
-    protected function getRdrSamples()
+    /**
+     * @return list<array{
+     *     test: string,
+     *     description: string,
+     *     processingRequired: bool,
+     *     collected?: string,
+     *     processed?: string,
+     *     finalized?: string
+     * }>
+     */
+    protected function getRdrSamples(): array
     {
         $samples = [];
         foreach ($this->getModifiedRequestedSamples() as $description => $test) {
@@ -1663,7 +1817,10 @@ class Order
         return $samples;
     }
 
-    protected function getModifiedRequestedSamples()
+    /**
+     * @return array<string, string>
+     */
+    protected function getModifiedRequestedSamples(): array
     {
         $requestedSamples = $this->getRequestedSamples();
         $decodedSamples = $requestedSamples ? json_decode($requestedSamples) : null;

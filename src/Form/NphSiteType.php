@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Validation;
 
 class NphSiteType extends AbstractType
 {
+    /** @var array<string, array<string, int>> */
     public static $siteChoices = [
         'status' => [
             'Active' => 1,
@@ -19,7 +20,7 @@ class NphSiteType extends AbstractType
         ]
     ];
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('name', Type\TextType::class, [
@@ -92,7 +93,7 @@ class NphSiteType extends AbstractType
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => NphSite::class

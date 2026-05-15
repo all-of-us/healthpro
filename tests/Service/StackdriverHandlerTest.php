@@ -5,6 +5,7 @@ namespace App\Tests\Service;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\StackdriverHandler;
+use Google\Cloud\Logging\Entry;
 use Google\Cloud\Logging\Logger as StackdriverLogger;
 use Monolog\Level;
 use Monolog\LogRecord;
@@ -18,7 +19,7 @@ class StackdriverHandlerTest extends TestCase
     {
         putenv('GOOGLE_CLOUD_PROJECT=healthpro-test');
 
-        $entry = new \stdClass();
+        $entry = new Entry();
         $stackdriverLogger = $this->createMock(StackdriverLogger::class);
         $stackdriverLogger->expects($this->once())
             ->method('entry')
@@ -49,7 +50,7 @@ class StackdriverHandlerTest extends TestCase
     {
         putenv('GOOGLE_CLOUD_PROJECT=healthpro-test');
 
-        $entry = new \stdClass();
+        $entry = new Entry();
         $stackdriverLogger = $this->createMock(StackdriverLogger::class);
         $stackdriverLogger->expects($this->once())
             ->method('entry')

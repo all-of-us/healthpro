@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route(path: '/nph/admin')]
@@ -21,13 +22,13 @@ class NphAdminController extends BaseController
     }
 
     #[Route(path: '/', name: 'nph_admin_home')]
-    public function index()
+    public function index(): Response
     {
         return $this->render('program/nph/admin/index.html.twig');
     }
 
     #[Route(path: '/sites', name: 'nph_admin_sites')]
-    public function sitesAction(NphSiteRepository $nphSiteRepository, ParameterBagInterface $params)
+    public function sitesAction(NphSiteRepository $nphSiteRepository, ParameterBagInterface $params): Response
     {
         $sites = $nphSiteRepository->findBy(['deleted' => 0], ['name' => 'asc']);
         return $this->render('program/nph/admin/sites/index.html.twig', [
@@ -42,8 +43,8 @@ class NphAdminController extends BaseController
         NphSiteRepository $nphSiteRepository,
         LoggerService $loggerService,
         Request $request,
-        $id = null
-    ) {
+        ?int $id = null
+    ): Response {
         if ($id) {
             $site = $nphSiteRepository->find($id);
             if (!$site) {

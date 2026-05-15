@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class NphSampleRevertType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('revert', Type\SubmitType::class, [
             'label' => 'Revert',

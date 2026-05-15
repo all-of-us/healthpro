@@ -13,35 +13,35 @@ class PatientStatusHistory
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'integer')]
-    private $userId;
+    private int $userId;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $site;
+    private string $site;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $status;
+    private string $status;
 
     #[ORM\Column(type: 'text', nullable: true)]
-    private $comments;
+    private ?string $comments = null;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTimeInterface $createdTs;
 
     #[ORM\Column(type: 'datetime', nullable: true)]
-    private $rdrTs;
+    private ?\DateTimeInterface $rdrTs = null;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\PatientStatus', inversedBy: 'patientStatusHistories')]
     #[ORM\JoinColumn(nullable: false)]
-    private $patientStatus;
+    private PatientStatus $patientStatus;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\PatientStatusImport', inversedBy: 'patientStatusHistories')]
-    private $import;
+    private ?PatientStatusImport $import = null;
 
     #[ORM\OneToOne(targetEntity: 'App\Entity\PatientStatus', mappedBy: 'history', cascade: ['persist', 'remove'])]
-    private $patientStatusRecords;
+    private ?PatientStatus $patientStatusRecords = null;
 
     public function getId(): ?int
     {
@@ -125,7 +125,7 @@ class PatientStatusHistory
         return $this->patientStatus;
     }
 
-    public function setPatientStatus(?PatientStatus $patientStatus): self
+    public function setPatientStatus(PatientStatus $patientStatus): self
     {
         $this->patientStatus = $patientStatus;
 
@@ -155,7 +155,7 @@ class PatientStatusHistory
 
         // set (or unset) the owning side of the relation if necessary
         $newHistory = null === $patientStatusRecords ? null : $this;
-        if ($patientStatusRecords->getHistory() !== $newHistory) {
+        if ($patientStatusRecords !== null && $patientStatusRecords->getHistory() !== $newHistory) {
             $patientStatusRecords->setHistory($newHistory);
         }
 

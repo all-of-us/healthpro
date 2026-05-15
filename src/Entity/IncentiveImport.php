@@ -12,28 +12,29 @@ class IncentiveImport
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $fileName;
+    private string $fileName;
 
     #[ORM\OneToOne(targetEntity: 'App\Entity\User')]
-    private $user;
+    private ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 50)]
-    private $site;
+    private string $site;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTimeInterface $createdTs;
 
     #[ORM\Column(type: 'smallint', options: ['default' => 0])]
-    private $importStatus = 0;
+    private int $importStatus = 0;
 
     #[ORM\Column(type: 'smallint', options: ['default' => 0])]
-    private $confirm = 0;
+    private int $confirm = 0;
 
+    /** @var Collection<int, IncentiveImportRow> */
     #[ORM\OneToMany(targetEntity: IncentiveImportRow::class, mappedBy: 'import', cascade: ['persist', 'remove'])]
-    private $incentiveImportRows;
+    private Collection $incentiveImportRows;
     public function __construct()
     {
         $this->incentiveImportRows = new ArrayCollection();
@@ -117,7 +118,7 @@ class IncentiveImport
     }
 
     /**
-     * @return Collection|IncentiveImportRow[]
+     * @return Collection<int, IncentiveImportRow>
      */
     public function getIncentiveImportRows(): Collection
     {
@@ -138,10 +139,6 @@ class IncentiveImport
     {
         if ($this->incentiveImportRows->contains($incentiveImportRow)) {
             $this->incentiveImportRows->removeElement($incentiveImportRow);
-            // set the owning side to null (unless already changed)
-            if ($incentiveImportRow->getImport()->getId() === $this->getId()) {
-                $incentiveImportRow->setImport(null);
-            }
         }
 
         return $this;

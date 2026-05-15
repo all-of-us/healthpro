@@ -13,7 +13,8 @@ class NphOrderForm extends AbstractType
     public const FORM_FINALIZE_TYPE = 'finalize';
     public const FORM_COLLECT_TYPE = 'collect';
 
-    public static $urineColors = [
+    /** @var array<string, int> */
+    public static array $urineColors = [
         'Color 1' => 1,
         'Color 2' => 2,
         'Color 3' => 3,
@@ -24,76 +25,29 @@ class NphOrderForm extends AbstractType
         'Color 8' => 8,
     ];
 
-    public static $urineClarity = [
+    /** @var array<string, string> */
+    public static array $urineClarity = [
         'Clean' => 'clean',
         'Slightly Cloudy' => 'slightly_cloudy',
         'Cloudy' => 'cloudy',
         'Turbid' => 'turbid'
     ];
 
-    public static $bowelMovements = [
+    /** @var array<string, string> */
+    public static array $bowelMovements = [
         'Response not provided' => 'not_provided',
         'I was constipated (had difficulty passing stool), and my stool looks like Type 1 and/or 2' => 'difficult',
         'I had diarrhea (watery stool), and my stool looks like Type 5, 6, and/or 7' => 'watery',
         'I had normal formed stool, and my stool looks like Type 3 and/or 4' => 'normal'
     ];
 
-    public static $bowelMovementQuality = [
+    /** @var array<string, string> */
+    public static array $bowelMovementQuality = [
         'Response not provided' => 'not_provided',
         'I tend to be constipated (have difficulty passing stool) - Type 1 and 2' => 'difficult',
         'I tend to have diarrhea (watery stool) - Type 5, 6, and 7' => 'watery',
         'I tend to have normal formed stool - Type 3 and 4' => 'normal'
     ];
-
-    protected function addCollectedTimeAndNoteFields(
-        FormBuilderInterface $builder,
-        array $options,
-        string $sample,
-        bool $disabled = false,
-        string $formType = self::FORM_FINALIZE_TYPE
-    ): void {
-        if ($formType === self::FORM_FINALIZE_TYPE || ($options['orderType'] !== NphOrder::TYPE_STOOL && $options['orderType'] !== NphOrder::TYPE_STOOL_2)) {
-            $constraints = $this->getDateTimeConstraints();
-            if ($formType === self::FORM_COLLECT_TYPE) {
-                $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample) {
-                    if (empty($value) && $context->getRoot()[$sample]->getData() === true) {
-                        $context->buildViolation('Collection time is required')->addViolation();
-                    }
-                });
-            } else {
-                $constraints[] = new Constraints\NotBlank([
-                    'message' => 'Collection time is required'
-                ]);
-            }
-            $constraints[] = $this->getCollectedTimeGreaterThanConstraint($options['orderCreatedTs']);
-            $orderCreatedTs = clone $options['orderCreatedTs'];
-            $userTimeZone = new \DateTimeZone($options['timeZone']);
-            $orderCreatedTs->setTimezone($userTimeZone);
-            $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
-                'required' => false,
-                'label' => 'Collection Time',
-                'widget' => 'single_text',
-                'format' => 'MM/dd/yyyy h:mm a',
-                'html5' => false,
-                'model_timezone' => 'UTC',
-                'view_timezone' => $options['timeZone'],
-                'constraints' => $constraints,
-                'attr' => [
-                    'class' => 'order-ts',
-                    'autocomplete' => 'off',
-                    'readonly' => $options['disableStoolCollectedTs'],
-                    'data-parsley-custom-date-comparison' => $orderCreatedTs->format('m/d/Y g:i A')
-                ],
-                'disabled' => $disabled
-            ]);
-        }
-        $builder->add("{$sample}Notes", Type\TextareaType::class, [
-            'label' => $formType === self::FORM_FINALIZE_TYPE ? 'Finalization Notes' : 'Notes',
-            'required' => false,
-            'constraints' => new Constraints\Type('string'),
-            'disabled' => $disabled
-        ]);
-    }
 
     protected function addUrineMetadataFields(
         FormBuilderInterface $builder,
@@ -216,6 +170,62 @@ class NphOrderForm extends AbstractType
         $builder->add('totalCollectionVolume', Type\NumberType::class, $urineVolumeCollection);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
+    protected function addCollectedTimeAndNoteFields(
+        FormBuilderInterface $builder,
+        array $options,
+        string $sample,
+        bool $disabled = false,
+        string $formType = self::FORM_FINALIZE_TYPE
+    ): void {
+        if ($formType === self::FORM_FINALIZE_TYPE || ($options['orderType'] !== NphOrder::TYPE_STOOL && $options['orderType'] !== NphOrder::TYPE_STOOL_2)) {
+            $constraints = $this->getDateTimeConstraints();
+            if ($formType === self::FORM_COLLECT_TYPE) {
+                $constraints[] = new Constraints\Callback(function ($value, $context) use ($sample) {
+                    if (empty($value) && $context->getRoot()[$sample]->getData() === true) {
+                        $context->buildViolation('Collection time is required')->addViolation();
+                    }
+                });
+            } else {
+                $constraints[] = new Constraints\NotBlank([
+                    'message' => 'Collection time is required'
+                ]);
+            }
+            $constraints[] = $this->getCollectedTimeGreaterThanConstraint($options['orderCreatedTs']);
+            $orderCreatedTs = clone $options['orderCreatedTs'];
+            $userTimeZone = new \DateTimeZone($options['timeZone']);
+            $orderCreatedTs->setTimezone($userTimeZone);
+            $builder->add("{$sample}CollectedTs", Type\DateTimeType::class, [
+                'required' => false,
+                'label' => 'Collection Time',
+                'widget' => 'single_text',
+                'format' => 'MM/dd/yyyy h:mm a',
+                'html5' => false,
+                'model_timezone' => 'UTC',
+                'view_timezone' => $options['timeZone'],
+                'constraints' => $constraints,
+                'attr' => [
+                    'class' => 'order-ts',
+                    'autocomplete' => 'off',
+                    'readonly' => $options['disableStoolCollectedTs'],
+                    'data-parsley-custom-date-comparison' => $orderCreatedTs->format('m/d/Y g:i A')
+                ],
+                'disabled' => $disabled
+            ]);
+        }
+        $builder->add("{$sample}Notes", Type\TextareaType::class, [
+            'label' => $formType === self::FORM_FINALIZE_TYPE ? 'Finalization Notes' : 'Notes',
+            'required' => false,
+            'constraints' => new Constraints\Type('string'),
+            'disabled' => $disabled
+        ]);
+    }
+
+    /**
+     * @return list<\Symfony\Component\Validator\Constraint>
+     */
     protected function getDateTimeConstraints(): array
     {
         return [

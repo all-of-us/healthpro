@@ -214,6 +214,9 @@ class RotateCloudSqlPasswordCommand extends Command
         return $newVersionOutput;
     }
 
+    /**
+     * @param array<string, string> $passwords
+     */
     private function updateCloudSqlCredentialsSecret(array $passwords, string $project, bool $dryRun): string
     {
         // Get latest enabled version number

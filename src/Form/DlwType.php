@@ -148,13 +148,16 @@ class DlwType extends AbstractType
         ]);
     }
 
-    private function getNumDecimalPlaces($num): int
+    private function getNumDecimalPlaces(mixed $num): int
     {
-        if ((int) $num == $num) {
-            return 0;
-        } elseif (!is_numeric($num)) {
+        if (!is_numeric($num)) {
             return 0;
         }
-        return strlen($num) - strrpos($num, '.') - 1;
+        $numString = (string) $num;
+        $decimalPosition = strrpos($numString, '.');
+        if ($decimalPosition === false) {
+            return 0;
+        }
+        return strlen($numString) - $decimalPosition - 1;
     }
 }

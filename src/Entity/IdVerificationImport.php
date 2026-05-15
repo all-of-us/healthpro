@@ -12,28 +12,29 @@ class IdVerificationImport
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $file_name;
+    private string $file_name;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\User')]
-    private $user;
+    private ?User $user = null;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $site;
+    private string $site;
 
     #[ORM\Column(type: 'datetime')]
-    private $createdTs;
+    private \DateTimeInterface $createdTs;
 
     #[ORM\Column(type: 'smallint', options: ['default' => 0])]
-    private $importStatus = 0;
+    private int $importStatus = 0;
 
     #[ORM\Column(type: 'smallint', options: ['default' => 0])]
-    private $confirm = 0;
+    private int $confirm = 0;
 
+    /** @var Collection<int, IdVerificationImportRow> */
     #[ORM\OneToMany(targetEntity: IdVerificationImportRow::class, mappedBy: 'import')]
-    private $idVerificationImportRows;
+    private Collection $idVerificationImportRows;
     public function __construct()
     {
         $this->idVerificationImportRows = new ArrayCollection();
@@ -117,7 +118,7 @@ class IdVerificationImport
     }
 
     /**
-     * @return Collection|IdVerificationImportRow[]
+     * @return Collection<int, IdVerificationImportRow>
      */
     public function getIdVerificationImportRows(): Collection
     {
@@ -136,12 +137,7 @@ class IdVerificationImport
 
     public function removeIdVerificationImportRow(IdVerificationImportRow $idVerificationImportRow): self
     {
-        if ($this->idVerificationImportRows->removeElement($idVerificationImportRow)) {
-            // set the owning side to null (unless already changed)
-            if ($idVerificationImportRow->getImport() === $this) {
-                $idVerificationImportRow->setImport(null);
-            }
-        }
+        $this->idVerificationImportRows->removeElement($idVerificationImportRow);
 
         return $this;
     }

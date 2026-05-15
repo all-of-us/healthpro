@@ -12,41 +12,41 @@ class NphSite
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'boolean')]
-    private $status;
+    private bool $status;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $name;
+    private string $name;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $googleGroup;
+    private string $googleGroup;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $organizationId;
+    private ?string $organizationId = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $awardeeId;
+    private ?string $awardeeId = null;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private $type;
+    private ?string $type = null;
 
     #[ORM\Column(type: 'boolean')]
-    private $deleted = false;
+    private bool $deleted = false;
 
     #[ORM\Column(type: 'string', length: 512, nullable: true)]
-    private $email;
+    private ?string $email = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private $mayolinkAccount;
+    private ?string $mayolinkAccount = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getStatus(): ?bool
+    public function getStatus(): bool
     {
         return $this->status;
     }
@@ -58,7 +58,7 @@ class NphSite
         return $this;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -70,7 +70,7 @@ class NphSite
         return $this;
     }
 
-    public function getGoogleGroup(): ?string
+    public function getGoogleGroup(): string
     {
         return $this->googleGroup;
     }
@@ -118,7 +118,7 @@ class NphSite
         return $this;
     }
 
-    public function getDeleted(): ?bool
+    public function getDeleted(): bool
     {
         return $this->deleted;
     }

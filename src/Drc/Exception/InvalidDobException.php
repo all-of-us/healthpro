@@ -4,5 +4,8 @@ namespace App\Drc\Exception;
 
 class InvalidDobException extends \Exception implements ParticipantSearchExceptionInterface
 {
-    protected $message = 'Invalid date of birth format';
+    public function __construct(string $message = 'Invalid date of birth format')
+    {
+        parent::__construct($message);
+    }
 }

@@ -12,6 +12,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method IdVerificationImportRow|null findOneBy(array $criteria, array $orderBy = null)
  * @method IdVerificationImportRow[]    findAll()
  * @method IdVerificationImportRow[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<IdVerificationImportRow>
  */
 class IdVerificationImportRowRepository extends ServiceEntityRepository
 {
@@ -20,6 +21,9 @@ class IdVerificationImportRowRepository extends ServiceEntityRepository
         parent::__construct($registry, IdVerificationImportRow::class);
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     public function getIdVerificationImportRows(int $limit): array
     {
         return $this->createQueryBuilder('ivir')
@@ -35,7 +39,7 @@ class IdVerificationImportRowRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_ARRAY);
     }
 
-    public function deleteUnconfirmedImportData($date): void
+    public function deleteUnconfirmedImportData(string $date): void
     {
         $query = 'DELETE ivir FROM id_verification_import_row ivir inner join id_verification_import ivi on ivir.import_id = ivi.id where ivi.created_ts < :date and ivi.confirm = :confirm';
         $params = ['date' => $date, 'confirm' => 0];

@@ -11,7 +11,15 @@ class NphParticipantReviewService
         $this->nphParticipantSummaryService = $nphParticipantSummaryService;
     }
 
-    public function getTodaysSamples(?array $samples, bool $biobankView = false): array
+    /**
+     * @param array<int, array<string, mixed>> $samples
+     *
+     * @return array{
+     *   samples: array<int, array<string, mixed>>,
+     *   rowCounts: array<string, array<string, int>>
+     * }
+     */
+    public function getTodaysSamples(array $samples, bool $biobankView = false): array
     {
         $count = 0;
         $rowCounts = [];

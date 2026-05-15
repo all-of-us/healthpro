@@ -2,9 +2,16 @@
 
 namespace App\Security;
 
+use App\Drc\GoogleUser;
+use App\Drc\SalesforceUser;
 use App\Entity\User as UserEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @phpstan-type GroupInfo object{email: string, name: string, id: string}
+ * @phpstan-type UserInfo array<string, mixed>
+ * @phpstan-type SessionInfo array<string, mixed>
+ */
 class User implements UserInterface
 {
     public const SITE_PREFIX = 'hpo-site-';
@@ -24,31 +31,53 @@ class User implements UserInterface
     public const HPO_TYPE = 'hpo';
     public const NPH_TYPE = 'nph';
 
-    private $googleUser;
-    private $groups;
-    private $sites;
-    private $nphSites;
-    private $awardees;
-    private $adminAccess;
-    private $nphAdminAccess;
-    private $info;
-    private $timezone;
-    private $lastLogin;
-    private $sessionInfo;
-    private $adminDvAccess;
-    private $biobankAccess;
-    private $nphBiobankAccess;
-    private $scrippsAccess;
-    private $scrippsAwardee;
-    private $readOnlyGroups;
+    private GoogleUser|SalesforceUser|MockUser $googleUser;
 
-    public function __construct($googleUser, array $groups, $info = null, $timezone = null, $sessionInfo = null)
+    /** @var list<mixed> */
+    private array $groups;
+
+    /** @var list<GroupInfo> */
+    private array $sites;
+
+    /** @var list<GroupInfo> */
+    private array $nphSites;
+
+    /** @var list<GroupInfo> */
+    private array $awardees;
+
+    private bool $adminAccess;
+    private bool $nphAdminAccess;
+
+    /** @var UserInfo */
+    private array $info;
+
+    private ?string $timezone;
+    private ?\DateTimeInterface $lastLogin = null;
+
+    /** @var SessionInfo */
+    private array $sessionInfo;
+
+    private bool $adminDvAccess;
+    private bool $biobankAccess;
+    private bool $nphBiobankAccess;
+    private bool $scrippsAccess;
+    private bool $scrippsAwardee = false;
+
+    /** @var list<GroupInfo> */
+    private array $readOnlyGroups;
+
+    /**
+     * @param list<mixed>        $groups
+     * @param UserInfo|null      $info
+     * @param SessionInfo|null   $sessionInfo
+     */
+    public function __construct(GoogleUser|SalesforceUser|MockUser $googleUser, array $groups, ?array $info = null, ?string $timezone = null, ?array $sessionInfo = null)
     {
         $this->googleUser = $googleUser;
         $this->groups = $groups;
-        $this->info = $info;
-        $this->timezone = is_null($timezone) && isset($info['timezone']) ? $info['timezone'] : $timezone;
-        $this->sessionInfo = $sessionInfo;
+        $this->info = $info ?? [];
+        $this->timezone = $timezone ?? ($this->info['timezone'] ?? null);
+        $this->sessionInfo = $sessionInfo ?? [];
         $this->sites = $this->computeSites(self::HPO_TYPE);
         $this->nphSites = $this->computeSites(self::NPH_TYPE);
         $this->awardees = $this->computeAwardees();
@@ -61,12 +90,18 @@ class User implements UserInterface
         $this->readOnlyGroups = $this->computeReadOnlyGroups();
     }
 
-    public function getGroups()
+    /**
+     * @return list<mixed>
+     */
+    public function getGroups(): array
     {
         return $this->groups;
     }
 
-    public function getInfo()
+    /**
+     * @return UserInfo
+     */
+    public function getInfo(): array
     {
         return $this->info;
     }
@@ -88,22 +123,34 @@ class User implements UserInterface
         return $twoFactorAuth;
     }
 
-    public function getSites()
+    /**
+     * @return list<GroupInfo>
+     */
+    public function getSites(): array
     {
         return $this->sites;
     }
 
+    /**
+     * @return list<GroupInfo>
+     */
     public function getNphSites(): array
     {
         return $this->nphSites;
     }
 
-    public function getAwardees()
+    /**
+     * @return list<GroupInfo>
+     */
+    public function getAwardees(): array
     {
         return $this->awardees;
     }
 
-    public function getSite($email, $siteType = 'sites')
+    /**
+     * @return GroupInfo|null
+     */
+    public function getSite(string $email, string $siteType = 'sites'): ?object
     {
         $site = null;
         foreach ($this->{$siteType} as $s) {
@@ -115,7 +162,10 @@ class User implements UserInterface
         return $site;
     }
 
-    public function getAwardee($email)
+    /**
+     * @return GroupInfo|null
+     */
+    public function getAwardee(string $email): ?object
     {
         $awardee = null;
         foreach ($this->awardees as $a) {
@@ -127,7 +177,7 @@ class User implements UserInterface
         return $awardee;
     }
 
-    public function belongsToSite($email, $siteType = 'sites')
+    public function belongsToSite(string $email, string $siteType = 'sites'): bool
     {
         $belongs = false;
         foreach ($this->{$siteType} as $site) {
@@ -139,7 +189,7 @@ class User implements UserInterface
         return $belongs;
     }
 
-    public function belongsToAwardee($email)
+    public function belongsToAwardee(string $email): bool
     {
         $belongs = false;
         foreach ($this->awardees as $awardee) {
@@ -151,12 +201,15 @@ class User implements UserInterface
         return $belongs;
     }
 
-    public function getGoogleUser()
+    public function getGoogleUser(): GoogleUser|SalesforceUser|MockUser
     {
         return $this->googleUser;
     }
 
-    public function getAllRoles()
+    /**
+     * @return list<string>
+     */
+    public function getAllRoles(): array
     {
         $roles = [];
         if (count($this->sites) > 0) {
@@ -226,17 +279,17 @@ class User implements UserInterface
         return $this->googleUser->getEmail();
     }
 
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->googleUser->getEmail();
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         // we don't actually store any credentials
     }
 
-    public function getTimezone($useDefault = true)
+    public function getTimezone(bool $useDefault = true): ?string
     {
         if (!$this->timezone) {
             return $useDefault ? self::DEFAULT_TIMEZONE : null;
@@ -244,7 +297,7 @@ class User implements UserInterface
         return $this->timezone;
     }
 
-    public function setTimezone($timezone)
+    public function setTimezone(?string $timezone): void
     {
         $this->timezone = $timezone;
     }
@@ -254,20 +307,23 @@ class User implements UserInterface
         return $this->lastLogin;
     }
 
-    public function setLastLogin(?\DateTimeInterface $lastLogin)
+    public function setLastLogin(?\DateTimeInterface $lastLogin): void
     {
         $this->lastLogin = $lastLogin;
     }
 
-    public function getId()
+    public function getId(): int|false
     {
         if (isset($this->info['id'])) {
-            return $this->info['id'];
+            return (int) $this->info['id'];
         }
         return false;
     }
 
-    public function getSiteFromId(string $siteId, string $siteType = 'sites')
+    /**
+     * @return GroupInfo|null
+     */
+    public function getSiteFromId(string $siteId, string $siteType = 'sites'): ?object
     {
         $site = null;
         foreach ($this->$siteType as $s) {
@@ -279,12 +335,18 @@ class User implements UserInterface
         return $site;
     }
 
-    public function getReadOnlyGroups()
+    /**
+     * @return list<GroupInfo>
+     */
+    public function getReadOnlyGroups(): array
     {
         return $this->readOnlyGroups;
     }
 
-    public function getReadOnlyGroup($email)
+    /**
+     * @return GroupInfo|null
+     */
+    public function getReadOnlyGroup(string $email): ?object
     {
         $readOnlyGroup = null;
         foreach ($this->readOnlyGroups as $g) {
@@ -296,7 +358,10 @@ class User implements UserInterface
         return $readOnlyGroup;
     }
 
-    public function getReadOnlyGroupFromId($groupId)
+    /**
+     * @return GroupInfo|null
+     */
+    public function getReadOnlyGroupFromId(string $groupId): ?object
     {
         $readOnlyGroup = null;
         foreach ($this->readOnlyGroups as $g) {
@@ -308,16 +373,22 @@ class User implements UserInterface
         return $readOnlyGroup;
     }
 
-    public function getGroup(string $email, string $siteType = 'sites')
+    /**
+     * @return GroupInfo|null
+     */
+    public function getGroup(string $email, string $siteType = 'sites'): ?object
     {
-        $group = $this->getSite($email);
+        $group = $this->getSite($email, $siteType);
         if ($group) {
             return $group;
         }
         return $this->getReadOnlyGroup($email);
     }
 
-    public function getGroupFromId(string $groupId, string $siteType = 'sites')
+    /**
+     * @return GroupInfo|null
+     */
+    public function getGroupFromId(string $groupId, string $siteType = 'sites'): ?object
     {
         $group = $this->getSiteFromId($groupId, $siteType);
         if ($group) {
@@ -326,7 +397,10 @@ class User implements UserInterface
         return $this->getReadOnlyGroupFromId($groupId);
     }
 
-    private function computeSites($siteType)
+    /**
+     * @return list<GroupInfo>
+     */
+    private function computeSites(string $siteType): array
     {
         $sites = [];
         $sitePrefix = $siteType === 'hpo' ? self::SITE_PREFIX : self::SITE_NPH_PREFIX;
@@ -351,7 +425,10 @@ class User implements UserInterface
         return $sites;
     }
 
-    private function computeAwardees()
+    /**
+     * @return list<GroupInfo>
+     */
+    private function computeAwardees(): array
     {
         $awardees = [];
         // awardee membership is determined by the user's groups
@@ -373,7 +450,7 @@ class User implements UserInterface
         return $awardees;
     }
 
-    private function computeAdminAccess($type)
+    private function computeAdminAccess(string $type): bool
     {
         $hasAccess = false;
         $groupPrefix = $type === 'hpo' ? self::ADMIN_GROUP : self::NPH_ADMIN_GROUP;
@@ -385,7 +462,7 @@ class User implements UserInterface
         return $hasAccess;
     }
 
-    private function computeAdminDvAccess()
+    private function computeAdminDvAccess(): bool
     {
         $hasAccess = false;
         foreach ($this->groups as $group) {
@@ -408,7 +485,7 @@ class User implements UserInterface
         return $hasAccess;
     }
 
-    private function computeScrippsAccess()
+    private function computeScrippsAccess(): bool
     {
         $hasAccess = false;
         foreach ($this->groups as $group) {
@@ -419,7 +496,10 @@ class User implements UserInterface
         return $hasAccess;
     }
 
-    private function computeReadOnlyGroups()
+    /**
+     * @return list<GroupInfo>
+     */
+    private function computeReadOnlyGroups(): array
     {
         $readOnlyGroups = [];
         foreach ($this->groups as $group) {
@@ -435,7 +515,12 @@ class User implements UserInterface
         return $readOnlyGroups;
     }
 
-    private function getUserRoles($roles, $site, $awardee)
+    /**
+     * @param list<string> $roles
+     *
+     * @return list<string>
+     */
+    private function getUserRoles(array $roles, mixed $site, mixed $awardee): array
     {
         if (!empty($site)) {
             UserEntity::removeUserRoles(['ROLE_AWARDEE', 'ROLE_AWARDEE_SCRIPPS'], $roles);
