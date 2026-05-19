@@ -2,6 +2,8 @@
 
 namespace App\Tests\Service;
 
+use App\Entity\Measurement;
+use App\Entity\Order;
 use App\Entity\PediatricAssent;
 use App\Entity\User;
 use App\Security\User as SecurityUser;
@@ -269,6 +271,56 @@ class PediatricAssentServiceTest extends TestCase
         self::assertSame(PediatricAssent::TYPE_BLOOD_SAMPLE, $payload->assentType);
         self::assertSame(PediatricAssent::RESPONSE_YES, $payload->assentResponse);
         self::assertSame('2026-05-07T15:15:00Z', $payload->created);
+    }
+
+    public function testLinkMeasurementAssentStoresMeasurement(): void
+    {
+        $assent = new PediatricAssent();
+        $measurement = new Measurement();
+        $repository = $this->createMock(ObjectRepository::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $userService = $this->createMock(UserService::class);
+        $siteService = $this->createMock(SiteService::class);
+
+        $repository->expects($this->once())->method('find')->with(99)->willReturn($assent);
+        $entityManager->expects($this->once())->method('getRepository')->with(PediatricAssent::class)->willReturn($repository);
+        $entityManager->expects($this->once())
+            ->method('persist')
+            ->with($this->callback(function ($persistedAssent) use ($assent, $measurement) {
+                self::assertSame($assent, $persistedAssent);
+                self::assertSame($measurement, $persistedAssent->getMeasurement());
+
+                return true;
+            }));
+        $entityManager->expects($this->once())->method('flush');
+
+        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service->linkMeasurementAssent(99, $measurement);
+    }
+
+    public function testLinkOrderAssentStoresOrder(): void
+    {
+        $assent = new PediatricAssent();
+        $order = new Order();
+        $repository = $this->createMock(ObjectRepository::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $userService = $this->createMock(UserService::class);
+        $siteService = $this->createMock(SiteService::class);
+
+        $repository->expects($this->once())->method('find')->with(77)->willReturn($assent);
+        $entityManager->expects($this->once())->method('getRepository')->with(PediatricAssent::class)->willReturn($repository);
+        $entityManager->expects($this->once())
+            ->method('persist')
+            ->with($this->callback(function ($persistedAssent) use ($assent, $order) {
+                self::assertSame($assent, $persistedAssent);
+                self::assertSame($order, $persistedAssent->getOrder());
+
+                return true;
+            }));
+        $entityManager->expects($this->once())->method('flush');
+
+        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service->linkOrderAssent(77, $order);
     }
 
     private function createUser(string $email, ?string $timezone = 'America/New_York'): User

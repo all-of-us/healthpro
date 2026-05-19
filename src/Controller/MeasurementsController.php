@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Audit\Log;
 use App\Entity\Measurement;
+use App\Entity\PediatricAssent;
 use App\Entity\User;
 use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
@@ -60,8 +61,11 @@ class MeasurementsController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}', name: 'measurement', defaults: ['measurementId' => null])]
     #[Route(path: '/read/participant/{participantId}/measurements/{measurementId}', name: 'read_measurement', methods: ['GET'])]
-    public function measurementsAction(string $participantId, ?int $measurementId, Request $request): Response
-    {
+    public function measurementsAction(
+        string $participantId,
+        ?int $measurementId,
+        Request $request
+    ): Response {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -488,8 +492,14 @@ class MeasurementsController extends BaseController
                     $assentForm = $this->createForm(PediatricAssentType::class, $formData, $formOptions);
                 }
                 if ($result['success']) {
+                    /** @var PediatricAssent|null $assent */
+                    $assent = $result['assent'] ?? null;
+                    $measurement = $this->createDraftPediatricMeasurement($participant);
+                    $pediatricAssentService->linkMeasurementAssent($assent?->getId(), $measurement);
+
                     return $this->redirectToRoute('measurement', [
-                        'participantId' => $participant->id
+                        'participantId' => $participant->id,
+                        'measurementId' => $measurement->getId(),
                     ]);
                 }
             } else {
@@ -585,5 +595,34 @@ class MeasurementsController extends BaseController
         $response = new JsonResponse($rdrMeasurement);
         $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
         return $response;
+    }
+
+    private function createDraftPediatricMeasurement(object $participant): Measurement
+    {
+        $type = $participant->pediatricMeasurementsVersionType ?? null;
+        $measurement = new Measurement();
+        $this->measurementService->load($measurement, $participant, $type);
+        if ($measurement->isPediatricForm()) {
+            $measurement->setAgeInMonths($participant->ageInMonths);
+        }
+
+        $userRepository = $this->em->getRepository(User::class);
+        $currentUser = $userRepository->find($this->getSecurityUser()->getId());
+        $now = new \DateTime();
+        $measurement->setUser($currentUser);
+        $measurement->setSite($this->siteService->getSiteId());
+        $measurement->setParticipantId($participant->id);
+        $measurement->setCreatedTs($now);
+        $measurement->setUpdatedTs($now);
+        $measurement->setVersion($this->measurementService->getCurrentVersion($type));
+        $measurement->setData(json_encode($measurement->getFieldData()));
+        if (isset($participant->sexAtBirth)) {
+            $measurement->setSexAtBirth($participant->sexAtBirth);
+        }
+
+        $this->em->persist($measurement);
+        $this->em->flush();
+
+        return $measurement;
     }
 }

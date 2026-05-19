@@ -36,6 +36,12 @@ class PediatricAssent
     #[ORM\ManyToOne]
     private ?User $user = null;
 
+    #[ORM\ManyToOne]
+    private ?Measurement $measurement = null;
+
+    #[ORM\ManyToOne]
+    private ?Order $order = null;
+
     #[ORM\Column(length: 255)]
     private string $createdBy;
 
@@ -88,6 +94,30 @@ class PediatricAssent
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getMeasurement(): ?Measurement
+    {
+        return $this->measurement;
+    }
+
+    public function setMeasurement(?Measurement $measurement): static
+    {
+        $this->measurement = $measurement;
+
+        return $this;
+    }
+
+    public function getOrder(): ?Order
+    {
+        return $this->order;
+    }
+
+    public function setOrder(?Order $order): static
+    {
+        $this->order = $order;
 
         return $this;
     }

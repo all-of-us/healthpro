@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Measurement;
+use App\Entity\Order;
 use App\Entity\PediatricAssent;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -68,6 +70,38 @@ class PediatricAssentService
         $payload->created = $createdUtc->format('Y-m-d\TH:i:s\Z');
 
         return $payload;
+    }
+
+    public function linkMeasurementAssent(?int $assentId, Measurement $measurement): void
+    {
+        if ($assentId === null) {
+            return;
+        }
+
+        $assent = $this->em->getRepository(PediatricAssent::class)->find($assentId);
+        if (!$assent instanceof PediatricAssent) {
+            return;
+        }
+
+        $assent->setMeasurement($measurement);
+        $this->em->persist($assent);
+        $this->em->flush();
+    }
+
+    public function linkOrderAssent(?int $assentId, Order $order): void
+    {
+        if ($assentId === null) {
+            return;
+        }
+
+        $assent = $this->em->getRepository(PediatricAssent::class)->find($assentId);
+        if (!$assent instanceof PediatricAssent) {
+            return;
+        }
+
+        $assent->setOrder($order);
+        $this->em->persist($assent);
+        $this->em->flush();
     }
 
     /**

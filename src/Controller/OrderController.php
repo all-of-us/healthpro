@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\Order;
+use App\Entity\PediatricAssent;
 use App\Entity\Site;
 use App\Form\OrderCreateType;
 use App\Form\OrderModifyType;
@@ -132,6 +133,9 @@ class OrderController extends BaseController
                     $this->orderService->persistNewOrder($order, $participant, $session->get('siteType'), $session->get('orderType'));
                     $orderId = $order->getId();
                     if ($orderId && $session->get('siteType')) {
+                        /** @var PediatricAssent|null $assent */
+                        $assent = $result['assent'] ?? null;
+                        $pediatricAssentService->linkOrderAssent($assent?->getId(), $order);
                         $this->clearPendingPediatricOrderSelection($session, $participantId);
                         $this->loggerService->log(Log::ORDER_CREATE, $orderId);
                         return $this->redirectToRoute('order', [
