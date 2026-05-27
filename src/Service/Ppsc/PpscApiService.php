@@ -272,6 +272,22 @@ class PpscApiService
         return $this->client->request('POST', $this->endpoint . $path, $params);
     }
 
+    public function createPediatricAssent(string $participantId, \stdClass $payload): \stdClass|bool
+    {
+        try {
+            $response = $this->post("participant/{$participantId}/pediatric-assent", $payload);
+            $result = json_decode($response->getBody()->getContents());
+            if (is_object($result) && isset($result->assentId, $result->status)) {
+                return $result;
+            }
+        } catch (\Exception $e) {
+            $this->logException($e);
+            return false;
+        }
+
+        return false;
+    }
+
     /**
      * @param array<string, mixed> $params
      */
@@ -342,7 +358,6 @@ class PpscApiService
 
         return json_decode($response->getBody()->getContents());
     }
-
     private function getParams(string $field): ?string
     {
         $ppscEnv = $this->env->getPpscEnv($this->getSessionValue('ppscEnv'));

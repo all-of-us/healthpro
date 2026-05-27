@@ -5,15 +5,19 @@ namespace App\Controller;
 use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\Order;
+use App\Entity\PediatricAssent;
 use App\Entity\Site;
 use App\Form\OrderCreateType;
 use App\Form\OrderModifyType;
 use App\Form\OrderRevertType;
 use App\Form\OrderType;
+use App\Form\PediatricAssentType;
+use App\Helper\PpscParticipant;
 use App\Service\EnvironmentService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
 use App\Service\OrderService;
+use App\Service\PediatricAssentService;
 use App\Service\Ppsc\PpscApiService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,6 +35,8 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class OrderController extends BaseController
 {
+    private const PEDIATRIC_ORDER_ASSENT_SESSION_KEY = 'pediatric_order_assent';
+
     protected OrderService $orderService;
     protected LoggerService $loggerService;
     protected SiteService $siteService;
@@ -70,8 +76,13 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/order/pediatric/assent/check', name: 'order_assent_pediatric')]
-    public function orderAssentPediatric(string $participantId, RequestStack $requestStack): Response
-    {
+    public function orderAssentPediatric(
+        string $participantId,
+        Request $request,
+        RequestStack $requestStack,
+        MeasurementService $measurementService,
+        PediatricAssentService $pediatricAssentService
+    ): Response {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -79,9 +90,88 @@ class OrderController extends BaseController
         if (!$participant->requirePediatricAssentCheck()) {
             throw $this->createAccessDeniedException();
         }
+        $session = $requestStack->getSession();
+        $selection = $this->getPendingPediatricOrderSelection($session, $participantId);
+        if ($selection === null) {
+            return $this->redirectToRoute('order_check_pediatric', [
+                'participantId' => $participantId
+            ]);
+        }
+        $assentContent = $this->getPediatricAssentContent($selection);
+        $showNoAssentModalOnLoad = false;
+        $formOptions = [
+            'assentQuestion' => $assentContent['question'],
+            'csrf_token_id' => 'pediatricOrderAssent',
+        ];
+        $assentForm = $this->createForm(PediatricAssentType::class, [
+            'acknowledgeNoAssent' => '0',
+            'pediatricAssentId' => null,
+        ], $formOptions);
+        $assentForm->handleRequest($request);
+        if ($assentForm->isSubmitted() && $assentForm->isValid()) {
+            /** @var array{pediatricAssent?: string, acknowledgeNoAssent?: string, pediatricAssentId?: string|int|null} $formData */
+            $formData = $assentForm->getData();
+            $assentResponse = (string) ($formData['pediatricAssent'] ?? '');
+            $acknowledgeNoAssent = (string) ($formData['acknowledgeNoAssent'] ?? '0') === '1';
+            $existingAssentId = empty($formData['pediatricAssentId']) ? null : (int) $formData['pediatricAssentId'];
+            if (in_array($assentResponse, ['yes', 'unable'], true)) {
+                $result = $pediatricAssentService->submitOrderAssent($participant->id, $selection, $assentResponse, $existingAssentId);
+                if (!$result['success']) {
+                    $this->addFlash('error', $result['errorMessage']);
+                    $formData['pediatricAssentId'] = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
+                    $assentForm = $this->createForm(PediatricAssentType::class, $formData, $formOptions);
+                }
+                if ($result['success']) {
+                    $formData['pediatricAssentId'] = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
+                    $physicalMeasurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id, $participant->isPediatric);
+                    if ($physicalMeasurement !== null) {
+                        $measurementService->load($physicalMeasurement, $participant);
+                    }
+                    $order = new Order();
+                    $this->orderService->loadSamplesSchema($order, $participant, $physicalMeasurement);
+                    $this->orderService->applyPediatricOrderSelection($order, $selection);
+                    $this->orderService->persistNewOrder($order, $participant, $session->get('siteType'), $session->get('orderType'));
+                    $orderId = $order->getId();
+                    if ($orderId && $session->get('siteType')) {
+                        /** @var PediatricAssent|null $assent */
+                        $assent = $result['assent'] ?? null;
+                        $pediatricAssentService->linkOrderAssent($assent?->getId(), $order);
+                        $this->clearPendingPediatricOrderSelection($session, $participantId);
+                        $this->loggerService->log(Log::ORDER_CREATE, $orderId);
+                        return $this->redirectToRoute('order', [
+                            'participantId' => $participant->id,
+                            'orderId' => $orderId
+                        ]);
+                    }
+                    $this->addFlash('error', 'Failed to create order.');
+                    $assentForm = $this->createForm(PediatricAssentType::class, $formData, $formOptions);
+                }
+            } else {
+                if (!$acknowledgeNoAssent) {
+                    $assentForm->get('pediatricAssent')->addError(new FormError('Please acknowledge the warning before proceeding.'));
+                } else {
+                    $result = $pediatricAssentService->submitOrderAssent($participant->id, $selection, $assentResponse, $existingAssentId);
+                    if ($result['success']) {
+                        $this->clearPendingPediatricOrderSelection($session, $participantId);
+                        return $this->redirectToRoute('participant', [
+                            'id' => $participant->id
+                        ]);
+                    }
+                    $this->addFlash('error', $result['errorMessage']);
+                    $formData['pediatricAssentId'] = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
+                    $formData['acknowledgeNoAssent'] = '0';
+                    $assentForm = $this->createForm(PediatricAssentType::class, $formData, $formOptions);
+                    $showNoAssentModalOnLoad = true;
+                }
+            }
+        }
+
         return $this->render('order/assent-pediatric.html.twig', [
             'participant' => $participant,
             'siteType' => $requestStack->getSession()->get('siteType'),
+            'selection' => $selection,
+            'assentForm' => $assentForm->createView(),
+            'showNoAssentModalOnLoad' => $showNoAssentModalOnLoad,
         ]);
     }
 
@@ -99,7 +189,7 @@ class OrderController extends BaseController
     }
 
     #[Route(path: '/ppsc/participant/{participantId}/order/create', name: 'order_create')]
-    public function orderCreateAction(string $participantId, Request $request, SessionInterface $session, MeasurementService $measurementService, ParameterBagInterface $params): Response
+    public function orderCreateAction(string $participantId, Request $request, SessionInterface $session, MeasurementService $measurementService): Response
     {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
@@ -124,6 +214,7 @@ class OrderController extends BaseController
             'nonBloodSamples' => $order::$nonBloodSamples,
             'pediatric' => $participant->isPediatric,
         ]);
+        $selection = $this->getPediatricOrderSelection($request, $participant);
         $showCustom = false;
         $createForm->handleRequest($request);
         if (!$createForm->isSubmitted() && !$this->isCsrfTokenValid('orderCheck', $request->request->get('csrf_token'))) {
@@ -152,49 +243,21 @@ class OrderController extends BaseController
                     } else {
                         $order->setRequestedSamples(json_encode($requestedSamples));
                     }
-                } elseif ($request->request->has('saliva')) {
+                } elseif (!$participant->isPediatric && $request->request->has('saliva')) {
                     $order->setType('saliva');
                 }
-                if ($participant->isPediatric) {
-                    if ($request->request->has('blood')) {
-                        $order->setRequestedSamples(json_encode($order->getPediatricBloodSamples()));
-                    } elseif ($request->request->has('urine')) {
-                        $order->setRequestedSamples(json_encode($order->getPediatricUrineSamples()));
-                    } elseif ($request->request->has('saliva')) {
-                        $order->setRequestedSamples(json_encode($order->getPediatricSalivaSamples()));
-                    }
+                if ($selection !== null) {
+                    $this->orderService->applyPediatricOrderSelection($order, $selection);
                 }
             }
             if ($createForm->isValid()) { // @phpstan-ignore-line
-                $order->setUser($this->getUserEntity());
-                $order->setSite($this->siteService->getSiteId());
-                $order->setParticipantId($participant->id);
-                $order->setBiobankId($participant->biobankId);
-                $order->setCreatedTs(new \DateTime());
-                $order->setCreatedTimezoneId($this->getUserEntity()->getTimezoneId());
-                if ($session->get('siteType') === 'dv' && $params->has('order_samples_version_dv')) {
-                    $order->setVersion($params->get('order_samples_version_dv'));
-                } else {
-                    $order->setVersion($order->getCurrentVersion());
+                if ($selection !== null && $participant->requirePediatricAssentCheck()) {
+                    $this->setPendingPediatricOrderSelection($session, $participant->id, $selection);
+                    return $this->redirectToRoute('order_assent_pediatric', [
+                        'participantId' => $participant->id
+                    ]);
                 }
-                $order->setAgeInMonths($participant->ageInMonths);
-                if ($session->get('orderType') === 'hpo') {
-                    $order->setProcessedCentrifugeType(Order::SWINGING_BUCKET);
-                }
-                if ($session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite()) {
-                    $order->setType('diversion');
-                }
-                $disableTubeSelect = $params->has('order_disable_dv_tube_select') && $params->get('order_disable_dv_tube_select');
-                if (!$disableTubeSelect and $session->get('siteType') === 'dv' && $this->siteService->isDiversionPouchSite() === false &&
-                    $params->has('order_samples_version_dv') && (float) $params->get('order_samples_version_dv') > 3.1) {
-                    $order->setVersion(null);
-                    $order->setType(Order::TUBE_SELECTION_TYPE);
-                }
-                if (empty($order->getOrderId())) {
-                    $order->setOrderId($this->orderService->generateId());
-                }
-                $this->em->persist($order);
-                $this->em->flush();
+                $this->orderService->persistNewOrder($order, $participant, $session->get('siteType'), $session->get('orderType'));
                 $orderId = $order->getId();
                 if ($orderId && $session->get('siteType')) {
                     $this->loggerService->log(Log::ORDER_CREATE, $orderId);
@@ -804,6 +867,7 @@ class OrderController extends BaseController
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
         }
+        $this->clearPendingPediatricOrderSelection($requestStack->getSession(), $participantId);
         $measurement = $this->em->getRepository(Measurement::class)->getMostRecentFinalizedNonNullWeight($participant->id, $participant->isPediatric);
         if ($measurement) {
             $measurementService->load($measurement, $participant);
@@ -836,5 +900,58 @@ class OrderController extends BaseController
             'params' => $params,
             'isPediatricOrder' => $order->isPediatricOrder(),
         ]);
+    }
+
+    private function getPediatricOrderSelection(Request $request, PpscParticipant $participant): ?string
+    {
+        if (!$participant->isPediatric) {
+            return null;
+        }
+        foreach (['blood', 'saliva', 'urine'] as $selection) {
+            if ($request->request->has($selection)) {
+                return $selection;
+            }
+        }
+        return null;
+    }
+
+    private function getPendingPediatricOrderSelection(SessionInterface $session, string $participantId): ?string
+    {
+        $pendingSelections = $session->get(self::PEDIATRIC_ORDER_ASSENT_SESSION_KEY, []);
+        $selection = $pendingSelections[$participantId] ?? null;
+        return in_array($selection, ['blood', 'saliva', 'urine'], true) ? $selection : null;
+    }
+
+    private function setPendingPediatricOrderSelection(SessionInterface $session, string $participantId, string $selection): void
+    {
+        $pendingSelections = $session->get(self::PEDIATRIC_ORDER_ASSENT_SESSION_KEY, []);
+        $pendingSelections[$participantId] = $selection;
+        $session->set(self::PEDIATRIC_ORDER_ASSENT_SESSION_KEY, $pendingSelections);
+    }
+
+    private function clearPendingPediatricOrderSelection(SessionInterface $session, string $participantId): void
+    {
+        $pendingSelections = $session->get(self::PEDIATRIC_ORDER_ASSENT_SESSION_KEY, []);
+        unset($pendingSelections[$participantId]);
+        $session->set(self::PEDIATRIC_ORDER_ASSENT_SESSION_KEY, $pendingSelections);
+    }
+
+    /**
+     * @return array{question: string}
+     */
+    private function getPediatricAssentContent(string $selection): array
+    {
+        return match ($selection) {
+            'blood' => [
+                'question' => 'Does the pediatric participant assent to giving a blood sample?',
+            ],
+            'saliva' => [
+                'question' => 'Does the pediatric participant assent to give a saliva sample today?',
+            ],
+            'urine' => [
+                'question' => 'Does the pediatric participant assent to give a urine sample today?',
+            ],
+            default => throw new \InvalidArgumentException('Unsupported pediatric order selection.'),
+        };
     }
 }

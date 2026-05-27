@@ -9,11 +9,13 @@
         </h2>
     </div>
     <ul class="nav nav-tabs">
+        <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
+        <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
         <li role="presentation" class="nav-item"><a class="nav-link active" href="#">Assent</a></li>
-        {% if siteType == 'dv' %}
-            {% set steps = ['Safety Check', 'Create', 'Collect', 'Process', 'Finalize'] %}
+        {% if selection == 'blood' %}
+            {% set steps = ['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
         {% else %}
-            {% set steps = ['Safety Check', 'Create', 'Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
+            {% set steps = ['Print Labels', 'Collect', 'Finalize', 'Print Requisition'] %}
         {% endif %}
         {% for step in steps %}
             <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#">{{ step }}</a></li>
@@ -24,29 +26,31 @@
             Pediatric Assent
         </div>
         <div class="card-body">
-            <div>
-                <label class="form-label" for="pediatricAssent">
-                    Does the pediatric participant assent to giving a blood sample?
-                </label>
-                <select class="form-select" id="pediatricAssent" data-continue-values="yes,unable" data-error-values="no">
-                    <option value="" selected>Select</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                    <option value="unable">Participant is unable to provide assent</option>
-                </select>
-                <div id="assentErrorMessage" class="text-danger mt-2 d-none">
-                    <i class="fa fa-exclamation-circle"></i> The participant has not assented. You may not proceed with order collection.
+            {{ form_start(assentForm, { attr: { class: 'prevent-resubmit', id: 'pediatricAssentForm', 'data-show-no-assent-modal-on-load': showNoAssentModalOnLoad ? '1' : '0' } }) }}
+                <div>
+                    {{ form_label(assentForm.pediatricAssent, null, { label_attr: { class: 'form-label', for: 'pediatricAssent' } }) }}
+                    {{ form_widget(assentForm.pediatricAssent, { attr: { class: 'form-select', id: 'pediatricAssent' } }) }}
+                    {% set assentError = assentForm.pediatricAssent.vars.errors|first %}
+                    {% if assentError %}
+                        <div id="assentErrorMessage" class="text-danger mt-2">
+                            <i class="fa fa-exclamation-circle"></i> {{ assentError.message }}
+                        </div>
+                    {% endif %}
                 </div>
-            </div>
+                {{ form_widget(assentForm.acknowledgeNoAssent, { attr: { id: 'acknowledgeNoAssent' } }) }}
+                {{ form_widget(assentForm.pediatricAssentId, { attr: { id: 'pediatricAssentId' } }) }}
+                {{ form_rest(assentForm) }}
+                <div class="mt-4">
+                    <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
+                    <button type="submit" class="btn btn-primary d-none" id="continueBtn" disabled>
+                        Continue
+                        <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                    </button>
+                </div>
+            {{ form_end(assentForm, { render_rest: false }) }}
         </div>
     </div>
-    <div class="mt-4">
-        <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
-        <a href="{{ path('order_check_pediatric', { participantId: participant.id }) }}" class="btn btn-primary d-none" id="continueBtn">
-            Continue
-            <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
-        </a>
-    </div>
+    {% include 'partials/modals/pediatric-assent-warning-modal.html.twig' %}
 {% endblock %}
 {% block pagejs %}
     {{ encore_entry_script_tags('pediatric-assent') }}
