@@ -165,7 +165,9 @@ class PediatricAssentService
             }
         }
 
+        $isNewAssent = false;
         if (!$assent instanceof PediatricAssent) {
+            $isNewAssent = true;
             $assent = new PediatricAssent();
             $assent->setParticipantId($participantId);
             $assent->setUser($userEntity);
@@ -194,14 +196,21 @@ class PediatricAssentService
                 'assentResponse' => $assentResponse,
                 'error' => $errorMessage,
             ]);
-            $this->em->persist($assent);
-            $this->em->flush();
+            // Do not persist brand-new failed assents to avoid orphan rows with null order/measurement IDs.
+            if (!$isNewAssent) {
+                $this->em->persist($assent);
+                $this->em->flush();
+            }
 
-            return [
+            $response = [
                 'success' => false,
                 'errorMessage' => 'Failed to submit pediatric assent to API.',
-                'assent' => $assent,
             ];
+            if (!$isNewAssent) {
+                $response['assent'] = $assent;
+            }
+
+            return $response;
         }
 
         $assent->setApiAssentId((string) $apiResponse->salesforceId);

@@ -369,24 +369,15 @@ class PediatricAssentServiceTest extends TestCase
                     return true;
                 })
             );
-        $entityManager->expects($this->once())
-            ->method('persist')
-            ->with($this->callback(function ($assent) {
-                self::assertInstanceOf(PediatricAssent::class, $assent);
-                self::assertSame(PediatricAssent::API_STATUS_FAILED, $assent->getApiStatus());
-                self::assertNull($assent->getApiAssentId());
-                self::assertSame('api rejected payload', $assent->getApiError());
-
-                return true;
-            }));
-        $entityManager->expects($this->once())->method('flush');
+        $entityManager->expects($this->never())->method('persist');
+        $entityManager->expects($this->never())->method('flush');
 
         $service = $this->createService($entityManager, $userService, $siteService, $apiService, $loggerService);
         $result = $service->submitMeasurementAssent('P123456789', 'yes');
 
         self::assertFalse($result['success']);
         self::assertSame('Failed to submit pediatric assent to API.', $result['errorMessage']);
-        self::assertArrayHasKey('assent', $result);
+        self::assertArrayNotHasKey('assent', $result);
     }
 
     private function createUser(string $email, ?string $timezone = 'America/New_York'): User
