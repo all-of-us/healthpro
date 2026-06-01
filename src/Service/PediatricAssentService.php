@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\PediatricAssent;
+use App\Service\Ppsc\PpscApiService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class PediatricAssentService
@@ -12,15 +13,18 @@ class PediatricAssentService
     private EntityManagerInterface $em;
     private UserService $userService;
     private SiteService $siteService;
+    private PpscApiService $ppscApiService;
 
     public function __construct(
         EntityManagerInterface $em,
         UserService $userService,
-        SiteService $siteService
+        SiteService $siteService,
+        PpscApiService $ppscApiService
     ) {
         $this->em = $em;
         $this->userService = $userService;
         $this->siteService = $siteService;
+        $this->ppscApiService = $ppscApiService;
     }
 
     /**
@@ -171,6 +175,25 @@ class PediatricAssentService
 
         $assent->setApiAssentId(null);
         $assent->setApiStatus(PediatricAssent::API_STATUS_PENDING);
+        $assent->setApiError(null);
+
+        $payload = $this->buildPediatricAssentPayload($assent);
+        $apiResponse = $this->ppscApiService->createPediatricAssent($participantId, $payload);
+        if ($apiResponse === false) {
+            $assent->setApiStatus(PediatricAssent::API_STATUS_FAILED);
+            $assent->setApiError($this->ppscApiService->getLastError() ?? 'Failed to create pediatric assent in PPSC API.');
+            $this->em->persist($assent);
+            $this->em->flush();
+
+            return [
+                'success' => false,
+                'errorMessage' => 'Failed to submit pediatric assent to API.',
+                'assent' => $assent,
+            ];
+        }
+
+        $assent->setApiAssentId((string) $apiResponse->salesforceId);
+        $assent->setApiStatus((string) $apiResponse->status);
         $assent->setApiError(null);
         $this->em->persist($assent);
         $this->em->flush();

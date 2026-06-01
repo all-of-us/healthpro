@@ -275,9 +275,12 @@ class PpscApiService
     public function createPediatricAssent(string $participantId, \stdClass $payload): \stdClass|bool
     {
         try {
-            $response = $this->post("participant/{$participantId}/pediatric-assent", $payload);
+            if (!isset($payload->participantId) || empty($payload->participantId)) {
+                $payload->participantId = $participantId;
+            }
+            $response = $this->post('assents', $payload);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->assentId, $result->status)) {
+            if (is_object($result) && isset($result->salesforceId, $result->status)) {
                 return $result;
             }
         } catch (\Exception $e) {

@@ -8,6 +8,7 @@ use App\Entity\PediatricAssent;
 use App\Entity\User;
 use App\Security\User as SecurityUser;
 use App\Service\PediatricAssentService;
+use App\Service\Ppsc\PpscApiService;
 use App\Service\SiteService;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,8 +39,8 @@ class PediatricAssentServiceTest extends TestCase
                 self::assertSame(PediatricAssent::TYPE_PHYSICAL_MEASUREMENT, $assent->getAssentType());
                 self::assertSame(PediatricAssent::RESPONSE_YES, $assent->getAssentResponse());
                 self::assertSame(3, $assent->getCreatedTimezoneId());
-                self::assertSame(PediatricAssent::API_STATUS_PENDING, $assent->getApiStatus());
-                self::assertNull($assent->getApiAssentId());
+                self::assertSame(PediatricAssent::API_STATUS_CREATED, $assent->getApiStatus());
+                self::assertSame('A123456', $assent->getApiAssentId());
                 self::assertNull($assent->getApiError());
                 self::assertInstanceOf(\DateTimeInterface::class, $assent->getCreatedTs());
 
@@ -47,7 +48,7 @@ class PediatricAssentServiceTest extends TestCase
             }));
         $entityManager->expects($this->once())->method('flush');
 
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService);
         $result = $service->submitMeasurementAssent('P123456789', 'yes');
 
         self::assertTrue($result['success']);
@@ -75,7 +76,7 @@ class PediatricAssentServiceTest extends TestCase
             }));
         $entityManager->expects($this->once())->method('flush');
 
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService);
         $result = $service->submitOrderAssent('P123456789', 'urine', 'unable');
 
         self::assertTrue($result['success']);
@@ -91,7 +92,7 @@ class PediatricAssentServiceTest extends TestCase
         $entityManager->expects($this->never())->method('persist');
         $entityManager->expects($this->never())->method('flush');
 
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService);
         $result = $service->submitOrderAssent('P123456789', 'hair', 'yes');
 
         self::assertFalse($result['success']);
@@ -107,7 +108,7 @@ class PediatricAssentServiceTest extends TestCase
         $entityManager->expects($this->never())->method('persist');
         $entityManager->expects($this->never())->method('flush');
 
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService);
         $result = $service->submitMeasurementAssent('P123456789', 'maybe');
 
         self::assertFalse($result['success']);
@@ -137,7 +138,7 @@ class PediatricAssentServiceTest extends TestCase
             }));
         $entityManager->expects($this->once())->method('flush');
 
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService);
         $result = $service->submitMeasurementAssent('P123456789', 'no');
 
         self::assertTrue($result['success']);
@@ -155,7 +156,7 @@ class PediatricAssentServiceTest extends TestCase
         $entityManager->expects($this->never())->method('persist');
         $entityManager->expects($this->never())->method('flush');
 
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService);
         $result = $service->submitMeasurementAssent('P123456789', 'yes');
 
         self::assertFalse($result['success']);
@@ -175,7 +176,7 @@ class PediatricAssentServiceTest extends TestCase
         $entityManager->expects($this->never())->method('persist');
         $entityManager->expects($this->never())->method('flush');
 
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService);
         $result = $service->submitMeasurementAssent('P123456789', 'yes');
 
         self::assertFalse($result['success']);
@@ -202,7 +203,10 @@ class PediatricAssentServiceTest extends TestCase
         $entityManager->expects($this->never())->method('persist');
         $entityManager->expects($this->never())->method('flush');
 
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $apiService = $this->createMock(PpscApiService::class);
+        $apiService->expects($this->never())->method('createPediatricAssent');
+
+        $service = $this->createService($entityManager, $userService, $siteService, $apiService);
         $result = $service->submitMeasurementAssent('P123456789', 'yes', 42);
 
         self::assertTrue($result['success']);
@@ -216,6 +220,10 @@ class PediatricAssentServiceTest extends TestCase
             ->setParticipantId('P123456789')
             ->setAssentType(PediatricAssent::TYPE_PHYSICAL_MEASUREMENT)
             ->setAssentResponse(PediatricAssent::RESPONSE_NO)
+            ->setCreatedBy('tester@example.com')
+            ->setSite('hpo-site-test')
+            ->setCreatedTs(new \DateTimeImmutable('2026-05-07 10:15:00', new \DateTimeZone('America/Chicago')))
+            ->setCreatedTimezoneId(3)
             ->setApiStatus(PediatricAssent::API_STATUS_FAILED)
             ->setApiAssentId('A12345')
             ->setApiError('previous failure');
@@ -232,15 +240,15 @@ class PediatricAssentServiceTest extends TestCase
             ->method('persist')
             ->with($this->callback(function ($assent) use ($existingAssent) {
                 self::assertSame($existingAssent, $assent);
-                self::assertSame(PediatricAssent::API_STATUS_PENDING, $assent->getApiStatus());
-                self::assertNull($assent->getApiAssentId());
+                self::assertSame(PediatricAssent::API_STATUS_CREATED, $assent->getApiStatus());
+                self::assertSame('A123456', $assent->getApiAssentId());
                 self::assertNull($assent->getApiError());
 
                 return true;
             }));
         $entityManager->expects($this->once())->method('flush');
 
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService);
         $result = $service->submitMeasurementAssent('P123456789', 'no', 7);
 
         self::assertTrue($result['success']);
@@ -252,7 +260,7 @@ class PediatricAssentServiceTest extends TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $userService = $this->createMock(UserService::class);
         $siteService = $this->createMock(SiteService::class);
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService);
         $assent = (new PediatricAssent())
             ->setParticipantId('P123456789')
             ->setCreatedBy('tester@example.com')
@@ -294,7 +302,7 @@ class PediatricAssentServiceTest extends TestCase
             }));
         $entityManager->expects($this->once())->method('flush');
 
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService);
         $service->linkMeasurementAssent(99, $measurement);
     }
 
@@ -319,8 +327,40 @@ class PediatricAssentServiceTest extends TestCase
             }));
         $entityManager->expects($this->once())->method('flush');
 
-        $service = new PediatricAssentService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService);
         $service->linkOrderAssent(77, $order);
+    }
+
+    public function testSubmitMeasurementAssentMarksFailedWhenApiCallFails(): void
+    {
+        $user = $this->createUser('tester@example.com');
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $userService = $this->createMock(UserService::class);
+        $siteService = $this->createMock(SiteService::class);
+        $apiService = $this->createMock(PpscApiService::class);
+
+        $userService->expects($this->once())->method('getUserEntity')->willReturn($user);
+        $siteService->expects($this->once())->method('getSiteId')->willReturn('hpo-site-test');
+        $apiService->expects($this->once())->method('createPediatricAssent')->willReturn(false);
+        $apiService->expects($this->once())->method('getLastError')->willReturn('api rejected payload');
+        $entityManager->expects($this->once())
+            ->method('persist')
+            ->with($this->callback(function ($assent) {
+                self::assertInstanceOf(PediatricAssent::class, $assent);
+                self::assertSame(PediatricAssent::API_STATUS_FAILED, $assent->getApiStatus());
+                self::assertNull($assent->getApiAssentId());
+                self::assertSame('api rejected payload', $assent->getApiError());
+
+                return true;
+            }));
+        $entityManager->expects($this->once())->method('flush');
+
+        $service = $this->createService($entityManager, $userService, $siteService, $apiService);
+        $result = $service->submitMeasurementAssent('P123456789', 'yes');
+
+        self::assertFalse($result['success']);
+        self::assertSame('Failed to submit pediatric assent to API.', $result['errorMessage']);
+        self::assertArrayHasKey('assent', $result);
     }
 
     private function createUser(string $email, ?string $timezone = 'America/New_York'): User
@@ -329,5 +369,22 @@ class PediatricAssentServiceTest extends TestCase
             ->setEmail($email)
             ->setGoogleId('google-id')
             ->setTimezone($timezone);
+    }
+
+    private function createService(
+        EntityManagerInterface $entityManager,
+        UserService $userService,
+        SiteService $siteService,
+        ?PpscApiService $apiService = null
+    ): PediatricAssentService {
+        if (!$apiService instanceof PpscApiService) {
+            $apiService = $this->createMock(PpscApiService::class);
+            $apiService->method('createPediatricAssent')->willReturn((object) [
+                'salesforceId' => 'A123456',
+                'status' => PediatricAssent::API_STATUS_CREATED,
+            ]);
+        }
+
+        return new PediatricAssentService($entityManager, $userService, $siteService, $apiService);
     }
 }
