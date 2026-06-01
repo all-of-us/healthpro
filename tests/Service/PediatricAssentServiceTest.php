@@ -49,8 +49,10 @@ class PediatricAssentServiceTest extends TestCase
                 return true;
             }));
         $entityManager->expects($this->once())->method('flush');
+        $loggerService = $this->createMock(LoggerService::class);
+        $loggerService->expects($this->once())->method('log')->with(Log::PEDIATRIC_ASSENT_CREATED);
 
-        $service = $this->createService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService, null, $loggerService);
         $result = $service->submitMeasurementAssent('P123456789', 'yes');
 
         self::assertTrue($result['success']);
@@ -77,8 +79,10 @@ class PediatricAssentServiceTest extends TestCase
                 return true;
             }));
         $entityManager->expects($this->once())->method('flush');
+        $loggerService = $this->createMock(LoggerService::class);
+        $loggerService->expects($this->once())->method('log')->with(Log::PEDIATRIC_ASSENT_CREATED);
 
-        $service = $this->createService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService, null, $loggerService);
         $result = $service->submitOrderAssent('P123456789', 'urine', 'unable');
 
         self::assertTrue($result['success']);
@@ -139,8 +143,10 @@ class PediatricAssentServiceTest extends TestCase
                 return true;
             }));
         $entityManager->expects($this->once())->method('flush');
+        $loggerService = $this->createMock(LoggerService::class);
+        $loggerService->expects($this->once())->method('log')->with(Log::PEDIATRIC_ASSENT_CREATED);
 
-        $service = $this->createService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService, null, $loggerService);
         $result = $service->submitMeasurementAssent('P123456789', 'no');
 
         self::assertTrue($result['success']);
@@ -249,8 +255,10 @@ class PediatricAssentServiceTest extends TestCase
                 return true;
             }));
         $entityManager->expects($this->once())->method('flush');
+        $loggerService = $this->createMock(LoggerService::class);
+        $loggerService->expects($this->once())->method('log')->with(Log::PEDIATRIC_ASSENT_CREATED);
 
-        $service = $this->createService($entityManager, $userService, $siteService);
+        $service = $this->createService($entityManager, $userService, $siteService, null, $loggerService);
         $result = $service->submitMeasurementAssent('P123456789', 'no', 7);
 
         self::assertTrue($result['success']);
