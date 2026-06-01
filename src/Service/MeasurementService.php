@@ -8,6 +8,7 @@ use App\Entity\BloodPressureSystolicHeightPercentile;
 use App\Entity\HeartRateAge;
 use App\Entity\Measurement;
 use App\Entity\MeasurementHistory;
+use App\Entity\PediatricAssent;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Entity\ZScores;
@@ -82,6 +83,7 @@ class MeasurementService
     public function createMeasurement(string $participantId, \stdClass $fhir): string|bool
     {
         try {
+            $this->appendAssentIdToMeasurementPayload($participantId, $fhir);
             $response = $this->ppscApiService->post("participants/{$participantId}/physical-measurements", $fhir);
             $result = json_decode($response->getBody()->getContents());
             if (is_object($result) && isset($result->drcId)) {
@@ -323,6 +325,22 @@ class MeasurementService
                 'value' => $site
             ]
         ];
+    }
+
+    private function appendAssentIdToMeasurementPayload(string $participantId, \stdClass $fhir): void
+    {
+        if (!isset($this->measurement) || !$this->measurement->getId()) {
+            return;
+        }
+
+        $assent = $this->em->getRepository(PediatricAssent::class)->findOneBy([
+            'participantId' => $participantId,
+            'measurement' => $this->measurement,
+        ]);
+
+        if ($assent instanceof PediatricAssent && !empty($assent->getApiAssentId())) {
+            $fhir->assentId = $assent->getApiAssentId();
+        }
     }
 
     /**

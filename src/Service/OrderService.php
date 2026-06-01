@@ -6,6 +6,7 @@ use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\OrderHistory;
+use App\Entity\PediatricAssent;
 use App\Entity\Site;
 use App\Entity\User;
 use App\Helper\PpscParticipant;
@@ -539,6 +540,7 @@ class OrderService
     public function createRdrOrder(): bool
     {
         $orderRdrObject = $this->order->getRdrObject();
+        $this->appendAssentIdToOrderPayload($this->order->getParticipantId(), $orderRdrObject);
         $rdrId = $this->createOrder($this->order->getParticipantId(), $orderRdrObject);
         if (!$rdrId) {
             // Check for rdr id conflict error code
@@ -953,6 +955,22 @@ class OrderService
             }
         }
         return $params;
+    }
+
+    private function appendAssentIdToOrderPayload(string $participantId, stdClass $orderRdrObject): void
+    {
+        if (!$this->order->getId()) {
+            return;
+        }
+
+        $assent = $this->em->getRepository(PediatricAssent::class)->findOneBy([
+            'participantId' => $participantId,
+            'order' => $this->order,
+        ]);
+
+        if ($assent instanceof PediatricAssent && !empty($assent->getApiAssentId())) {
+            $orderRdrObject->assentId = $assent->getApiAssentId();
+        }
     }
 
     private function getNumericId(): string
