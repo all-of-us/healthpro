@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\PediatricAssent;
@@ -14,17 +15,20 @@ class PediatricAssentService
     private UserService $userService;
     private SiteService $siteService;
     private PpscApiService $ppscApiService;
+    private LoggerService $loggerService;
 
     public function __construct(
         EntityManagerInterface $em,
         UserService $userService,
         SiteService $siteService,
-        PpscApiService $ppscApiService
+        PpscApiService $ppscApiService,
+        LoggerService $loggerService
     ) {
         $this->em = $em;
         $this->userService = $userService;
         $this->siteService = $siteService;
         $this->ppscApiService = $ppscApiService;
+        $this->loggerService = $loggerService;
     }
 
     /**
@@ -181,7 +185,15 @@ class PediatricAssentService
         $apiResponse = $this->ppscApiService->createPediatricAssent($participantId, $payload);
         if ($apiResponse === false) {
             $assent->setApiStatus(PediatricAssent::API_STATUS_FAILED);
-            $assent->setApiError($this->ppscApiService->getLastError() ?? 'Failed to create pediatric assent in PPSC API.');
+            $errorMessage = $this->ppscApiService->getLastError() ?? 'Failed to create pediatric assent in PPSC API.';
+            $assent->setApiError($errorMessage);
+            $this->loggerService->log(Log::PPSC_API_ERROR, [
+                'message' => 'Failed to submit pediatric assent to API.',
+                'participantId' => $participantId,
+                'assentType' => $assentType,
+                'assentResponse' => $assentResponse,
+                'error' => $errorMessage,
+            ]);
             $this->em->persist($assent);
             $this->em->flush();
 
@@ -197,6 +209,7 @@ class PediatricAssentService
         $assent->setApiError(null);
         $this->em->persist($assent);
         $this->em->flush();
+        $this->loggerService->log(Log::PEDIATRIC_ASSENT_CREATED, $assent->getId());
 
         return [
             'success' => true,

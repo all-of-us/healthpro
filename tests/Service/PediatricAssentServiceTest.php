@@ -2,10 +2,12 @@
 
 namespace App\Tests\Service;
 
+use App\Audit\Log;
 use App\Entity\Measurement;
 use App\Entity\Order;
 use App\Entity\PediatricAssent;
 use App\Entity\User;
+use App\Service\LoggerService;
 use App\Security\User as SecurityUser;
 use App\Service\PediatricAssentService;
 use App\Service\Ppsc\PpscApiService;
@@ -338,11 +340,27 @@ class PediatricAssentServiceTest extends TestCase
         $userService = $this->createMock(UserService::class);
         $siteService = $this->createMock(SiteService::class);
         $apiService = $this->createMock(PpscApiService::class);
+        $loggerService = $this->createMock(LoggerService::class);
 
         $userService->expects($this->once())->method('getUserEntity')->willReturn($user);
         $siteService->expects($this->once())->method('getSiteId')->willReturn('hpo-site-test');
         $apiService->expects($this->once())->method('createPediatricAssent')->willReturn(false);
         $apiService->expects($this->once())->method('getLastError')->willReturn('api rejected payload');
+        $loggerService->expects($this->once())
+            ->method('log')
+            ->with(
+                Log::PPSC_API_ERROR,
+                $this->callback(function ($data) {
+                    self::assertIsArray($data);
+                    self::assertSame('Failed to submit pediatric assent to API.', $data['message'] ?? null);
+                    self::assertSame('P123456789', $data['participantId'] ?? null);
+                    self::assertSame(PediatricAssent::TYPE_PHYSICAL_MEASUREMENT, $data['assentType'] ?? null);
+                    self::assertSame(PediatricAssent::RESPONSE_YES, $data['assentResponse'] ?? null);
+                    self::assertSame('api rejected payload', $data['error'] ?? null);
+
+                    return true;
+                })
+            );
         $entityManager->expects($this->once())
             ->method('persist')
             ->with($this->callback(function ($assent) {
@@ -355,7 +373,7 @@ class PediatricAssentServiceTest extends TestCase
             }));
         $entityManager->expects($this->once())->method('flush');
 
-        $service = $this->createService($entityManager, $userService, $siteService, $apiService);
+        $service = $this->createService($entityManager, $userService, $siteService, $apiService, $loggerService);
         $result = $service->submitMeasurementAssent('P123456789', 'yes');
 
         self::assertFalse($result['success']);
@@ -375,7 +393,8 @@ class PediatricAssentServiceTest extends TestCase
         EntityManagerInterface $entityManager,
         UserService $userService,
         SiteService $siteService,
-        ?PpscApiService $apiService = null
+        ?PpscApiService $apiService = null,
+        ?LoggerService $loggerService = null
     ): PediatricAssentService {
         if (!$apiService instanceof PpscApiService) {
             $apiService = $this->createMock(PpscApiService::class);
@@ -385,6 +404,11 @@ class PediatricAssentServiceTest extends TestCase
             ]);
         }
 
-        return new PediatricAssentService($entityManager, $userService, $siteService, $apiService);
+        if (!$loggerService instanceof LoggerService) {
+            $loggerService = $this->createMock(LoggerService::class);
+            $loggerService->expects($this->never())->method('log');
+        }
+
+        return new PediatricAssentService($entityManager, $userService, $siteService, $apiService, $loggerService);
     }
 }
