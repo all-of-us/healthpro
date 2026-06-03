@@ -5338,16 +5338,16 @@
         },
         {
             "name": "symfony/dom-crawler",
-            "version": "v6.4.32",
+            "version": "v6.4.40",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dom-crawler.git",
-                "reference": "f57f1cbd6b13b54e7f8a25cae1ee55cbe892b1f3"
+                "reference": "7e65f76c28f5ed8d933f2c86698a3e2bf0de1b10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/f57f1cbd6b13b54e7f8a25cae1ee55cbe892b1f3",
-                "reference": "f57f1cbd6b13b54e7f8a25cae1ee55cbe892b1f3",
+                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/7e65f76c28f5ed8d933f2c86698a3e2bf0de1b10",
+                "reference": "7e65f76c28f5ed8d933f2c86698a3e2bf0de1b10",
                 "shasum": ""
             },
             "require": {
@@ -5385,7 +5385,7 @@
             "description": "Eases DOM navigation for HTML and XML documents",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/dom-crawler/tree/v6.4.32"
+                "source": "https://github.com/symfony/dom-crawler/tree/v6.4.40"
             },
             "funding": [
                 {
@@ -5405,7 +5405,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-04T12:18:37+00:00"
+            "time": "2026-05-19T20:33:22+00:00"
         },
         {
             "name": "symfony/dotenv",
@@ -6259,16 +6259,16 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v6.4.33",
+            "version": "v6.4.41",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "f1a490cc9d595ba7ebe684220e625d1e472ad278"
+                "reference": "48d76c29a67a301e0f7779a512bf76417395ffef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/f1a490cc9d595ba7ebe684220e625d1e472ad278",
-                "reference": "f1a490cc9d595ba7ebe684220e625d1e472ad278",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/48d76c29a67a301e0f7779a512bf76417395ffef",
+                "reference": "48d76c29a67a301e0f7779a512bf76417395ffef",
                 "shasum": ""
             },
             "require": {
@@ -6316,7 +6316,7 @@
             "description": "Defines an object-oriented layer for the HTTP specification",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/http-foundation/tree/v6.4.33"
+                "source": "https://github.com/symfony/http-foundation/tree/v6.4.41"
             },
             "funding": [
                 {
@@ -6336,7 +6336,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-27T15:04:55+00:00"
+            "time": "2026-05-24T10:54:17+00:00"
         },
         {
             "name": "symfony/http-kernel",
@@ -6458,16 +6458,16 @@
         },
         {
             "name": "symfony/monolog-bridge",
-            "version": "v6.4.32",
+            "version": "v6.4.40",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/monolog-bridge.git",
-                "reference": "13335cf0f5a6915a79f0a18644befc0bae4f9dd3"
+                "reference": "85500da808ce785c6c95fafdbc226cd8af349007"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/monolog-bridge/zipball/13335cf0f5a6915a79f0a18644befc0bae4f9dd3",
-                "reference": "13335cf0f5a6915a79f0a18644befc0bae4f9dd3",
+                "url": "https://api.github.com/repos/symfony/monolog-bridge/zipball/85500da808ce785c6c95fafdbc226cd8af349007",
+                "reference": "85500da808ce785c6c95fafdbc226cd8af349007",
                 "shasum": ""
             },
             "require": {
@@ -6517,7 +6517,7 @@
             "description": "Provides integration for Monolog with various Symfony components",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/monolog-bridge/tree/v6.4.32"
+                "source": "https://github.com/symfony/monolog-bridge/tree/v6.4.40"
             },
             "funding": [
                 {
@@ -6537,7 +6537,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-02T11:51:10+00:00"
+            "time": "2026-05-19T20:33:22+00:00"
         },
         {
             "name": "symfony/monolog-bundle",
@@ -7807,16 +7807,16 @@
         },
         {
             "name": "symfony/routing",
-            "version": "v6.4.32",
+            "version": "v6.4.41",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/routing.git",
-                "reference": "0dc6253e864e71b486e8ba4970a56ab849106ebe"
+                "reference": "af04c79671fd8df0805a44c83fa2b0ba56c8329e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/routing/zipball/0dc6253e864e71b486e8ba4970a56ab849106ebe",
-                "reference": "0dc6253e864e71b486e8ba4970a56ab849106ebe",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/af04c79671fd8df0805a44c83fa2b0ba56c8329e",
+                "reference": "af04c79671fd8df0805a44c83fa2b0ba56c8329e",
                 "shasum": ""
             },
             "require": {
@@ -7870,7 +7870,7 @@
                 "url"
             ],
             "support": {
-                "source": "https://github.com/symfony/routing/tree/v6.4.32"
+                "source": "https://github.com/symfony/routing/tree/v6.4.41"
             },
             "funding": [
                 {
@@ -7890,7 +7890,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-01-12T08:31:19+00:00"
+            "time": "2026-05-24T11:18:16+00:00"
         },
         {
             "name": "symfony/security-bundle",
@@ -8172,16 +8172,16 @@
         },
         {
             "name": "symfony/security-http",
-            "version": "v6.4.31",
+            "version": "v6.4.41",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/security-http.git",
-                "reference": "2f4ddc4a79b0e6f7dcc72e5ebd7109b3436b967a"
+                "reference": "1a01cd7a6313d5a375480e0d1d4a0ddf834ae12b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/security-http/zipball/2f4ddc4a79b0e6f7dcc72e5ebd7109b3436b967a",
-                "reference": "2f4ddc4a79b0e6f7dcc72e5ebd7109b3436b967a",
+                "url": "https://api.github.com/repos/symfony/security-http/zipball/1a01cd7a6313d5a375480e0d1d4a0ddf834ae12b",
+                "reference": "1a01cd7a6313d5a375480e0d1d4a0ddf834ae12b",
                 "shasum": ""
             },
             "require": {
@@ -8240,7 +8240,7 @@
             "description": "Symfony Security Component - HTTP Integration",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/security-http/tree/v6.4.31"
+                "source": "https://github.com/symfony/security-http/tree/v6.4.41"
             },
             "funding": [
                 {
@@ -8260,7 +8260,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-12-17T22:32:13+00:00"
+            "time": "2026-05-25T06:03:23+00:00"
         },
         {
             "name": "symfony/serializer",
@@ -12974,5 +12974,5 @@
     "platform-overrides": {
         "php": "8.3"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
