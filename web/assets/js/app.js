@@ -16,11 +16,11 @@ require("datatables.net-responsive-bs/js/responsive.bootstrap.js");
 require("datatables.net-buttons/js/dataTables.buttons.js");
 require("jsbarcode/dist/barcodes/JsBarcode.code128.min.js");
 require("inputmask/dist/jquery.inputmask.bundle.js");
-require("bootstrap5-toggle/js/bootstrap5-toggle.jquery.min");
 require("./bootstrap-session-timeout-bs5.js");
 require("corejs-typeahead");
 window.Masonry = require("masonry-layout");
 window.Bloodhound = require("corejs-typeahead/dist/bloodhound.js");
+require("bootstrap5-toggle/js/bootstrap5-toggle.jquery.min.js"); // imports-loader injects jQuery into this module's scope
 
 // Most views are separate webpack entries except for:
 // Modals is needed on every page
