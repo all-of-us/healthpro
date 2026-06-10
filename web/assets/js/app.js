@@ -3,6 +3,7 @@ const $ = require("jquery");
 window.$ = $;
 
 window.bootstrap = require("bootstrap5");
+const { BootstrapToggle } = require("bootstrap5-toggle");
 require("backbone/backbone.js");
 window.tempusDominus = require("@eonasdan/tempus-dominus/dist/js/tempus-dominus.min");
 require("parsleyjs/dist/parsley.js");
@@ -20,7 +21,15 @@ require("./bootstrap-session-timeout-bs5.js");
 require("corejs-typeahead");
 window.Masonry = require("masonry-layout");
 window.Bloodhound = require("corejs-typeahead/dist/bloodhound.js");
-require("bootstrap5-toggle/js/bootstrap5-toggle.jquery.min.js"); // imports-loader injects jQuery into this module's scope
+
+// bootstrap5-toggle >=5.3 does not auto-register via jQuery in bundlers, initialize explicitly
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('input[type="checkbox"][data-toggle^="toggle"]').forEach((element) => {
+        if (!element.bsToggle) {
+            new BootstrapToggle(element, {});
+        }
+    });
+});
 
 // Most views are separate webpack entries except for:
 // Modals is needed on every page
@@ -34,7 +43,7 @@ require("@fortawesome/fontawesome-free/css/v4-shims.css");
 require("@eonasdan/tempus-dominus/dist/css/tempus-dominus.min.css");
 require("datatables.net-bs5/css/dataTables.bootstrap5.css");
 require("datatables.net-responsive-bs/css/responsive.bootstrap.css");
-require("bootstrap5-toggle/css/bootstrap5-toggle.min.css");
+require("../../../node_modules/bootstrap5-toggle/css/bootstrap5-toggle.min.css");
 require("../css/app.css");
 require("../css/bs5.css");
 

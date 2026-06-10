@@ -97,22 +97,6 @@ Encore
     .enableVersioning(Encore.isProduction())
 
     // uncomment if you're having problems with a jQuery plugin
-    .autoProvidejQuery()
-
-    // Inject jQuery into bootstrap5-toggle's module scope so the IIFE `}(jQuery)` finds it
-    .addLoader({
-        test: /bootstrap5-toggle\/js\/bootstrap5-toggle\.jquery\.min\.js$/,
-        use: [
-            {
-                loader: 'imports-loader',
-                options: {
-                    imports: {
-                        moduleName: 'jquery',
-                        name: 'jQuery'
-                    }
-                }
-            }
-        ]
-    });
+    .autoProvidejQuery();
 
 module.exports = Encore.getWebpackConfig();
