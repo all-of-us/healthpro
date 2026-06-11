@@ -63,7 +63,7 @@
             </div>
         </div>
         <div class="col-md-12 mt-2">
-            <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Recapture</a>
+            <a href="{{ path('measurement_pediatric_assent_check', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Recapture</a>
         </div>
     {% else %}
         <h5>Please confirm the participant's weight is accurate prior to biospecimen collection. Click confirm if the participant's weight is accurate. Click Amend to edit the weight captured on today's

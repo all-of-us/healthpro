@@ -461,6 +461,7 @@ class MeasurementsController extends BaseController
         Request $request,
         PediatricAssentService $pediatricAssentService
     ): Response {
+        $requestedMeasurementType = $request->query->get('type');
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -494,13 +495,18 @@ class MeasurementsController extends BaseController
                 if ($result['success']) {
                     /** @var PediatricAssent|null $assent */
                     $assent = $result['assent'] ?? null;
-                    $measurement = $this->createDraftPediatricMeasurement($participant);
+                    $measurement = $this->createDraftPediatricMeasurement($participant, $requestedMeasurementType);
                     $pediatricAssentService->linkMeasurementAssent($assent?->getId(), $measurement);
 
-                    return $this->redirectToRoute('measurement', [
+                    $redirectParams = [
                         'participantId' => $participant->id,
                         'measurementId' => $measurement->getId(),
-                    ]);
+                    ];
+                    if (!empty($requestedMeasurementType)) {
+                        $redirectParams['type'] = $requestedMeasurementType;
+                    }
+
+                    return $this->redirectToRoute('measurement', $redirectParams);
                 }
             } else {
                 if (!$acknowledgeNoAssent) {
@@ -597,9 +603,9 @@ class MeasurementsController extends BaseController
         return $response;
     }
 
-    private function createDraftPediatricMeasurement(object $participant): Measurement
+    private function createDraftPediatricMeasurement(object $participant, ?string $requestedType = null): Measurement
     {
-        $type = $participant->pediatricMeasurementsVersionType ?? null;
+        $type = $requestedType ?: ($participant->pediatricMeasurementsVersionType ?? null);
         $measurement = new Measurement();
         $this->measurementService->load($measurement, $participant, $type);
         if ($measurement->isPediatricForm()) {
