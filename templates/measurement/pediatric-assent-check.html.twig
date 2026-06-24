@@ -1,0 +1,45 @@
+{% extends 'program/hpo/ppsc/base.html.twig' %}
+{% block title %}Physical Measurements Blood Donor Check- {% endblock %}
+{% block bodycontainer %}container-fluid{% endblock %}
+{% block body %}
+    <div>
+        <div class="page-header pb-1 mb-3 border-bottom">
+            <h2>
+                <i class="fa fa-clipboard" aria-hidden="true"></i> New Physical Measurements
+            </h2>
+        </div>
+        <div class="card border-success mt-4">
+            <div class="card-header bg-success text-white">
+                Pediatric Assent
+            </div>
+            <div class="card-body">
+                {{ form_start(assentForm, { attr: { class: 'prevent-resubmit', id: 'pediatricAssentForm', 'data-show-no-assent-modal-on-load': showNoAssentModalOnLoad ? '1' : '0' } }) }}
+                    <div>
+                        {{ form_label(assentForm.pediatricAssent, null, { label_attr: { class: 'form-label', for: 'pediatricAssent' } }) }}
+                        {{ form_widget(assentForm.pediatricAssent, { attr: { class: 'form-select', id: 'pediatricAssent' } }) }}
+                        {% set assentError = assentForm.pediatricAssent.vars.errors|first %}
+                        {% if assentError %}
+                            <div id="assentErrorMessage" class="text-danger mt-2">
+                                <i class="fa fa-exclamation-circle"></i> {{ assentError.message }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {{ form_widget(assentForm.acknowledgeNoAssent, { attr: { id: 'acknowledgeNoAssent' } }) }}
+                    {{ form_widget(assentForm.pediatricAssentId, { attr: { id: 'pediatricAssentId' } }) }}
+                    {{ form_rest(assentForm) }}
+                    <div class="mt-4">
+                        <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
+                        <button type="submit" class="btn btn-primary d-none" id="continueBtn" disabled>
+                            Continue
+                            <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                        </button>
+                    </div>
+                {{ form_end(assentForm, { render_rest: false }) }}
+            </div>
+        </div>
+    </div>
+    {% include 'partials/modals/pediatric-assent-warning-modal.html.twig' %}
+{% endblock %}
+{% block pagejs %}
+    {{ encore_entry_script_tags('pediatric-assent') }}
+{% endblock %}

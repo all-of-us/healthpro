@@ -14,7 +14,11 @@
         {% if siteType == 'dv' %}
             {% set steps = ['Create', 'Collect', 'Process', 'Finalize'] %}
         {% else %}
-            {% set steps = ['Create', 'Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition'] %}
+            {% set steps = ['Create'] %}
+            {% if participant.requirePediatricAssentCheck %}
+                {% set steps = steps|merge(['Assent']) %}
+            {% endif %}
+            {% set steps = steps|merge(['Print Labels', 'Collect', 'Process', 'Finalize', 'Print Requisition']) %}
         {% endif %}
         {% for step in steps %}
             <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#">{{ step }}</a></li>
@@ -59,7 +63,11 @@
             </div>
         </div>
         <div class="col-md-12 mt-2">
-            <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Recapture</a>
+            {% if participant.requirePediatricAssentCheck %}
+                <a href="{{ path('measurement_pediatric_assent_check', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Recapture</a>
+            {% else %}
+                <a href="{{ path('measurement', {'participantId': participant.id, 'type': 'peds-weight'}) }}" class="btn btn-warning">Recapture</a>
+            {% endif %}
         </div>
     {% else %}
         <h5>Please confirm the participant's weight is accurate prior to biospecimen collection. Click confirm if the participant's weight is accurate. Click Amend to edit the weight captured on today's

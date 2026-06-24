@@ -7,7 +7,7 @@ use App\Entity\BloodPressureSystolicHeightPercentile;
 use App\Entity\BmiForAge5YearsAndUp;
 use App\Entity\HeadCircumferenceForAge0To36Months;
 use App\Entity\HeightForAge0To23Months;
-use App\Entity\HeightForAge24MonthsTo6Years;
+use App\Entity\HeightForAge24MonthsAndUp;
 use App\Entity\Measurement;
 use App\Entity\User;
 use App\Entity\WeightForAge0To23Months;
@@ -279,7 +279,7 @@ class MeasurementTest extends KernelTestCase
             ]],
             [25, [
                 'weightForAgeCharts' => WeightForAge24MonthsAndUp::class,
-                'heightForAgeCharts' => HeightForAge24MonthsTo6Years::class,
+                'heightForAgeCharts' => HeightForAge24MonthsAndUp::class,
                 'headCircumferenceForAgeCharts' => HeadCircumferenceForAge0To36Months::class,
                 'weightForLengthCharts' => WeightForLength23MonthsTo5Years::class,
                 'bmiForAgeCharts' => null,
@@ -288,7 +288,7 @@ class MeasurementTest extends KernelTestCase
             ]],
             [60, [
                 'weightForAgeCharts' => WeightForAge24MonthsAndUp::class,
-                'heightForAgeCharts' => HeightForAge24MonthsTo6Years::class,
+                'heightForAgeCharts' => HeightForAge24MonthsAndUp::class,
                 'headCircumferenceForAgeCharts' => null,
                 'weightForLengthCharts' => WeightForLength23MonthsTo5Years::class,
                 'bmiForAgeCharts' => BmiForAge5YearsAndUp::class,

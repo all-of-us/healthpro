@@ -38,14 +38,13 @@ class HpoPpscController extends BaseController
         }
         $measurements = $this->em->getRepository(Measurement::class)->getMeasurementsWithoutParent($id);
         $orders = $this->em->getRepository(Order::class)->findBy(['participantId' => $id], ['id' => 'desc']);
-        $evaluationUrl = $measurementService->requireBloodDonorCheck() ? 'measurement_blood_donor_check' : 'measurement';
         $cacheEnabled = $params->has('ppsc_disable_cache') ? !$params->get('ppsc_disable_cache') : true;
         $isDVType = $session->get('siteType') === 'dv';
         return $this->render('/program/hpo/ppsc/in-person-enrollment.html.twig', [
             'participant' => $participant,
             'orders' => $orders,
             'measurements' => $measurements,
-            'evaluationUrl' => $evaluationUrl,
+            'evaluationUrl' => $measurementService->getMeasurementUrl($participant),
             'cacheEnabled' => $cacheEnabled,
             'isDVType' => $isDVType
         ]);

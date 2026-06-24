@@ -160,6 +160,47 @@ class MeasurementServiceTest extends ServiceTestCase
         ];
     }
 
+    /**
+     * @dataProvider getMeasurementUrlProvider
+     */
+    public function testGetMeasurementUrl(bool $isPediatric, string $dob, bool $bloodDonorCheck, string $expectedUrl)
+    {
+        $measurementServiceMock = $this->getMockBuilder(MeasurementService::class)
+            ->setConstructorArgs([
+                $this->createMock(EntityManagerInterface::class),
+                $this->createMock(RequestStack::class),
+                $this->createMock(UserService::class),
+                $this->createMock(PpscApiService::class),
+                $this->createMock(SiteService::class),
+                $this->createMock(ParameterBagInterface::class),
+                $this->createMock(LoggerService::class),
+            ])
+            ->onlyMethods(['requireBloodDonorCheck'])
+            ->getMock();
+
+        $measurementServiceMock->method('requireBloodDonorCheck')->willReturn($bloodDonorCheck);
+
+        $participant = new PpscParticipant((object) [
+            'isPediatric' => $isPediatric,
+            'dob' => $dob
+        ]);
+
+        $this->assertSame($expectedUrl, $measurementServiceMock->getMeasurementUrl($participant));
+    }
+
+    public function getMeasurementUrlProvider(): array
+    {
+        $today = new \DateTime();
+        return [
+            'Pediatric assent check required' => [true, (clone $today)->sub(new \DateInterval('P90M'))->format('Y-m-d'), false, 'measurement_pediatric_assent_check'],
+            'Blood donor check required' => [false, (clone $today)->sub(new \DateInterval('P90M'))->format('Y-m-d'), true, 'measurement_blood_donor_check'],
+            'Standard measurement' => [false, (clone $today)->sub(new \DateInterval('P90M'))->format('Y-m-d'), false, 'measurement'],
+            'Pediatric but not in assent age range, blood donor check' => [true, (clone $today)->sub(new \DateInterval('P80M'))->format('Y-m-d'), true, 'measurement_blood_donor_check'],
+            'Pediatric but not in assent age range, standard' => [true, (clone $today)->sub(new \DateInterval('P80M'))->format('Y-m-d'), false, 'measurement'],
+        ];
+    }
+
+
     private function createSite($hybrid = null): void
     {
         $em = static::getContainer()->get(EntityManagerInterface::class);
