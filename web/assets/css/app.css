@@ -439,7 +439,7 @@ label.label-normal {
 .multiheader-ancillary {
     background-color: #d3e9fc;
 }
-.dataTables_processing {
+.dt-processing {
     z-index: 1000;
     color: #fff;
     background-color: #337ab7;
@@ -454,7 +454,7 @@ label.label-normal {
     );
     opacity: 0.7;
 }
-#workqueue tr.tr-withdrawn.odd, #workqueue_consents_row tr.tr-withdrawn.odd {
+#workqueue tr.tr-withdrawn:nth-child(odd), #workqueue_consents_row tr.tr-withdrawn:nth-child(odd) {
     background: repeating-linear-gradient(
         -45deg,
         #f9f9f9,
@@ -1035,7 +1035,8 @@ table.table-samples td {
     border: 1px solid #dee2e6;
 }
 
-.quick-view-table th.sorting::after {
+.quick-view-table th.dt-orderable-asc::after,
+.quick-view-table th.dt-orderable-desc::after {
     content: "\f0dc" !important;
     font-family: "Font Awesome 5 Free", serif !important;
     font-weight: 900;
@@ -1044,7 +1045,7 @@ table.table-samples td {
     margin-left: 5px;
 }
 
-.quick-view-table th.sorting_asc::after {
+.quick-view-table th.dt-ordering-asc::after {
     content: "\f0de" !important;
     font-family: "Font Awesome 5 Free", serif !important;
     font-weight: 900;
@@ -1053,7 +1054,7 @@ table.table-samples td {
     margin-left: 5px;
 }
 
-.quick-view-table th.sorting_desc::after {
+.quick-view-table th.dt-ordering-desc::after {
     content: "\f0dd" !important;
     font-family: "Font Awesome 5 Free", serif !important;
     font-weight: 900;
