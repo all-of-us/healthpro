@@ -10,10 +10,10 @@ require("parsleyjs/dist/parsley.js");
 require("./parsley-validator.js"); // customized parsley validator
 // Include the required file for exporting to CSV
 require("datatables.net-buttons/js/buttons.html5.js");
-require("datatables.net/js/jquery.dataTables.js");
+require("datatables.net/js/dataTables.js");
 require("datatables.net-bs5/js/dataTables.bootstrap5.js");
 require("datatables.net-responsive/js/dataTables.responsive.js");
-require("datatables.net-responsive-bs/js/responsive.bootstrap.js");
+require("datatables.net-responsive-bs5/js/responsive.bootstrap5.js");
 require("datatables.net-buttons/js/dataTables.buttons.js");
 require("jsbarcode/dist/barcodes/JsBarcode.code128.min.js");
 require("inputmask/dist/jquery.inputmask.bundle.js");
@@ -42,7 +42,7 @@ require("@fortawesome/fontawesome-free/css/all.css");
 require("@fortawesome/fontawesome-free/css/v4-shims.css");
 require("@eonasdan/tempus-dominus/dist/css/tempus-dominus.min.css");
 require("datatables.net-bs5/css/dataTables.bootstrap5.css");
-require("datatables.net-responsive-bs/css/responsive.bootstrap.css");
+require("datatables.net-responsive-bs5/css/responsive.bootstrap5.css");
 require("../../../node_modules/bootstrap5-toggle/css/bootstrap5-toggle.min.css");
 require("../css/app.css");
 require("../css/bs5.css");
