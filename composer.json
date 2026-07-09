@@ -48,6 +48,7 @@
         "google/cloud-secret-manager": "^1.7",
         "ext-mbstring": "*",
         "mpdf/mpdf": "^8.1",
+        "tecnickcom/tcpdf": "^6.10",
         "qipsius/tcpdf-bundle": "^2.0",
         "league/oauth2-client": "^2.7",
         "google/protobuf": "^4.33.6",
