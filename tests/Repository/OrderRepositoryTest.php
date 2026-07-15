@@ -16,9 +16,7 @@ class OrderRepositoryTest extends RepositoryTestCase
         $this->repo = static::getContainer()->get(OrderRepository::class);
     }
 
-    /**
-     * @dataProvider nightlyReportOrdersDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('nightlyReportOrdersDataProvider')]
     public function testGetNightlyReportOrders(array $ordersInputData, array $expectedResult)
     {
         foreach ($ordersInputData as $data) {

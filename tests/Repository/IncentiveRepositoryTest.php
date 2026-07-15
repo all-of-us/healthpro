@@ -20,9 +20,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         $this->repo = static::getContainer()->get(IncentiveRepository::class);
     }
 
-    /**
-     * @dataProvider paginationDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('paginationDataProvider')]
     public function testOnsitePatientStatusPagination($start, $length, $resultCount, $resultParticipantId): void
     {
         $this->createIncentives();
@@ -43,9 +41,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider dateFilterDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dateFilterDataProvider')]
     public function testOnsiteIncentivesDateFilters($startDate, $endDate, $resultCount): void
     {
         $this->createIncentives();
@@ -74,9 +70,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider participantIdDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('participantIdDataProvider')]
     public function testOnsiteIncentivesParticipantIdLookup($participantId): void
     {
         $this->createIncentives();
@@ -97,9 +91,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider paramsCountDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('paramsCountDataProvider')]
     public function testGetOnsiteIncentivesCount($params, $resultCount): void
     {
         $this->createIncentives();

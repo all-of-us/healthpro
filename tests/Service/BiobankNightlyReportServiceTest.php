@@ -10,9 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class BiobankNightlyReportServiceTest extends ServiceTestCase
 {
-    /**
-     * @dataProvider generateNightlyReportsDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('generateNightlyReportsDataProvider')]
 
     public function testGenerateNightlyReport(bool $isProd, string $expectedBucketName)
     {
@@ -50,7 +48,7 @@ class BiobankNightlyReportServiceTest extends ServiceTestCase
         // Assert that the GcsBucketService's uploadFile method is called with correct parameters
         $gcsBucketServiceMock->expects($this->once())
             ->method('uploadFile')
-            ->with($expectedBucketName, $this->isType('resource'), $expectedFileName);
+            ->with($expectedBucketName, $this->isResource(), $expectedFileName);
 
         $service->generateNightlyReport();
     }

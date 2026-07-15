@@ -17,9 +17,7 @@ class NphParticipantTest extends TestCase
         $this->assertSame('1999-05-20', $participant->dob->format('Y-m-d'));
     }
 
-    /**
-     * @dataProvider enrollmentStatusProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('enrollmentStatusProvider')]
     public function testParticipantModule($enrollmentStatus, $expectedModule): void
     {
         $participant = new NphParticipant((object) [
@@ -107,9 +105,7 @@ class NphParticipantTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider moduleDietStatusProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('moduleDietStatusProvider')]
     public function testGetModuleDietStatus($nphModuleDietStatus, $module, $expected)
     {
         $nphModuleDietStatusField = "nphModule{$module}DietStatus";

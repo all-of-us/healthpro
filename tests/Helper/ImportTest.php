@@ -7,9 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ImportTest extends TestCase
 {
-    /**
-     * @dataProvider participantIdProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('participantIdProvider')]
     public function testValidParticipantId($participantId, $isValid): void
     {
         $result = Import::isValidParticipantId($participantId);
@@ -28,9 +26,7 @@ class ImportTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider emailDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('emailDataProvider')]
     public function testValidEmail($email, $isValid): void
     {
         $result = Import::isValidEmail($email);
@@ -48,9 +44,7 @@ class ImportTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dateProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dateProvider')]
     public function testValidDate($date, $isValid): void
     {
         $result = Import::isValidDate($date);
@@ -69,9 +63,7 @@ class ImportTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider duplicateParticipantIDProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('duplicateParticipantIDProvider')]
     public function testDuplicateParticipantId($imports, $participantId, $isDuplicate): void
     {
         $result = Import::hasDuplicateParticipantId($imports, $participantId);

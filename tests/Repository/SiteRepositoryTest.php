@@ -76,9 +76,7 @@ class SiteRepositoryTest extends KernelTestCase
         $this->assertSame(100000, $result);
     }
 
-    /**
-     * @dataProvider siteStatusProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('siteStatusProvider')]
     public function testActiveSiteCount($siteId, $status, $expectedResult): void
     {
         $awardeeId = 'TEST_AWARDEE_' . $siteId;

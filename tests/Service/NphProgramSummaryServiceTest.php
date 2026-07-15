@@ -52,7 +52,7 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
         $files = scandir($NphModulesDirectory, SCANDIR_SORT_NONE);
         $files = array_diff($files, ['.', '..']);
         $this->assertCount(count($files), $modules);
-        $this->assertContainsOnly('string', $modules);
+        $this->assertContainsOnlyString($modules);
     }
 
     public function testGetProgramSummary(): void
@@ -60,7 +60,7 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
         $programSummary = $this->service->getProgramSummary();
         $this->assertIsArray($programSummary);
         $this->assertNotEmpty($programSummary);
-        $this->assertContainsOnly('array', $programSummary);
+        $this->assertContainsOnlyArray($programSummary);
         $this->assertArrayHasKey('1', $programSummary);
         $this->assertArrayHasKey('2', $programSummary);
         $this->assertArrayHasKey('3', $programSummary);
@@ -78,7 +78,7 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
         $combinedSummary = $this->service->combineOrderSummaryWithProgramSummary($orderSummary, $programSummary);
         $this->assertIsArray($combinedSummary);
         $this->assertNotEmpty($combinedSummary);
-        $this->assertContainsOnly('array', $combinedSummary);
+        $this->assertContainsOnlyArray($combinedSummary);
         $this->assertArrayHasKey('1', $combinedSummary);
         $this->assertArrayHasKey('2', $combinedSummary);
         $this->assertArrayHasKey('3', $combinedSummary);
@@ -97,7 +97,7 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
         $sampleStatusCounts = $this->nphOrderService->getSampleStatusCounts($combinedSummary);
         $this->assertIsArray($sampleStatusCounts);
         $this->assertNotEmpty($sampleStatusCounts);
-        $this->assertContainsOnly('array', $sampleStatusCounts);
+        $this->assertContainsOnlyArray($sampleStatusCounts);
         $this->assertArrayHasKey('1', $sampleStatusCounts);
         $this->assertArrayHasKey('2', $sampleStatusCounts);
         $this->assertArrayHasKey('3', $sampleStatusCounts);

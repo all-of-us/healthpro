@@ -21,9 +21,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         $this->repo = static::getContainer()->get(PatientStatusRepository::class);
     }
 
-    /**
-     * @dataProvider paginationDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('paginationDataProvider')]
     public function testOnsitePatientStatusPagination($start, $length, $resultCount, $resultParticipantId): void
     {
         $this->createPatientStatus();
@@ -44,9 +42,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider dateFilterDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dateFilterDataProvider')]
     public function testOnsitePatientStatusDateFilters($startDate, $endDate, $resultCount): void
     {
         $this->createPatientStatus();
@@ -69,9 +65,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider participantIdDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('participantIdDataProvider')]
     public function testOnsitePatientStatusParticipantIdLookup($participantId): void
     {
         $this->createPatientStatus();
@@ -99,9 +93,7 @@ class PatientStatusRepositoryTest extends KernelTestCase
         $this->assertCount(1, $sites);
     }
 
-    /**
-     * @dataProvider paramsCountDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('paramsCountDataProvider')]
     public function testGetOnsitePatientStatusesCount($params, $resultCount): void
     {
         $this->createPatientStatus();

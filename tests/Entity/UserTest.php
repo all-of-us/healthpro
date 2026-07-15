@@ -7,9 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class UserTest extends TestCase
 {
-    /**
-     * @dataProvider removeUsersDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('removeUsersDataProvider')]
     public function testRemoveUserRoles($totalRoles, $removeRoles, $expectedNewRoles)
     {
         User::removeUserRoles($removeRoles, $totalRoles);
@@ -25,9 +23,7 @@ class UserTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider timezoneDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('timezoneDataProvider')]
     public function testGetTimezoneId(string $timezone, int $expectedId)
     {
         $user = new User;

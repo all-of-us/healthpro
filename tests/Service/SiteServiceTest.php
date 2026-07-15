@@ -120,9 +120,7 @@ class SiteServiceTest extends ServiceTestCase
         self::assertSame('TEST_AWARDEE_' . $this->id, $this->service->getSiteAwardeeId());
     }
 
-    /**
-     * @dataProvider siteDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('siteDataProvider')]
     public function testIsValidSite($program, $mayoLinkAccount, $switchSiteName, $checkSiteName, $expectedResult): void
     {
         // set env to stable to test isValidSite status
@@ -163,9 +161,7 @@ class SiteServiceTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider siteStatusProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('siteStatusProvider')]
     public function testIsActiveSite($activeSiteCount, $expectedResult): void
     {
         $siteId = 'test-123456'; // Replace with an actual site ID

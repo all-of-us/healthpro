@@ -23,9 +23,7 @@ class ContextTemplateServiceTest extends ServiceTestCase
         }
     }
 
-    /**
-     * @dataProvider programTemplateDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('programTemplateDataProvider')]
     public function testGetProgramTemplate(string $program, string $expectedTemplate): void
     {
         $this->session->set('program', $program);
@@ -41,9 +39,7 @@ class ContextTemplateServiceTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider isCurrentProgramDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('isCurrentProgramDataProvider')]
     public function testIsCurrentProgram(string $program, bool $expectedIsCurrentProgram): void
     {
         $this->session->set('program', $program);
@@ -59,9 +55,7 @@ class ContextTemplateServiceTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider getCurrentProgramDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCurrentProgramDataProvider')]
     public function testGetCurrentProgram(string $program): void
     {
         $this->session->set('program', $program);
@@ -77,9 +71,7 @@ class ContextTemplateServiceTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider getIsCurrentProgramHpoDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getIsCurrentProgramHpoDataProvider')]
     public function testIsCurrentProgramHpo(string $program, bool $expectedIsCurrentProgramHpo): void
     {
         $this->session->set('program', $program);
@@ -95,9 +87,7 @@ class ContextTemplateServiceTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider getIsCurrentProgramNphDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getIsCurrentProgramNphDataProvider')]
     public function testIsCurrentProgramNph(string $program, bool $expectedIsCurrentProgramNph): void
     {
         $this->session->set('program', $program);
@@ -113,9 +103,7 @@ class ContextTemplateServiceTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider getCurrentProgramDisplayTextDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getCurrentProgramDisplayTextDataProvider')]
     public function testGetCurrentProgramDisplayText(string $program, string $expectedIsCurrentProgramDisplayText): void
     {
         $this->session->set('program', $program);

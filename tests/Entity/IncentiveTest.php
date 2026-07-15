@@ -7,9 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class IncentiveTest extends KernelTestCase
 {
-    /**
-     * @dataProvider incentiveTypeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('incentiveTypeProvider')]
     public function testGetIncentiveTypeDisplayName(string $incentiveType, ?string $expectedDisplayName): void
     {
         $incentive = new Incentive();
@@ -27,9 +25,7 @@ class IncentiveTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider incentiveOccurrenceProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('incentiveOccurrenceProvider')]
     public function testGetIncentiveOccurrenceDisplayName(string $incentiveOccurrence, ?string $expectedDisplayName): void
     {
         $incentive = new Incentive();
@@ -47,9 +43,7 @@ class IncentiveTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider incentiveAmountProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('incentiveAmountProvider')]
     public function testGetIncentiveAmountDisplayName(string $incentiveAmount, ?string $expectedDisplayName): void
     {
         $incentive = new Incentive();
@@ -67,9 +61,7 @@ class IncentiveTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider incentiveRecipientProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('incentiveRecipientProvider')]
     public function testGetIncentiveRecipientDisplayName(string $recipient, ?string $expectedDisplayName): void
     {
         $incentive = new Incentive();
@@ -88,9 +80,7 @@ class IncentiveTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider incentiveOtherRecipientProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('incentiveOtherRecipientProvider')]
     public function testGetOtherIncentiveRecipient(string $recipient, ?string $expectedDisplayName): void
     {
         $incentive = new Incentive();

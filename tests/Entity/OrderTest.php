@@ -464,9 +464,7 @@ class OrderTest extends KernelTestCase
         $this->assertSame(false, $order->canUnlock());
     }
 
-    /**
-     * @dataProvider orderTypeProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('orderTypeProvider')]
     public function testOrderTypeDisplayText($orderDisplayText, $orderType, $requestedSamples)
     {
         $orderData = $this->getOrderData();
@@ -489,9 +487,7 @@ class OrderTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider getBiobankChangesDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getBiobankChangesDataProvider')]
     public function testGetBiobankChanges($data, $json)
     {
         $createdTs = new \DateTime('2022-01-01 08:00:00');
@@ -548,9 +544,7 @@ class OrderTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider biobankOrderDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('biobankOrderDataProvider')]
     public function testBiobankOrderChanges($data, $result)
     {
         $createdTs = new \DateTime('2022-01-01 08:00:00');
@@ -625,9 +619,7 @@ class OrderTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider orderSampleVersionsDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('orderSampleVersionsDataProvider')]
     public function testOrderSampleVersion($sampleVersion, $resultSampleVersion)
     {
         $orderData = $this->getOrderData();
@@ -653,9 +645,7 @@ class OrderTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider orderDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('orderDataProvider')]
     public function testHideTrackingFieldByDefault(?string $fedexTracking, ?string $orderType, bool $expected): void
     {
         $order = new Order();

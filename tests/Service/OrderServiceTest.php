@@ -16,9 +16,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderServiceTest extends ServiceTestCase
 {
-    /**
-     * @dataProvider siteStatusProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('siteStatusProvider')]
     public function testInactiveSiteFormDisabled($status, $isActiveSite, $expectedResult): void
     {
         $mockSiteService = $this->createMock(SiteService::class);
