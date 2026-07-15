@@ -9,7 +9,7 @@ class NphParticipantTest extends TestCase
 {
     public function testNphParticipant(): void
     {
-        $participant = new NphParticipant((object)[
+        $participant = new NphParticipant((object) [
             'participantNphId' => '10000000000000',
             'nphDateOfBirth' => '1999-05-20',
         ]);
@@ -22,57 +22,57 @@ class NphParticipantTest extends TestCase
      */
     public function testParticipantModule($enrollmentStatus, $expectedModule): void
     {
-        $participant = new NphParticipant((object)[
+        $participant = new NphParticipant((object) [
             'nphEnrollmentStatus' => $enrollmentStatus
         ]);
         $this->assertSame($expectedModule, $participant->module);
     }
 
-    public function enrollmentStatusProvider(): array
+    public static function enrollmentStatusProvider(): array
     {
         return [
             'module1_complete' => [
-                [(object)['value' => 'module1_complete']],
+                [(object) ['value' => 'module1_complete']],
                 1,
             ],
             'module2_consented' => [
-                [(object)['value' => 'module2_consented']],
+                [(object) ['value' => 'module2_consented']],
                 2,
             ],
             'module3_eligibilityConfirmed' => [
-                [(object)['value' => 'module3_eligibilityConfirmed']],
+                [(object) ['value' => 'module3_eligibilityConfirmed']],
                 3,
             ],
             'no_match' => [
-                [(object)['value' => 'invalid_status']],
+                [(object) ['value' => 'invalid_status']],
                 1,
             ],
             'multiple_statuses_match' => [
                 [
-                    (object)['value' => 'module2_complete'],
-                    (object)['value' => 'module3_dietAssigned'],
+                    (object) ['value' => 'module2_complete'],
+                    (object) ['value' => 'module3_dietAssigned'],
                 ],
                 2,
             ],
             'multiple_statuses_match_time' => [
                 [
-                    (object)[
+                    (object) [
                         'time' => '2023-07-13T22:09:10',
                         'value' => 'nph_referred',
                     ],
-                    (object)[
+                    (object) [
                         'time' => '2023-07-13T22:09:10',
                         'value' => 'module3_dietAssigned',
                     ],
-                    (object)[
+                    (object) [
                         'time' => '2023-07-13T23:09:10',
                         'value' => 'module2_dietAssigned',
                     ],
-                    (object)[
+                    (object) [
                         'time' => '2023-07-19T23:15:10',
                         'value' => 'module3_eligibilityConfirmed',
                     ],
-                    (object)[
+                    (object) [
                         'time' => '2023-07-18T23:15:10',
                         'value' => 'module2_eligibilityConfirmed',
                     ]
@@ -81,23 +81,23 @@ class NphParticipantTest extends TestCase
             ],
             'multiple_statuses_match_equal_time' => [
                 [
-                    (object)[
+                    (object) [
                         'time' => '2023-07-13T22:09:10',
                         'value' => 'nph_referred',
                     ],
-                    (object)[
+                    (object) [
                         'time' => '2023-07-13T22:09:10',
                         'value' => 'module3_dietAssigned',
                     ],
-                    (object)[
+                    (object) [
                         'time' => '2023-07-13T23:09:10',
                         'value' => 'module2_dietAssigned',
                     ],
-                    (object)[
+                    (object) [
                         'time' => '2023-07-18T23:15:10',
                         'value' => 'module3_eligibilityConfirmed',
                     ],
-                    (object)[
+                    (object) [
                         'time' => '2023-07-18T23:15:10',
                         'value' => 'module2_eligibilityConfirmed',
                     ]
@@ -113,18 +113,18 @@ class NphParticipantTest extends TestCase
     public function testGetModuleDietStatus($nphModuleDietStatus, $module, $expected)
     {
         $nphModuleDietStatusField = "nphModule{$module}DietStatus";
-        $participant = new NphParticipant((object)[
+        $participant = new NphParticipant((object) [
             $nphModuleDietStatusField => $nphModuleDietStatus
         ]);
         $moduleDietStatusField = "module{$module}DietStatus";
         $this->assertEquals($expected, $participant->{$moduleDietStatusField});
     }
 
-    public function moduleDietStatusProvider(): array
+    public static function moduleDietStatusProvider(): array
     {
         return [
             'Completed Diet Status' => [
-                'dietStatusData' => [
+                'nphModuleDietStatus' => [
                     (object) [
                         'dietName' => 'ORANGE',
                         'dietStatus' => [
@@ -145,7 +145,7 @@ class NphParticipantTest extends TestCase
                 'expected' => ['ORANGE' => 'completed']
             ],
             'Discontinued Diet Status' => [
-                'dietStatusData' => [
+                'nphModuleDietStatus' => [
                     (object) [
                         'dietName' => 'ORANGE',
                         'dietStatus' => [
@@ -166,7 +166,7 @@ class NphParticipantTest extends TestCase
                 'expected' => ['ORANGE' => 'discontinued']
             ],
             'Started Diet Status' => [
-                'dietStatusData' => [
+                'nphModuleDietStatus' => [
                     (object) [
                         'dietName' => 'ORANGE',
                         'dietStatus' => [
@@ -197,7 +197,7 @@ class NphParticipantTest extends TestCase
                 'expected' => ['ORANGE' => 'started', 'PURPLE' => 'started']
             ],
             'Incomplete Diet Status' => [
-                'dietStatusData' => [
+                'nphModuleDietStatus' => [
                     (object) [
                         'dietName' => 'BLUE',
                         'dietStatus' => [

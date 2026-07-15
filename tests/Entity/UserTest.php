@@ -16,7 +16,7 @@ class UserTest extends TestCase
         $this->assertEmpty(array_diff($totalRoles, $expectedNewRoles));
     }
 
-    public function removeUsersDataProvider(): array
+    public static function removeUsersDataProvider(): array
     {
         return [
             [['ROLE_USER', 'ROLE_NPH_USER', 'ROLE_ADMIN'], ['ROLE_USER'], ['ROLE_NPH_USER', 'ROLE_ADMIN']],

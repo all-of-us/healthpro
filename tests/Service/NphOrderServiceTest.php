@@ -110,7 +110,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($sampleType, $this->service->getSampleType($sampleCode));
     }
 
-    public function sampleTypeDataProvider(): array
+    public static function sampleTypeDataProvider(): array
     {
         return [
             ['nail', 'NAILB'],
@@ -137,7 +137,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($expectedSampleLabels, $this->service->getSamplesWithLabels($nphOrder->getNphSamples()));
     }
 
-    public function sampleLabelsDataProvider(): array
+    public static function sampleLabelsDataProvider(): array
     {
         return [
             ['preLMT', 'urine', 'URINES', 'Spot Urine'],
@@ -168,7 +168,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($expectedSampleLabelAndIds, $this->service->getSamplesWithLabelsAndIds($nphOrder->getNphSamples()));
     }
 
-    public function sampleLabelsAndIdsDataProvider(): array
+    public static function sampleLabelsAndIdsDataProvider(): array
     {
         return [
             ['preLMT', 'urine', 'URINES', 'Spot Urine', '1000000001', '2000000001'],
@@ -274,7 +274,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($this->service->isAtLeastOneSampleChecked($formData, $nphOrder), $isAtLeastOneSampleChecked);
     }
 
-    public function orderCollectionFormDataProvider(): array
+    public static function orderCollectionFormDataProvider(): array
     {
         return [
             ['preLMT', 'urine', ['URINES'], ['URINES' => true], true],
@@ -331,7 +331,7 @@ class NphOrderServiceTest extends ServiceTestCase
         }
     }
 
-    public function orderCollectionDataProvider(): array
+    public static function orderCollectionDataProvider(): array
     {
         $collectedTs = new \DateTime('2022-11-18');
         $urineMetaData = [
@@ -394,7 +394,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($collectionFormData, $this->service->getExistingOrderCollectionData($nphOrder, true));
     }
 
-    public function adminOrderEditsDataProvider(): array
+    public static function adminOrderEditsDataProvider(): array
     {
         $collectedTs = new \DateTime('2025-04-28');
         return [
@@ -432,7 +432,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($this->service->hasAtLeastOneAliquotSample($formData, $sampleCode), $isAtLeastOneSampleChecked);
     }
 
-    public function orderFinalizationFormDataProvider(): array
+    public static function orderFinalizationFormDataProvider(): array
     {
         return [
             ['URINES', ['URINESA1' => ['1234567890'], ['URINESA2' => []]], true],
@@ -509,7 +509,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertEquals($sampleIdentifier, $rdrObject->sample['test']);
     }
 
-    public function orderFinalizationDataProvider(): array
+    public static function orderFinalizationDataProvider(): array
     {
         $collectedTs = new \DateTime('2022-12-01');
         $aliquotTs = new \DateTime('2022-12-02');
@@ -617,7 +617,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($this->service->getSamplesMetadata($nphOrder), $expectedMetaData);
     }
 
-    public function samplesMetadataDataProvider(): array
+    public static function samplesMetadataDataProvider(): array
     {
         $collectedTs = new \DateTime('2022-11-18');
         $urineMetaData = [
@@ -673,7 +673,7 @@ class NphOrderServiceTest extends ServiceTestCase
         }
     }
 
-    public function saveSamplesModificationDataProvider(): array
+    public static function saveSamplesModificationDataProvider(): array
     {
         $collectedTs = new \DateTime('2022-11-18');
         return [
@@ -714,7 +714,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($modifyReason, $nphSample->getModifyReason());
     }
 
-    public function saveSampleModificationDataProvider(): array
+    public static function saveSampleModificationDataProvider(): array
     {
         $collectedTs = new \DateTime('2022-11-18');
         return [
@@ -752,7 +752,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertSame($expectedFormErrors, $this->service->validateGenerateOrdersData($formData));
     }
 
-    public function validateGenerateOrdersDataProvider(): array
+    public static function validateGenerateOrdersDataProvider(): array
     {
         return [
             [
@@ -784,7 +784,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertEquals($expectedResult, $actualResult);
     }
 
-    public function dietStartedDataProvider(): array
+    public static function dietStartedDataProvider(): array
     {
         return [
             [
@@ -812,7 +812,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertEquals($expectedResult, $actualResult);
     }
 
-    public function dietStartedOrCompletedDataProvider(): array
+    public static function dietStartedOrCompletedDataProvider(): array
     {
         return [
             [
@@ -830,7 +830,7 @@ class NphOrderServiceTest extends ServiceTestCase
         ];
     }
 
-    public function saveDlwCollectionDataProvider(): array
+    public static function saveDlwCollectionDataProvider(): array
     {
         return [
             ['P0000000003', 1, 'Period1Diet', [
@@ -875,7 +875,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function activeDietPeriodProvider(): array
+    public static function activeDietPeriodProvider(): array
     {
         return [
             'no in-progress periods' => [
@@ -917,7 +917,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function activeModuleProvider(): array
+    public static function activeModuleProvider(): array
     {
         return [
             'in progress module 1' => [

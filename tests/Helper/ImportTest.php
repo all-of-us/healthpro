@@ -16,7 +16,7 @@ class ImportTest extends TestCase
         $this->assertEquals($result, $isValid);
     }
 
-    public function participantIdProvider()
+    public static function participantIdProvider()
     {
         return [
             ['P000000000', true],
@@ -37,7 +37,7 @@ class ImportTest extends TestCase
         $this->assertEquals($result, $isValid);
     }
 
-    public function emailDataProvider()
+    public static function emailDataProvider()
     {
         return [
             ['test-1@pmi-ops.org', true],
@@ -57,7 +57,7 @@ class ImportTest extends TestCase
         $this->assertEquals($result, $isValid);
     }
 
-    public function dateProvider()
+    public static function dateProvider()
     {
         return [
             ['02/01/2022', true],
@@ -78,7 +78,7 @@ class ImportTest extends TestCase
         $this->assertEquals($result, $isDuplicate);
     }
 
-    public function duplicateParticipantIDProvider()
+    public static function duplicateParticipantIDProvider()
     {
         return [
             [[['participant_id' => 'P01'], ['participant_id' => 'P01'], ['participant_id' => 'P03']], 'P01', true],

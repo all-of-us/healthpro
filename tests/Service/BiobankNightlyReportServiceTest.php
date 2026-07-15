@@ -55,7 +55,7 @@ class BiobankNightlyReportServiceTest extends ServiceTestCase
         $service->generateNightlyReport();
     }
 
-    public function generateNightlyReportsDataProvider(): array
+    public static function generateNightlyReportsDataProvider(): array
     {
         return [
             'Staging environment' =>

@@ -79,7 +79,7 @@ class MeasurementServiceTest extends ServiceTestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function siteStatusProvider(): array
+    public static function siteStatusProvider(): array
     {
         return [
             'No parent ID, inactive site: expect true' => [null, false, true],
@@ -142,7 +142,7 @@ class MeasurementServiceTest extends ServiceTestCase
         $measurementService->backfillMeasurementsSexAtBirth();
     }
 
-    public function backfillMeasurementsProvider(): array
+    public static function backfillMeasurementsProvider(): array
     {
         return [
             'Valid sexAtBirth data' => [

@@ -26,7 +26,7 @@ class NphParticipantReviewServiceTest extends ServiceTestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function samplesDataProvider(): array
+    public static function samplesDataProvider(): array
     {
         return [
             [

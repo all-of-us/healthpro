@@ -24,7 +24,7 @@ class NphOrderTest extends NphTestCase
         $this->assertSame($canRestore, $nphOrder->canModify(NphSample::RESTORE));
     }
 
-    public function canCancelRestoreDataProvider(): array
+    public static function canCancelRestoreDataProvider(): array
     {
         return [
             [
@@ -109,7 +109,7 @@ class NphOrderTest extends NphTestCase
         $this->assertSame($isMetadataFieldDisabled, $nphOrder->isMetadataFieldDisabled());
     }
 
-    public function isDisabledAndMetadataDisabledDataProvider(): array
+    public static function isDisabledAndMetadataDisabledDataProvider(): array
     {
         return [
             [
@@ -174,7 +174,7 @@ class NphOrderTest extends NphTestCase
         $this->assertSame($expectedStatus, $nphOrder->getStatus());
     }
 
-    public function getOrderStatusDataProvider(): array
+    public static function getOrderStatusDataProvider(): array
     {
         $finalizedTs = new \DateTime('2023-01-01 08:00:00');
         $collectedTs = new \DateTime('2023-01-01 08:00:00');
@@ -270,7 +270,7 @@ class NphOrderTest extends NphTestCase
         $this->assertSame($expectedCollectedTs, $nphOrder->getCollectedTs());
     }
 
-    public function collectedTimeProvider(): array
+    public static function collectedTimeProvider(): array
     {
         $collectedTs1 = new \DateTime('2023-03-15 08:00:00');
         $collectedTs2 = new \DateTime('2023-03-16 08:00:00');
@@ -335,7 +335,7 @@ class NphOrderTest extends NphTestCase
         $this->assertSame($expectedResult, $nphOrder->isStoolCollectedTsDisabled());
     }
 
-    public function stoolTypeProvider(): array
+    public static function stoolTypeProvider(): array
     {
         $collectedTs = new \DateTime();
         return [
@@ -408,7 +408,7 @@ class NphOrderTest extends NphTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function metadataProvider(): array
+    public static function metadataProvider(): array
     {
         return [
             [

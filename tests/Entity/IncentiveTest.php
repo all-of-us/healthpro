@@ -18,7 +18,7 @@ class IncentiveTest extends KernelTestCase
         $this->assertEquals($expectedDisplayName, $incentive->getIncentiveTypeDisplayName());
     }
 
-    public function incentiveTypeProvider(): array
+    public static function incentiveTypeProvider(): array
     {
         return [
             ['gift_card', 'Gift Card'],
@@ -38,7 +38,7 @@ class IncentiveTest extends KernelTestCase
         $this->assertEquals($expectedDisplayName, $incentive->getIncentiveOccurrenceDisplayName());
     }
 
-    public function incentiveOccurrenceProvider(): array
+    public static function incentiveOccurrenceProvider(): array
     {
         return [
             ['one_time', 'One-time Incentive'],
@@ -58,7 +58,7 @@ class IncentiveTest extends KernelTestCase
         $this->assertEquals($expectedDisplayName, $incentive->getIncentiveAmountDisplayName());
     }
 
-    public function incentiveAmountProvider(): array
+    public static function incentiveAmountProvider(): array
     {
         return [
             ['25', '$25.00'],
@@ -78,7 +78,7 @@ class IncentiveTest extends KernelTestCase
         $this->assertEquals($expectedDisplayName, $incentive->getIncentiveRecipientDisplayName());
     }
 
-    public function incentiveRecipientProvider(): array
+    public static function incentiveRecipientProvider(): array
     {
         return [
             ['adult_participant', 'Adult Participant'],
@@ -99,7 +99,7 @@ class IncentiveTest extends KernelTestCase
         $this->assertEquals($expectedDisplayName, $incentive->getOtherIncentiveRecipient());
     }
 
-    public function incentiveOtherRecipientProvider(): array
+    public static function incentiveOtherRecipientProvider(): array
     {
         return [
             ['other, text1', 'text1'],

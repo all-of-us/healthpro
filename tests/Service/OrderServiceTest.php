@@ -78,7 +78,7 @@ class OrderServiceTest extends ServiceTestCase
         $this->assertFalse(in_array('1PS08', json_decode($order->getProcessedSamples())));
     }
 
-    public function siteStatusProvider(): array
+    public static function siteStatusProvider(): array
     {
         return [
             'No status, inactive site: expect true' => [null, false, true],

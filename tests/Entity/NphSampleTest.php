@@ -19,7 +19,7 @@ class NphSampleTest extends NphTestCase
         $this->assertSame($canUnlock, $nphSample->canUnlock());
     }
 
-    public function canUnlockDataProvider(): array
+    public static function canUnlockDataProvider(): array
     {
         $finalizedTs = new \DateTime('2023-01-08 08:00:00');
         return [
@@ -76,7 +76,7 @@ class NphSampleTest extends NphTestCase
         $this->assertSame($expectedAliquotIds, $sample->getNphAliquotIds());
     }
 
-    public function aliquotDataProvider(): array
+    public static function aliquotDataProvider(): array
     {
         return [
             [
@@ -145,7 +145,7 @@ class NphSampleTest extends NphTestCase
         $this->assertEquals($expectedResult, $nphSample->isDisabled());
     }
 
-    public function isDisabledDataProvider(): array
+    public static function isDisabledDataProvider(): array
     {
         $finalizedTs = new \DateTime('2023-03-06 08:00:00');
         return [
@@ -171,7 +171,7 @@ class NphSampleTest extends NphTestCase
         $this->assertEquals($expectedResult, $nphSample->isUnlocked());
     }
 
-    public function isUnlockedDataProvider(): array
+    public static function isUnlockedDataProvider(): array
     {
         return [
             [NphSample::REVERT, false],
@@ -193,7 +193,7 @@ class NphSampleTest extends NphTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function sampleMetadataProvider(): array
+    public static function sampleMetadataProvider(): array
     {
         return [
             [

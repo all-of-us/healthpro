@@ -151,7 +151,7 @@ class SiteServiceTest extends ServiceTestCase
         $this->assertEquals($expectedResult, $this->service->isValidSite($checkSiteEmail));
     }
 
-    public function siteDataProvider(): array
+    public static function siteDataProvider(): array
     {
         return [
             'valid mayolink account number and site email' => [User::PROGRAM_HPO, '123456789', 'hpo-site-test', 'hpo-site-test', true],
@@ -195,7 +195,7 @@ class SiteServiceTest extends ServiceTestCase
         $this->assertSame($expectedResult, $result);
     }
 
-    public function siteStatusProvider(): array
+    public static function siteStatusProvider(): array
     {
         return [
             'Active site' => [1, true],

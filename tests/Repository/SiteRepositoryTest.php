@@ -95,7 +95,7 @@ class SiteRepositoryTest extends KernelTestCase
         $this->assertSame($expectedResult, $this->repo->getActiveSiteCount($siteId));
     }
 
-    public function siteStatusProvider(): array
+    public static function siteStatusProvider(): array
     {
         return [
             'Active site' => ['test-site12345', 1, 1],

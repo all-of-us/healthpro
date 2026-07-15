@@ -401,7 +401,7 @@ class ParticipantTest extends TestCase
         $this->assertSame('deactivated', $participant->activityStatus);
     }
 
-    public function getPediatricWeightBreakpointProvider()
+    public static function getPediatricWeightBreakpointProvider()
     {
         return
             [

@@ -70,7 +70,7 @@ class MeasurementTest extends KernelTestCase
         return json_decode($json);
     }
 
-    public function measurementsProvider()
+    public static function measurementsProvider()
     {
         return [
             [
@@ -84,7 +84,7 @@ class MeasurementTest extends KernelTestCase
         ];
     }
 
-    public function bloodDonorMeasurementsProvider()
+    public static function bloodDonorMeasurementsProvider()
     {
         return [
             [
@@ -94,7 +94,7 @@ class MeasurementTest extends KernelTestCase
         ];
     }
 
-    public function ehrSourceMeasurementsProvider()
+    public static function ehrSourceMeasurementsProvider()
     {
         return [
             [
@@ -203,7 +203,7 @@ class MeasurementTest extends KernelTestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function calculateZScoreDataProvider(): array
+    public static function calculateZScoreDataProvider(): array
     {
         return [
             [10, 2, 5, 3, 0.5],
@@ -223,7 +223,7 @@ class MeasurementTest extends KernelTestCase
         $this->assertEquals($expectedPercentile, $percentile);
     }
 
-    public function calculatePercentileDataProvider(): array
+    public static function calculatePercentileDataProvider(): array
     {
         return [
             [-3.9, 0],
@@ -256,7 +256,7 @@ class MeasurementTest extends KernelTestCase
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function ageDataProvider(): array
+    public static function ageDataProvider(): array
     {
         return [
             [0, [

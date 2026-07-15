@@ -18,7 +18,6 @@ class IncentiveRepositoryTest extends KernelTestCase
         self::bootKernel();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
         $this->repo = static::getContainer()->get(IncentiveRepository::class);
-
     }
 
     /**
@@ -33,10 +32,9 @@ class IncentiveRepositoryTest extends KernelTestCase
         $incentives = $this->repo->getOnSiteIncentives('PS_SITE_TEST', $params);
         $this->assertEquals($resultCount, count($incentives));
         $this->assertEquals($resultParticipantId, $incentives[0]['participantId']);
-
     }
 
-    public function paginationDataProvider()
+    public static function paginationDataProvider()
     {
         return [
             [0, 2, 2, 'P000000004'],
@@ -64,7 +62,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         $this->assertEquals($resultCount, count($incentives));
     }
 
-    public function dateFilterDataProvider()
+    public static function dateFilterDataProvider()
     {
         return [
             ['2022-01-15', '2022-02-15', 2],
@@ -88,7 +86,7 @@ class IncentiveRepositoryTest extends KernelTestCase
         $this->assertEquals($participantId, $incentives[0]['participantId']);
     }
 
-    public function participantIdDataProvider()
+    public static function participantIdDataProvider()
     {
         return [
             ['P000000000'],
@@ -109,16 +107,16 @@ class IncentiveRepositoryTest extends KernelTestCase
         $this->assertEquals($resultCount, $count);
     }
 
-    public function paramsCountDataProvider()
+    public static function paramsCountDataProvider()
     {
         return [
             [[], 5],
             [['participantId' => 'P000000001'], 1],
-            [['startDate' => $this->getDate('2022-03-15')], 3],
-            [['endDate' => $this->getDate('2022-04-15')], 4],
+            [['startDate' => new \DateTime('2022-03-15')], 3],
+            [['endDate' => new \DateTime('2022-04-15')], 4],
             [['startDateOfService' => '2022-01-15'], 5],
             [['endDateOfService' => '2022-03-15'], 3],
-            [['startDate' => $this->getDate('2022-02-15'), 'endDate' => $this->getDate('2022-04-15')], 3],
+            [['startDate' => new \DateTime('2022-02-15'), 'endDate' => new \DateTime('2022-04-15')], 3],
             [['startDateOfService' => '2022-01-15', 'endDateOfService' => '2022-04-15'], 4]
         ];
     }
