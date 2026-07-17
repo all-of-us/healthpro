@@ -49,7 +49,7 @@ class MeasurementServiceTest extends ServiceTestCase
     #[\PHPUnit\Framework\Attributes\DataProvider('siteStatusProvider')]
     public function testInactiveSiteFormDisabled($parentId, $isActiveSite, $expectedResult): void
     {
-        $mockSiteService = $this->createMock(SiteService::class);
+        $mockSiteService = $this->createStub(SiteService::class);
         $mockSiteService->method('isActiveSite')->willReturn($isActiveSite);
 
         $measurementService = new MeasurementService(
@@ -62,12 +62,8 @@ class MeasurementServiceTest extends ServiceTestCase
             static::getContainer()->get(LoggerService::class),
         );
 
-        $measurementMock = $this->getMockBuilder(Measurement::class)
-            ->getMock();
-
-        $measurementMock->expects($this->any())
-            ->method('getParentId')
-            ->willReturn($parentId);
+        $measurementMock = $this->createStub(Measurement::class);
+        $measurementMock->method('getParentId')->willReturn($parentId);
 
         $reflection = new \ReflectionClass($measurementService);
         $property = $reflection->getProperty('measurement');
@@ -93,13 +89,13 @@ class MeasurementServiceTest extends ServiceTestCase
         $measurement = $this->createMock(Measurement::class);
         $measurement->method('getParticipantId')->willReturn('123');
 
-        $repository = $this->createMock(MeasurementRepository::class);
+        $repository = $this->createStub(MeasurementRepository::class);
         $repository->method('getMissingSexAtBirthPediatricMeasurements')->willReturn([$measurement]);
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->method('getRepository')->willReturn($repository);
 
-        $ppscApiService = $this->createMock(PpscApiService::class);
+        $ppscApiService = $this->createStub(PpscApiService::class);
         $ppscApiService->method('getParticipantById')->willReturn($participantData);
         $loggerService = $this->createMock(LoggerService::class);
 

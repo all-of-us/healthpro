@@ -15,24 +15,18 @@ class BiobankNightlyReportServiceTest extends ServiceTestCase
     public function testGenerateNightlyReport(bool $isProd, string $expectedBucketName)
     {
         // Mock the Order entity repository
-        $orderRepositoryMock = $this->getMockBuilder(OrderRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $orderRepositoryMock = $this->createStub(OrderRepository::class);
 
         // Configure the getNightlyReportOrders method on the repository to return dummy data
-        $orderRepositoryMock->expects($this->any())
-            ->method('getNightlyReportOrders')
-            ->willReturn([]);
+        $orderRepositoryMock->method('getNightlyReportOrders')->willReturn([]);
 
         // Mock dependencies
-        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock = $this->createStub(EntityManagerInterface::class);
         $gcsBucketServiceMock = $this->createMock(GcsBucketService::class);
-        $envMock = $this->createMock(EnvironmentService::class);
+        $envMock = $this->createStub(EnvironmentService::class);
 
         // Configure the EntityManagerInterface mock to return the Order repository mock
-        $emMock->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($orderRepositoryMock);
+        $emMock->method('getRepository')->willReturn($orderRepositoryMock);
 
         // Configure the GcsBucketService mock to return true for uploadFile method
         $gcsBucketServiceMock->method('uploadFile')->willReturn(true);

@@ -124,7 +124,7 @@ class SiteServiceTest extends ServiceTestCase
     public function testIsValidSite($program, $mayoLinkAccount, $switchSiteName, $checkSiteName, $expectedResult): void
     {
         // set env to stable to test isValidSite status
-        $environmentService = $this->createMock(EnvironmentService::class);
+        $environmentService = $this->createStub(EnvironmentService::class);
         $environmentService->method('isStable')->willReturn(true);
         $this->service = new SiteService(
             static::getContainer()->get(ParameterBagInterface::class),

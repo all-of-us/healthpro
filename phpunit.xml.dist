@@ -9,6 +9,7 @@
   </php>
   <extensions>
     <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
+    <bootstrap class="App\Tests\PHPUnit\GlobalHandlerCleanupExtension"/>
   </extensions>
   <testsuites>
     <testsuite name="Symfony Test Suite">

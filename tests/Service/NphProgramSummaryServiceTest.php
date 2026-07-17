@@ -36,8 +36,8 @@ class NphProgramSummaryServiceTest extends ServiceTestCase
             static::getContainer()->get(EntityManagerInterface::class),
             static::getContainer()->get(UserService::class),
             static::getContainer()->get(SiteService::class),
-            $this->createMock(LoggerService::class),
-            $this->createMock(RdrApiService::class)
+            $this->createStub(LoggerService::class),
+            $this->createStub(RdrApiService::class)
         );
     }
 

@@ -30,7 +30,7 @@ class NphOrderServiceTest extends ServiceTestCase
         $this->login('test-nph-user1@example.com', ['nph-site-test'], 'America/Chicago');
         $siteService = static::getContainer()->get(SiteService::class);
         $siteService->switchSite('nph-site-test' . '@' . self::GROUP_DOMAIN);
-        $mockRdrApiService = $this->createMock(RdrApiService::class);
+        $mockRdrApiService = $this->createStub(RdrApiService::class);
         $mockRdrApiService->method('post')->willReturnCallback(
             function ($arg) {
                 if ($arg === 'rdr/v1/api/v1/nph/Participant/P0000000003/DlwDosage') {
@@ -51,7 +51,7 @@ class NphOrderServiceTest extends ServiceTestCase
             static::getContainer()->get(EntityManagerInterface::class),
             static::getContainer()->get(UserService::class),
             static::getContainer()->get(SiteService::class),
-            $this->createMock(LoggerService::class),
+            $this->createStub(LoggerService::class),
             $mockRdrApiService
         );
         $this->testSetup = new testSetup(static::getContainer()->get(EntityManagerInterface::class));
