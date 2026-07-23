@@ -12,21 +12,19 @@ class NphParticipantReviewServiceTest extends ServiceTestCase
 
     public function setup(): void
     {
-        $mockNphParticipantSummaryService = $this->createMock(NphParticipantSummaryService::class);
+        $mockNphParticipantSummaryService = $this->createStub(NphParticipantSummaryService::class);
         $mockNphParticipantSummaryService->method('getParticipantById')->willReturn(new NphParticipant());
         $this->service = new NphParticipantReviewService($mockNphParticipantSummaryService);
     }
 
-    /**
-     * @dataProvider samplesDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('samplesDataProvider')]
     public function testGetTodaysSamples(array $samples, bool $biobankView, array $expectedResult)
     {
         $result = $this->service->getTodaysSamples($samples, $biobankView);
         $this->assertEquals($expectedResult, $result);
     }
 
-    public function samplesDataProvider(): array
+    public static function samplesDataProvider(): array
     {
         return [
             [

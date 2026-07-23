@@ -2,16 +2,14 @@
 
 <!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.5/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
          backupGlobals="false"
-         backupStaticAttributes="false"
          colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
+         cacheDirectory=".phpunit.cache"
+         backupStaticProperties="false"
     >
     <php>
         <ini name="error_reporting" value="E_ALL" />
@@ -21,7 +19,8 @@
     </php>
 
     <extensions>
-        <extension class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
+        <bootstrap class="App\Tests\PHPUnit\GlobalHandlerCleanupExtension"/>
     </extensions>
 
     <testsuites>

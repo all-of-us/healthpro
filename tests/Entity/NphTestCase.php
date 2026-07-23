@@ -17,12 +17,11 @@ class NphTestCase extends KernelTestCase
     {
         self::bootKernel();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
-
     }
 
     protected function getUser(): User
     {
-        $user = new User;
+        $user = new User();
         $user->setEmail('test@example.com');
         $user->setGoogleId('12345');
         return $user;
@@ -31,21 +30,21 @@ class NphTestCase extends KernelTestCase
     protected function createNphOrder($params = []): NphOrder
     {
         $order = new NphOrder();
-        $this->setData($order, $params);
+        $this->populateEntityData($order, $params);
         return $order;
     }
 
     protected function createNphSample($params = []): NphSample
     {
         $sample = new NphSample();
-        $this->setData($sample, $params);
+        $this->populateEntityData($sample, $params);
         return $sample;
     }
 
     protected function createNphAliquot($params = []): NphAliquot
     {
         $aliquot = new NphAliquot();
-        $this->setData($aliquot, $params);
+        $this->populateEntityData($aliquot, $params);
         return $aliquot;
     }
 
@@ -94,7 +93,7 @@ class NphTestCase extends KernelTestCase
         ];
     }
 
-    private function setData($obj, $params): void
+    private function populateEntityData($obj, $params): void
     {
         foreach ($params as $key => $value) {
             $obj->{'set' . ucfirst($key)}($value);

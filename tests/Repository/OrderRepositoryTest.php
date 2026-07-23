@@ -16,30 +16,7 @@ class OrderRepositoryTest extends RepositoryTestCase
         $this->repo = static::getContainer()->get(OrderRepository::class);
     }
 
-    protected function getUser(): User
-    {
-        $user = new User();
-        $user->setEmail('test@example.com');
-        $user->setGoogleId('12345');
-        $this->em->persist($user);
-        $this->em->flush();
-        return $user;
-    }
-
-    protected function createOrder($params = []): Order
-    {
-        $order = new Order;
-        foreach ($params as $key => $value) {
-            $order->{'set' . ucfirst($key)}($value);
-        }
-        $this->em->persist($order);
-        $this->em->flush();
-        return $order;
-    }
-
-    /**
-     * @dataProvider nightlyReportOrdersDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('nightlyReportOrdersDataProvider')]
     public function testGetNightlyReportOrders(array $ordersInputData, array $expectedResult)
     {
         foreach ($ordersInputData as $data) {
@@ -55,7 +32,7 @@ class OrderRepositoryTest extends RepositoryTestCase
         $this->assertSame($nightlyReportsData[0]['finalizedTs']->format('Y-m-d H:i:s T'), $expectedResult[0]['finalizedTs']->format('Y-m-d H:i:s T'));
     }
 
-    public function nightlyReportOrdersDataProvider(): array
+    public static function nightlyReportOrdersDataProvider(): array
     {
         // Define different scenarios and their expected outputs
         $now = new \DateTime('now');
@@ -63,7 +40,7 @@ class OrderRepositoryTest extends RepositoryTestCase
         $twoDaysBefore = new \DateTime('-2 day');
         return [
             'valid_orders' => [
-                'inputData' => [
+                'ordersInputData' => [
                     [
                         'biobankId' => 'T1001',
                         'orderId' => '10001',
@@ -91,6 +68,27 @@ class OrderRepositoryTest extends RepositoryTestCase
                 ],
             ]
         ];
+    }
+
+    protected function getUser(): User
+    {
+        $user = new User();
+        $user->setEmail('test@example.com');
+        $user->setGoogleId('12345');
+        $this->em->persist($user);
+        $this->em->flush();
+        return $user;
+    }
+
+    protected function createOrder($params = []): Order
+    {
+        $order = new Order();
+        foreach ($params as $key => $value) {
+            $order->{'set' . ucfirst($key)}($value);
+        }
+        $this->em->persist($order);
+        $this->em->flush();
+        return $order;
     }
 
     private function getRequiredOrderData(): array
