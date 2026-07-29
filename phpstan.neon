@@ -1,3 +1,6 @@
+includes:
+    - phpstan-baseline.neon
+
 parameters:
     level: 6
     paths:
@@ -7,6 +10,6 @@ parameters:
     doctrine:
         objectManagerLoader: tests/object-manager.php
     symfony:
-        container_xml_path: var/cache/dev/App_KernelDevDebugContainer.xml
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
         constantHassers: false
     treatPhpDocTypesAsCertain: false

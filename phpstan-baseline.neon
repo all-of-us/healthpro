@@ -1,2 +1,1648 @@
 parameters:
 	ignoreErrors:
+		-
+			message: '''
+				#^PHPDoc tag @SuppressWarnings has invalid value \(\(PHPMD\.UnusedLocalVariable\)
+				\(\$type parameter in run callback is required but not used\)\)\: Unexpected token "\.UnusedLocalVariable\)", expected '\)' at offset 108 on line 4$#
+			'''
+			identifier: phpDoc.parseError
+			count: 1
+			path: src/Command/DeployCommand.php
+
+		-
+			message: '#^PHPDoc tag @var with type object\{id\: string, title\: string, type\: string, status\: string, assignee\: string\} is not subtype of native type object\{id\: mixed, title\: mixed, type\: mixed, status\: mixed, assignee\: mixed\}&stdClass\.$#'
+			identifier: varTag.nativeType
+			count: 1
+			path: src/Command/ReleaseTicketCommand.php
+
+		-
+			message: '#^Negated boolean expression is always false\.$#'
+			identifier: booleanNot.alwaysFalse
+			count: 2
+			path: src/Controller/MeasurementsController.php
+
+		-
+			message: '#^Method App\\Controller\\NphBiobankController\:\:getDateRangeFilterForm\(\) return type with generic interface Symfony\\Component\\Form\\FormInterface does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Controller/NphBiobankController.php
+
+		-
+			message: '#^Method App\\Controller\\NphOrderLookupController\:\:generateOrderLookupView\(\) has parameter \$aliquotIdForm with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Controller/NphOrderLookupController.php
+
+		-
+			message: '#^Method App\\Controller\\NphOrderLookupController\:\:generateOrderLookupView\(\) has parameter \$idForm with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Controller/NphOrderLookupController.php
+
+		-
+			message: '#^Method App\\Controller\\NphOrderLookupController\:\:generateOrderLookupView\(\) has parameter \$sampleIdForm with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Controller/NphOrderLookupController.php
+
+		-
+			message: '#^Method App\\Controller\\NphOrderLookupController\:\:getIdForm\(\) return type with generic interface Symfony\\Component\\Form\\FormInterface does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Controller/NphOrderLookupController.php
+
+		-
+			message: '#^Method App\\Controller\\NphOrderLookupController\:\:getSampleAliquotIdForm\(\) return type with generic interface Symfony\\Component\\Form\\FormInterface does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Controller/NphOrderLookupController.php
+
+		-
+			message: '#^Method App\\Controller\\OrderController\:\:createOrderCollectForm\(\) return type with generic interface Symfony\\Component\\Form\\FormInterface does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Controller/OrderController.php
+
+		-
+			message: '#^Class App\\Form\\BiobankOrderType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/BiobankOrderType.php
+
+		-
+			message: '#^Class App\\Form\\CrossOriginAgreeType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/CrossOriginAgreeType.php
+
+		-
+			message: '#^Class App\\Form\\DebugParticipantLookupType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/DebugParticipantLookupType.php
+
+		-
+			message: '#^Class App\\Form\\DeceasedReportReviewType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/DeceasedReportReviewType.php
+
+		-
+			message: '#^Class App\\Form\\DeceasedReportType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/DeceasedReportType.php
+
+		-
+			message: '#^Class App\\Form\\DlwType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/DlwType.php
+
+		-
+			message: '#^Class App\\Form\\FeatureNotificationType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/FeatureNotificationType.php
+
+		-
+			message: '#^Class App\\Form\\GroupMemberType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/GroupMemberType.php
+
+		-
+			message: '#^Class App\\Form\\IdVerificationImportConfirmFormType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/IdVerificationImportConfirmFormType.php
+
+		-
+			message: '#^Class App\\Form\\IdVerificationImportFormType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/IdVerificationImportFormType.php
+
+		-
+			message: '#^Class App\\Form\\IdVerificationType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/IdVerificationType.php
+
+		-
+			message: '#^Class App\\Form\\IncentiveImportConfirmFormType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/IncentiveImportConfirmFormType.php
+
+		-
+			message: '#^Class App\\Form\\IncentiveImportFormType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/IncentiveImportFormType.php
+
+		-
+			message: '#^Class App\\Form\\IncentiveRemoveType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/IncentiveRemoveType.php
+
+		-
+			message: '#^Class App\\Form\\IncentiveType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/IncentiveType.php
+
+		-
+			message: '#^Class App\\Form\\MeasurementBloodDonorCheckType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/MeasurementBloodDonorCheckType.php
+
+		-
+			message: '#^Class App\\Form\\MeasurementModifyType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/MeasurementModifyType.php
+
+		-
+			message: '#^Class App\\Form\\MeasurementRevertType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/MeasurementRevertType.php
+
+		-
+			message: '#^Class App\\Form\\MeasurementType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/MeasurementType.php
+
+		-
+			message: '#^Method App\\Form\\MeasurementType\:\:addDiastolicBloodPressureConstraint\(\) has parameter \$form with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/MeasurementType.php
+
+		-
+			message: '#^Class App\\Form\\MissingMeasurementsType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/MissingMeasurementsType.php
+
+		-
+			message: '#^Class App\\Form\\MissingOrdersType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/MissingOrdersType.php
+
+		-
+			message: '#^Class App\\Form\\MockLoginType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/MockLoginType.php
+
+		-
+			message: '#^Class App\\Form\\NoticeType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/NoticeType.php
+
+		-
+			message: '#^Class App\\Form\\Nph\\NphAliquotLookupType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphAliquotLookupType.php
+
+		-
+			message: '#^Class App\\Form\\Nph\\NphCrossSiteAgreeType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphCrossSiteAgreeType.php
+
+		-
+			message: '#^Class App\\Form\\Nph\\NphGenerateOrderWarningLogType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphGenerateOrderWarningLogType.php
+
+		-
+			message: '#^Class App\\Form\\Nph\\NphOrderForm extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphOrderForm.php
+
+		-
+			message: '#^Method App\\Form\\Nph\\NphOrderForm\:\:addCollectedTimeAndNoteFields\(\) has parameter \$builder with generic interface Symfony\\Component\\Form\\FormBuilderInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphOrderForm.php
+
+		-
+			message: '#^Method App\\Form\\Nph\\NphOrderForm\:\:addStoolMetadataFields\(\) has parameter \$builder with generic interface Symfony\\Component\\Form\\FormBuilderInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphOrderForm.php
+
+		-
+			message: '#^Method App\\Form\\Nph\\NphOrderForm\:\:addUrineMetadataFields\(\) has parameter \$builder with generic interface Symfony\\Component\\Form\\FormBuilderInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphOrderForm.php
+
+		-
+			message: '#^Method App\\Form\\Nph\\NphOrderForm\:\:addUrineTotalCollectionVolume\(\) has parameter \$builder with generic interface Symfony\\Component\\Form\\FormBuilderInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphOrderForm.php
+
+		-
+			message: '#^Class App\\Form\\Nph\\NphOrderType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphOrderType.php
+
+		-
+			message: '#^Method App\\Form\\Nph\\NphOrderType\:\:addStoolKitField\(\) has parameter \$builder with generic interface Symfony\\Component\\Form\\FormBuilderInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphOrderType.php
+
+		-
+			message: '#^Class App\\Form\\Nph\\NphSampleLookupType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphSampleLookupType.php
+
+		-
+			message: '#^Class App\\Form\\Nph\\NphSampleModifyBulkType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphSampleModifyBulkType.php
+
+		-
+			message: '#^Class App\\Form\\Nph\\NphSampleModifyType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphSampleModifyType.php
+
+		-
+			message: '#^Class App\\Form\\Nph\\NphSampleProcessCompleteType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphSampleProcessCompleteType.php
+
+		-
+			message: '#^Class App\\Form\\Nph\\NphSampleResubmitType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphSampleResubmitType.php
+
+		-
+			message: '#^Class App\\Form\\Nph\\NphSampleRevertType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Nph/NphSampleRevertType.php
+
+		-
+			message: '#^Class App\\Form\\NphSiteType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/NphSiteType.php
+
+		-
+			message: '#^Class App\\Form\\OrderCreateType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/OrderCreateType.php
+
+		-
+			message: '#^Class App\\Form\\OrderLookupIdType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/OrderLookupIdType.php
+
+		-
+			message: '#^Class App\\Form\\OrderLookupType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/OrderLookupType.php
+
+		-
+			message: '#^Class App\\Form\\OrderModifyType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/OrderModifyType.php
+
+		-
+			message: '#^Class App\\Form\\OrderRevertType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/OrderRevertType.php
+
+		-
+			message: '#^Class App\\Form\\OrderType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/OrderType.php
+
+		-
+			message: '#^Class App\\Form\\ParticipantLookupBiobankIdType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/ParticipantLookupBiobankIdType.php
+
+		-
+			message: '#^Class App\\Form\\ParticipantLookupEmailType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/ParticipantLookupEmailType.php
+
+		-
+			message: '#^Class App\\Form\\ParticipantLookupIdType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/ParticipantLookupIdType.php
+
+		-
+			message: '#^Class App\\Form\\ParticipantLookupSearchType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/ParticipantLookupSearchType.php
+
+		-
+			message: '#^Class App\\Form\\ParticipantLookupTelephoneType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/ParticipantLookupTelephoneType.php
+
+		-
+			message: '#^Class App\\Form\\PatientStatusImportConfirmFormType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/PatientStatusImportConfirmFormType.php
+
+		-
+			message: '#^Class App\\Form\\PatientStatusImportFormType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/PatientStatusImportFormType.php
+
+		-
+			message: '#^Class App\\Form\\PatientStatusType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/PatientStatusType.php
+
+		-
+			message: '#^Class App\\Form\\PediatricMeasurementType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/PediatricMeasurementType.php
+
+		-
+			message: '#^Method App\\Form\\PediatricMeasurementType\:\:addDiastolicBloodPressureConstraint\(\) has parameter \$form with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/PediatricMeasurementType.php
+
+		-
+			message: '#^Class App\\Form\\ProblemCommentType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/ProblemCommentType.php
+
+		-
+			message: '#^Class App\\Form\\ProblemType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/ProblemType.php
+
+		-
+			message: '#^Class App\\Form\\RemoveGroupMemberType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/RemoveGroupMemberType.php
+
+		-
+			message: '#^Class App\\Form\\ReviewTodayFilterType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/ReviewTodayFilterType.php
+
+		-
+			message: '#^Class App\\Form\\SettingsType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/SettingsType.php
+
+		-
+			message: '#^Class App\\Form\\SiteType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/SiteType.php
+
+		-
+			message: '#^Class App\\Form\\WorkQueueViewDeleteType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/WorkQueueViewDeleteType.php
+
+		-
+			message: '#^Class App\\Form\\WorkQueueViewType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/WorkQueueViewType.php
+
+		-
+			message: '#^Class App\\Form\\WorkQueueViewUpdateType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/WorkQueueViewUpdateType.php
+
+		-
+			message: '#^Call to function is_object\(\) with stdClass will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Helper/NphParticipant.php
+
+		-
+			message: '#^Call to function is_object\(\) with stdClass will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Helper/PpscParticipant.php
+
+		-
+			message: '#^Class App\\Repository\\AwardeeRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/AwardeeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\AwardeeRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/AwardeeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\AwardeeRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/AwardeeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\AwardeeRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/AwardeeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BloodPressureDiastolicHeightPercentileRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BloodPressureDiastolicHeightPercentileRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BloodPressureDiastolicHeightPercentileRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BloodPressureDiastolicHeightPercentileRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BloodPressureDiastolicHeightPercentileRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BloodPressureDiastolicHeightPercentileRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BloodPressureDiastolicHeightPercentileRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BloodPressureDiastolicHeightPercentileRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BloodPressureSystolicHeightPercentileRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BloodPressureSystolicHeightPercentileRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BloodPressureSystolicHeightPercentileRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BloodPressureSystolicHeightPercentileRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BloodPressureSystolicHeightPercentileRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BloodPressureSystolicHeightPercentileRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BloodPressureSystolicHeightPercentileRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BloodPressureSystolicHeightPercentileRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BmiForAge5YearsAndUpRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BmiForAge5YearsAndUpRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BmiForAge5YearsAndUpRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BmiForAge5YearsAndUpRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BmiForAge5YearsAndUpRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BmiForAge5YearsAndUpRepository.php
+
+		-
+			message: '#^Class App\\Repository\\BmiForAge5YearsAndUpRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/BmiForAge5YearsAndUpRepository.php
+
+		-
+			message: '#^Class App\\Repository\\DeceasedLogRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/DeceasedLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\DeceasedLogRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/DeceasedLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\DeceasedLogRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/DeceasedLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\DeceasedLogRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/DeceasedLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\EhrWithdrawalLogRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/EhrWithdrawalLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\EhrWithdrawalLogRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/EhrWithdrawalLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\EhrWithdrawalLogRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/EhrWithdrawalLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\EhrWithdrawalLogRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/EhrWithdrawalLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\FeatureNotificationRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/FeatureNotificationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\FeatureNotificationRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/FeatureNotificationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\FeatureNotificationRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/FeatureNotificationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\FeatureNotificationRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/FeatureNotificationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\FeatureNotificationUserMapRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/FeatureNotificationUserMapRepository.php
+
+		-
+			message: '#^Class App\\Repository\\FeatureNotificationUserMapRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/FeatureNotificationUserMapRepository.php
+
+		-
+			message: '#^Class App\\Repository\\FeatureNotificationUserMapRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/FeatureNotificationUserMapRepository.php
+
+		-
+			message: '#^Class App\\Repository\\FeatureNotificationUserMapRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/FeatureNotificationUserMapRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeadCircumferenceForAge0To36MonthsRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeadCircumferenceForAge0To36MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeadCircumferenceForAge0To36MonthsRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeadCircumferenceForAge0To36MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeadCircumferenceForAge0To36MonthsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeadCircumferenceForAge0To36MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeadCircumferenceForAge0To36MonthsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeadCircumferenceForAge0To36MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeartRateAgeRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeartRateAgeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeartRateAgeRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeartRateAgeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeartRateAgeRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeartRateAgeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeartRateAgeRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeartRateAgeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeightForAge0To23MonthsRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeightForAge0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeightForAge0To23MonthsRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeightForAge0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeightForAge0To23MonthsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeightForAge0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeightForAge0To23MonthsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeightForAge0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeightForAge24MonthsTo6YearsRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeightForAge24MonthsTo6YearsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeightForAge24MonthsTo6YearsRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeightForAge24MonthsTo6YearsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeightForAge24MonthsTo6YearsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeightForAge24MonthsTo6YearsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\HeightForAge24MonthsTo6YearsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/HeightForAge24MonthsTo6YearsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationImportRowRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationImportRowRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationImportRowRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationImportRowRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationRdrRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationRdrRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationRdrRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationRdrRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationRdrRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationRdrRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationRdrRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationRdrRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IdVerificationRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IdVerificationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IncentiveImportRowRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IncentiveImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IncentiveImportRowRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IncentiveImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IncentiveImportRowRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IncentiveImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IncentiveImportRowRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IncentiveImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IncentiveRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IncentiveRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IncentiveRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IncentiveRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IncentiveRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IncentiveRepository.php
+
+		-
+			message: '#^Class App\\Repository\\IncentiveRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/IncentiveRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementHistoryRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementHistoryRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementHistoryRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementHistoryRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementQueueRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementQueueRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementQueueRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementQueueRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementQueueRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementQueueRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementQueueRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementQueueRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementRepository.php
+
+		-
+			message: '#^Class App\\Repository\\MeasurementRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/MeasurementRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NoticeRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NoticeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NoticeRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NoticeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NoticeRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NoticeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NoticeRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NoticeRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphAdminOrderEditLogRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphAdminOrderEditLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphAdminOrderEditLogRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphAdminOrderEditLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphAdminOrderEditLogRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphAdminOrderEditLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphAdminOrderEditLogRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphAdminOrderEditLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphAliquotRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphAliquotRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphAliquotRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphAliquotRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphAliquotRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphAliquotRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphAliquotRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphAliquotRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphDlwRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphDlwRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphDlwRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphDlwRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphDlwRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphDlwRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphDlwRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphDlwRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphGenerateOrderWarningLogRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphGenerateOrderWarningLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphGenerateOrderWarningLogRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphGenerateOrderWarningLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphGenerateOrderWarningLogRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphGenerateOrderWarningLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphGenerateOrderWarningLogRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphGenerateOrderWarningLogRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphOrderRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphOrderRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphOrderRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphOrderRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphOrderRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphOrderRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphOrderRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphOrderRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSampleProcessingStatusRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSampleProcessingStatusRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSampleProcessingStatusRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSampleProcessingStatusRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSampleProcessingStatusRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSampleProcessingStatusRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSampleProcessingStatusRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSampleProcessingStatusRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSampleRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSampleRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSampleRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSampleRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSampleRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSampleRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSampleRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSampleRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSiteRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSiteRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSiteRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSiteRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSiteRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSiteRepository.php
+
+		-
+			message: '#^Class App\\Repository\\NphSiteRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/NphSiteRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrderHistoryRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrderHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrderHistoryRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrderHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrderHistoryRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrderHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrderHistoryRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrderHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrderRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrderRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrderRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrderRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrderRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrderRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrderRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrderRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrganizationRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrganizationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrganizationRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrganizationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrganizationRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrganizationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\OrganizationRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/OrganizationRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusHistoryRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusHistoryRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusHistoryRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusHistoryRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusHistoryRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusImportRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusImportRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusImportRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusImportRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusImportRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusImportRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusImportRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusImportRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusImportRowRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusImportRowRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusImportRowRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusImportRowRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusImportRowRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusRepository.php
+
+		-
+			message: '#^Class App\\Repository\\PatientStatusRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/PatientStatusRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ProblemCommentRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProblemCommentRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ProblemCommentRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProblemCommentRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ProblemCommentRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProblemCommentRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ProblemCommentRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProblemCommentRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ProblemRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProblemRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ProblemRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProblemRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ProblemRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProblemRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ProblemRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ProblemRepository.php
+
+		-
+			message: '#^Method App\\Repository\\ProblemRepository\:\:getProblemsWithCommentsCount\(\) should return array\<int, array\<string, mixed\>\> but returns list\<array\<int\|string, mixed\>\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Repository/ProblemRepository.php
+
+		-
+			message: '#^Class App\\Repository\\SiteRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/SiteRepository.php
+
+		-
+			message: '#^Class App\\Repository\\SiteRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/SiteRepository.php
+
+		-
+			message: '#^Class App\\Repository\\SiteRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/SiteRepository.php
+
+		-
+			message: '#^Class App\\Repository\\SiteRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/SiteRepository.php
+
+		-
+			message: '#^Class App\\Repository\\SiteSyncRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/SiteSyncRepository.php
+
+		-
+			message: '#^Class App\\Repository\\SiteSyncRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/SiteSyncRepository.php
+
+		-
+			message: '#^Class App\\Repository\\SiteSyncRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/SiteSyncRepository.php
+
+		-
+			message: '#^Class App\\Repository\\SiteSyncRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/SiteSyncRepository.php
+
+		-
+			message: '#^Class App\\Repository\\UserRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UserRepository.php
+
+		-
+			message: '#^Class App\\Repository\\UserRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UserRepository.php
+
+		-
+			message: '#^Class App\\Repository\\UserRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UserRepository.php
+
+		-
+			message: '#^Class App\\Repository\\UserRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UserRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForAge0To23MonthsRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForAge0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForAge0To23MonthsRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForAge0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForAge0To23MonthsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForAge0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForAge0To23MonthsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForAge0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForAge24MonthsAndUpRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForAge24MonthsAndUpRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForAge24MonthsAndUpRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForAge24MonthsAndUpRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForAge24MonthsAndUpRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForAge24MonthsAndUpRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForAge24MonthsAndUpRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForAge24MonthsAndUpRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForLength0To23MonthsRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForLength0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForLength0To23MonthsRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForLength0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForLength0To23MonthsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForLength0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForLength0To23MonthsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForLength0To23MonthsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForLength23MonthsTo5YearsRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForLength23MonthsTo5YearsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForLength23MonthsTo5YearsRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForLength23MonthsTo5YearsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForLength23MonthsTo5YearsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForLength23MonthsTo5YearsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WeightForLength23MonthsTo5YearsRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WeightForLength23MonthsTo5YearsRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WorkqueueViewRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WorkqueueViewRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WorkqueueViewRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WorkqueueViewRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WorkqueueViewRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WorkqueueViewRepository.php
+
+		-
+			message: '#^Class App\\Repository\\WorkqueueViewRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/WorkqueueViewRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ZScoresRepository has PHPDoc tag @method for method findBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ZScoresRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ZScoresRepository has PHPDoc tag @method for method findBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ZScoresRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ZScoresRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#1 \$criteria with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ZScoresRepository.php
+
+		-
+			message: '#^Class App\\Repository\\ZScoresRepository has PHPDoc tag @method for method findOneBy\(\) parameter \#2 \$orderBy with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/ZScoresRepository.php
+
+		-
+			message: '#^Call to function is_object\(\) with App\\Security\\User will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Service/LoggerService.php
+
+		-
+			message: '#^Method App\\Service\\OrderService\:\:setOrderUpdateFromForm\(\) has parameter \$form with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Service/OrderService.php
+
+		-
+			message: '#^Method App\\Service\\OrderService\:\:updateOrderVersion\(\) has parameter \$orderCollectForm with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Service/OrderService.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between true and true will always evaluate to true\.$#'
+			identifier: identical.alwaysTrue
+			count: 1
+			path: src/Service/PDFService.php
+
+		-
+			message: '#^Strict comparison using \!\=\= between array and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 3
+			path: src/Service/PediatricsReportService.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<mixed\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: src/Service/SiteSyncService.php
+
+		-
+			message: '#^Variable \$user in empty\(\) always exists and is not falsy\.$#'
+			identifier: empty.variable
+			count: 1
+			path: src/Service/UserService.php
