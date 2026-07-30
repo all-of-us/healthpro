@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Service\MockGoogleGroupsService;
 use App\Service\UserService;
+use App\Tests\GoogleGroup;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,7 +12,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use App\Tests\GoogleGroup;
 
 class AppWebTestCase extends WebTestCase
 {

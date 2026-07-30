@@ -78,6 +78,14 @@ $(document).ready(function () {
             }
         });
         const instance = new tempusDominus.TempusDominus(element, options);
+        if (!element.readOnly) {
+            element.addEventListener("show.td", () => {
+                // Ensure input field stays focused after calendar opens
+                setTimeout(() => {
+                    element.focus();
+                }, 50);
+            });
+        }
         element._bs5dtp = instance;
         return instance;
     };

@@ -18,7 +18,7 @@ class NphParticipantSummaryServiceTest extends ServiceTestCase
             'cache_time' => 300,
             'ds_clean_up_limit' => 100,
         ]);
-        $mockRdrApiService = $this->createMock(RdrApiService::class);
+        $mockRdrApiService = $this->createStub(RdrApiService::class);
         $data = $this->getMockRdrResponseData();
         $mockRdrApiService->method('GQLPost')->willReturn($this->getGuzzleResponse($data));
         $nphParticipantService = new NphParticipantSummaryService($mockRdrApiService, $mockParamsService);
@@ -36,7 +36,7 @@ class NphParticipantSummaryServiceTest extends ServiceTestCase
 
     public function testGetAllParticipantDetailsById()
     {
-        $mockRdrApiService = $this->createMock(RdrApiService::class);
+        $mockRdrApiService = $this->createStub(RdrApiService::class);
         $data = $this->getMockRdrResponseData();
         $mockRdrApiService->method('GQLPost')->willReturn($this->getGuzzleResponse($data));
         $nphParticipantService = new NphParticipantSummaryService(
@@ -50,7 +50,7 @@ class NphParticipantSummaryServiceTest extends ServiceTestCase
 
     public function testSearch()
     {
-        $mockRdrApiService = $this->createMock(RdrApiService::class);
+        $mockRdrApiService = $this->createStub(RdrApiService::class);
         $data = $this->getMockRdrResponseData();
         $mockRdrApiService->method('GQLPost')->willReturn($this->getGuzzleResponse($data));
         $nphParticipantService = new NphParticipantSummaryService(

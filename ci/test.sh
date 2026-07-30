@@ -2,4 +2,4 @@
 
 mkdir -p /tmp/circleci-test-results
 
-./bin/phpunit -v --log-junit /tmp/circleci-test-results/phpunit.xml
+./bin/phpunit --log-junit /tmp/circleci-test-results/phpunit.xml
