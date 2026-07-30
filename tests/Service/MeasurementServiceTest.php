@@ -152,9 +152,7 @@ class MeasurementServiceTest extends ServiceTestCase
         ];
     }
 
-    /**
-     * @dataProvider getMeasurementUrlProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('getMeasurementUrlProvider')]
     public function testGetMeasurementUrl(bool $isPediatric, string $dob, bool $bloodDonorCheck, string $expectedUrl)
     {
         $measurementServiceMock = $this->getMockBuilder(MeasurementService::class)
@@ -180,7 +178,7 @@ class MeasurementServiceTest extends ServiceTestCase
         $this->assertSame($expectedUrl, $measurementServiceMock->getMeasurementUrl($participant));
     }
 
-    public function getMeasurementUrlProvider(): array
+    public static function getMeasurementUrlProvider(): array
     {
         $today = new \DateTime();
         return [

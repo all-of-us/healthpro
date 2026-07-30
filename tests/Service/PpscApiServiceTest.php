@@ -11,7 +11,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class PpscApiServiceTest extends ServiceTestCase
 {
@@ -20,7 +19,7 @@ class PpscApiServiceTest extends ServiceTestCase
         $mockParamsService = $this->getPpscParams();
         $mockEnvService = $this->createStub(EnvironmentService::class);
         $mockLoggerService = $this->createStub(LoggerInterface::class);
-        $mockClient = $this->createStub(HttpClient::class);
+        $mockClient = $this->createMock(HttpClient::class);
         $mockEnvService->method('getPpscEnv')->willReturn('qa');
         $data = $this->getMockPpscAccessTokenData();
         $mockClient->expects($this->once())->method('request')->willReturn($this->getGuzzleResponse($data));
