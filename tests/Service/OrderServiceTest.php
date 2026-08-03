@@ -16,30 +16,24 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class OrderServiceTest extends ServiceTestCase
 {
-    /**
-     * @dataProvider siteStatusProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('siteStatusProvider')]
     public function testInactiveSiteFormDisabled($status, $isActiveSite, $expectedResult): void
     {
-        $mockSiteService = $this->createMock(SiteService::class);
+        $mockSiteService = $this->createStub(SiteService::class);
         $mockSiteService->method('isActiveSite')->willReturn($isActiveSite);
 
         $orderService = new OrderService(
             static::getContainer()->get(PpscApiService::class),
             static::getContainer()->get(ParameterBagInterface::class),
             static::getContainer()->get(EntityManagerInterface::class),
-            $this->createMock(MayolinkOrderService::class),
+            $this->createStub(MayolinkOrderService::class),
             static::getContainer()->get(UserService::class),
             $mockSiteService,
             static::getContainer()->get(LoggerService::class),
         );
 
-        $orderMock = $this->getMockBuilder(Order::class)
-            ->getMock();
-
-        $orderMock->expects($this->any())
-            ->method('getStatus')
-            ->willReturn($status);
+        $orderMock = $this->createStub(Order::class);
+        $orderMock->method('getStatus')->willReturn($status);
 
         $reflection = new \ReflectionClass($orderService);
         $property = $reflection->getProperty('order');
@@ -55,12 +49,12 @@ class OrderServiceTest extends ServiceTestCase
             static::getContainer()->get(PpscApiService::class),
             static::getContainer()->get(ParameterBagInterface::class),
             static::getContainer()->get(EntityManagerInterface::class),
-            $this->createMock(MayolinkOrderService::class),
+            $this->createStub(MayolinkOrderService::class),
             static::getContainer()->get(UserService::class),
             static::getContainer()->get(SiteService::class),
             static::getContainer()->get(LoggerService::class),
         );
-        $formInterface = $this->createMock(\Symfony\Component\Form\FormInterface::class);
+        $formInterface = $this->createStub(\Symfony\Component\Form\FormInterface::class);
         $orderData = $this->getOrderData();
         $order = $this->createOrder($orderData);
         $this->assertTrue(in_array('1PS08', json_decode($order->getProcessedSamples())));
@@ -78,7 +72,7 @@ class OrderServiceTest extends ServiceTestCase
         $this->assertFalse(in_array('1PS08', json_decode($order->getProcessedSamples())));
     }
 
-    public function siteStatusProvider(): array
+    public static function siteStatusProvider(): array
     {
         return [
             'No status, inactive site: expect true' => [null, false, true],

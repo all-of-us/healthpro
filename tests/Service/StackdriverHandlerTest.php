@@ -79,16 +79,10 @@ class StackdriverHandlerTest extends TestCase
 
     private function createHandler(StackdriverLogger $stackdriverLogger): StackdriverHandler
     {
-        $env = $this->getMockBuilder(EnvironmentService::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['isLocal'])
-            ->getMock();
+        $env = $this->createStub(EnvironmentService::class);
         $env->method('isLocal')->willReturn(false);
 
-        $loggerService = $this->getMockBuilder(LoggerService::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getLogMetaData'])
-            ->getMock();
+        $loggerService = $this->createStub(LoggerService::class);
         $loggerService->method('getLogMetaData')->willReturn([
             'user' => 'test-user',
             'site' => 'test-site',

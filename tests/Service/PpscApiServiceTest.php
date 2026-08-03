@@ -18,9 +18,9 @@ class PpscApiServiceTest extends ServiceTestCase
     public function testGetAccessToken(): void
     {
         $mockParamsService = $this->getPpscParams();
-        $mockEnvService = $this->createMock(EnvironmentService::class);
-        $mockLoggerService = $this->createMock(LoggerInterface::class);
-        $mockClient = $this->createMock(HttpClient::class);
+        $mockEnvService = $this->createStub(EnvironmentService::class);
+        $mockLoggerService = $this->createStub(LoggerInterface::class);
+        $mockClient = $this->createStub(HttpClient::class);
         $mockEnvService->method('getPpscEnv')->willReturn('qa');
         $data = $this->getMockPpscAccessTokenData();
         $mockClient->method('request')->willReturn($this->getGuzzleResponse($data));
@@ -33,18 +33,19 @@ class PpscApiServiceTest extends ServiceTestCase
     public function testGetRequestDetailsById(): void
     {
         $mockParamsService = $this->getPpscParams();
-        $mockEnvService = $this->createMock(EnvironmentService::class);
-        $mockLoggerService = $this->createMock(LoggerInterface::class);
-        $mockClient = $this->createMock(HttpClient::class);
+        $mockEnvService = $this->createStub(EnvironmentService::class);
+        $mockLoggerService = $this->createStub(LoggerInterface::class);
+        $mockClient = $this->createStub(HttpClient::class);
         $mockEnvService->method('getPpscEnv')->willReturn('qa');
         $data = $this->getMockPpscRequestIdData();
         $mockClient->method('request')->willReturn($this->getGuzzleResponse($data));
-        $ppscApiService = $this->getMockBuilder(PpscApiService::class)
-            ->setConstructorArgs([$mockParamsService, $this->requestStack, $mockEnvService, $mockLoggerService])
-            ->onlyMethods(['getAccessToken'])
-            ->getMock();
+        $ppscApiService = new class ($mockParamsService, $this->requestStack, $mockEnvService, $mockLoggerService) extends PpscApiService {
+            public function getAccessToken(bool $refresh = false): ?string
+            {
+                return 'test_access_token';
+            }
+        };
         $ppscApiService->client = $mockClient;
-        $ppscApiService->method('getAccessToken')->willReturn('test_access_token');
         $result = $ppscApiService->getRequestDetailsById('123456789');
         $this->assertEquals('P000000123', $result->participantId);
         $this->assertEquals('test', $result->siteId);
@@ -53,18 +54,19 @@ class PpscApiServiceTest extends ServiceTestCase
     public function testGetParticipantById(): void
     {
         $mockParamsService = $this->getPpscParams();
-        $mockEnvService = $this->createMock(EnvironmentService::class);
-        $mockLoggerService = $this->createMock(LoggerInterface::class);
-        $mockClient = $this->createMock(HttpClient::class);
+        $mockEnvService = $this->createStub(EnvironmentService::class);
+        $mockLoggerService = $this->createStub(LoggerInterface::class);
+        $mockClient = $this->createStub(HttpClient::class);
         $mockEnvService->method('getPpscEnv')->willReturn('qa');
         $data = $this->getMockPpscParticipantData();
         $mockClient->method('request')->willReturn($this->getGuzzleResponse($data));
-        $ppscApiService = $this->getMockBuilder(PpscApiService::class)
-            ->setConstructorArgs([$mockParamsService, $this->requestStack, $mockEnvService, $mockLoggerService])
-            ->onlyMethods(['getAccessToken'])
-            ->getMock();
+        $ppscApiService = new class ($mockParamsService, $this->requestStack, $mockEnvService, $mockLoggerService) extends PpscApiService {
+            public function getAccessToken(bool $refresh = false): ?string
+            {
+                return 'test_access_token';
+            }
+        };
         $ppscApiService->client = $mockClient;
-        $ppscApiService->method('getAccessToken')->willReturn('test_access_token');
         $result = $ppscApiService->getParticipantById('P000000123', '1');
         $this->assertInstanceOf(PpscParticipant::class, $result);
         $this->assertEquals('P000000123', $result->id);
@@ -74,18 +76,19 @@ class PpscApiServiceTest extends ServiceTestCase
     public function testPost(): void
     {
         $mockParamsService = $this->getPpscParams();
-        $mockEnvService = $this->createMock(EnvironmentService::class);
-        $mockLoggerService = $this->createMock(LoggerInterface::class);
-        $mockClient = $this->createMock(HttpClient::class);
+        $mockEnvService = $this->createStub(EnvironmentService::class);
+        $mockLoggerService = $this->createStub(LoggerInterface::class);
+        $mockClient = $this->createStub(HttpClient::class);
         $mockEnvService->method('getPpscEnv')->willReturn('qa');
         $data = $this->getMockPostData();
         $mockClient->method('request')->willReturn($this->getGuzzleResponse($data));
-        $ppscApiService = $this->getMockBuilder(PpscApiService::class)
-            ->setConstructorArgs([$mockParamsService, $this->requestStack, $mockEnvService, $mockLoggerService])
-            ->onlyMethods(['getAccessToken'])
-            ->getMock();
+        $ppscApiService = new class ($mockParamsService, $this->requestStack, $mockEnvService, $mockLoggerService) extends PpscApiService {
+            public function getAccessToken(bool $refresh = false): ?string
+            {
+                return 'test_access_token';
+            }
+        };
         $ppscApiService->client = $mockClient;
-        $ppscApiService->method('getAccessToken')->willReturn('test_access_token');
         $result = $ppscApiService->post('/physical_measurements', new \stdClass());
         $this->assertInstanceOf(ResponseInterface::class, $result);
     }

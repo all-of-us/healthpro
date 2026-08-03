@@ -18,12 +18,9 @@ class IdVerificationRepositoryTest extends KernelTestCase
         self::bootKernel();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
         $this->repo = static::getContainer()->get(IdVerificationRepository::class);
-
     }
 
-    /**
-     * @dataProvider paginationDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('paginationDataProvider')]
     public function testOnsiteIdVerificationsPagination($start, $length, $resultCount, $resultParticipantId): void
     {
         $this->createIdVerifications();
@@ -34,10 +31,9 @@ class IdVerificationRepositoryTest extends KernelTestCase
 
         $this->assertEquals($resultCount, count($idVerifications));
         $this->assertEquals($resultParticipantId, $idVerifications[0]['participantId']);
-
     }
 
-    public function paginationDataProvider()
+    public static function paginationDataProvider()
     {
         return [
             [0, 2, 2, 'P000000004'],
@@ -46,9 +42,7 @@ class IdVerificationRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider dateFilterDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('dateFilterDataProvider')]
     public function testOnsiteIdVerificationsDateFilters($startDate, $endDate, $resultCount): void
     {
         $this->createIdVerifications();
@@ -59,7 +53,7 @@ class IdVerificationRepositoryTest extends KernelTestCase
         $this->assertEquals($resultCount, count($idVerifications));
     }
 
-    public function dateFilterDataProvider()
+    public static function dateFilterDataProvider()
     {
         return [
             ['2022-01-15', '2022-02-15', 2],
@@ -71,9 +65,7 @@ class IdVerificationRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider participantIdDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('participantIdDataProvider')]
     public function testOnsiteIdVerificationsParticipantIdLookup($participantId): void
     {
         $this->createIdVerifications();
@@ -83,7 +75,7 @@ class IdVerificationRepositoryTest extends KernelTestCase
         $this->assertEquals($participantId, $idVerifications[0]['participantId']);
     }
 
-    public function participantIdDataProvider()
+    public static function participantIdDataProvider()
     {
         return [
             ['P000000000'],
@@ -94,9 +86,7 @@ class IdVerificationRepositoryTest extends KernelTestCase
         ];
     }
 
-    /**
-     * @dataProvider paramsCountDataProvider
-     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('paramsCountDataProvider')]
     public function testGetOnsiteIdVerificationsCount($params, $resultCount): void
     {
         $this->createIdVerifications();
@@ -104,14 +94,14 @@ class IdVerificationRepositoryTest extends KernelTestCase
         $this->assertEquals($resultCount, $count);
     }
 
-    public function paramsCountDataProvider()
+    public static function paramsCountDataProvider()
     {
         return [
             [[], 5],
             [['participantId' => 'P000000001'], 1],
-            [['startDate' => $this->getDate('2022-03-15')], 3],
-            [['endDate' => $this->getDate('2022-04-15')], 4],
-            [['startDate' => $this->getDate('2022-02-15'), 'endDate' => $this->getDate('2022-04-15')], 3],
+            [['startDate' => new \DateTime('2022-03-15')], 3],
+            [['endDate' => new \DateTime('2022-04-15')], 4],
+            [['startDate' => new \DateTime('2022-02-15'), 'endDate' => new \DateTime('2022-04-15')], 3],
         ];
     }
 

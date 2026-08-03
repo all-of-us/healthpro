@@ -34,7 +34,7 @@ class SessionAuthenticationStrategyTest extends KernelTestCase
         $strategy = static::getContainer()->get('security.authentication.session_strategy.main');
 
         /** @var TokenInterface&MockObject $token */
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createStub(TokenInterface::class);
 
         $strategy->onAuthentication($request, $token);
 
