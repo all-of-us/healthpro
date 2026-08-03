@@ -10,7 +10,7 @@
 <div class="card mb-3">
     <div class="card-header">
         <h3 class="card-title h5 mb-0">
-            Weight and Height/Length
+            Weight and Height{% if schema.fields['height-or-length'] is defined %} /Length {% endif %}
         </h3>
     </div>
     <div class="card-body">
@@ -50,14 +50,16 @@
                 </div>
             {% endfor %}
         </div>
-        <h4>Height/Length</h4>
-        <div class="card card-body mb-3">
-            <div class="row">
-                <div class="col-sm-4">
-                    {{ metrics.form_row(measurementForm, schema.fields['height-or-length']) }}
+        {% if schema.fields['height-or-length'] is defined %}
+            <h4>Height/Length</h4>
+            <div class="card card-body mb-3">
+                <div class="row">
+                    <div class="col-sm-4">
+                        {{ metrics.form_row(measurementForm, schema.fields['height-or-length']) }}
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
         <div class="row replicate row-equal-height">
             {% for i in 0..2 %}
                 <div class="col-sm-4">
@@ -109,7 +111,7 @@
                             <small class="text-muted">(average of two closest measures)</small>
                         </p>
                         <p class="lead">
-                            Height/Length:
+                            Height{% if schema.fields['height-or-length'] is defined %} /Length {% endif %}:
                             <span id="mean-height"></span>
                             {{ schema.fields['height'].unit }}
                             <span id="convert-height"></span>
@@ -132,7 +134,7 @@
                         </div>
                         <div id="weight-warning" class="metric-warnings text-warning"></div>
                         <div class="row g-0 lead">
-                            <div>Height/Length:</div>
+                            <div>Height/{% if schema.fields['height-or-length'] is defined %} /Length {% endif %}:</div>
                             <div>
                                 {{ growthMacros.displayGrowthPercentile('height-for-age', sexAtBirth) }}
                             </div>

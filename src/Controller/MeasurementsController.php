@@ -4,17 +4,20 @@ namespace App\Controller;
 
 use App\Audit\Log;
 use App\Entity\Measurement;
+use App\Entity\PediatricAssent;
 use App\Entity\User;
 use App\Form\MeasurementBloodDonorCheckType;
 use App\Form\MeasurementModifyType;
 use App\Form\MeasurementRevertType;
 use App\Form\MeasurementType;
+use App\Form\PediatricAssentType;
 use App\Form\PediatricMeasurementType;
 use App\Model\Measurement\Fhir;
 use App\Service\EnvironmentService;
 use App\Service\HelpService;
 use App\Service\LoggerService;
 use App\Service\MeasurementService;
+use App\Service\PediatricAssentService;
 use App\Service\Ppsc\PpscApiService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -58,8 +61,11 @@ class MeasurementsController extends BaseController
 
     #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}', name: 'measurement', defaults: ['measurementId' => null])]
     #[Route(path: '/read/participant/{participantId}/measurements/{measurementId}', name: 'read_measurement', methods: ['GET'])]
-    public function measurementsAction(string $participantId, ?int $measurementId, Request $request): Response
-    {
+    public function measurementsAction(
+        string $participantId,
+        ?int $measurementId,
+        Request $request
+    ): Response {
         $participant = $this->ppscApiService->getParticipantById($participantId);
         if (!$participant) {
             throw $this->createNotFoundException('Participant not found.');
@@ -449,6 +455,84 @@ class MeasurementsController extends BaseController
         ]);
     }
 
+    #[Route(path: '/ppsc/participant/{participantId}/measurements/pediatric/assent/check', name: 'measurement_pediatric_assent_check')]
+    public function measurementPediatricAssentCheckAction(
+        string $participantId,
+        Request $request,
+        PediatricAssentService $pediatricAssentService
+    ): Response {
+        $requestedMeasurementType = $request->query->get('type');
+        $participant = $this->ppscApiService->getParticipantById($participantId);
+        if (!$participant) {
+            throw $this->createNotFoundException('Participant not found.');
+        }
+        if (!$participant->requirePediatricAssentCheck()) {
+            throw $this->createAccessDeniedException();
+        }
+        $showNoAssentModalOnLoad = false;
+        $formOptions = [
+            'assentQuestion' => 'Does the pediatric participant assent to physical measurements today?',
+            'csrf_token_id' => 'pediatricMeasurementAssent',
+        ];
+        $assentForm = $this->createForm(PediatricAssentType::class, [
+            'acknowledgeNoAssent' => '0',
+            'pediatricAssentId' => null,
+        ], $formOptions);
+        $assentForm->handleRequest($request);
+        if ($assentForm->isSubmitted() && $assentForm->isValid()) {
+            /** @var array{pediatricAssent?: string, acknowledgeNoAssent?: string, pediatricAssentId?: string|int|null} $formData */
+            $formData = $assentForm->getData();
+            $assentResponse = (string) ($formData['pediatricAssent'] ?? '');
+            $acknowledgeNoAssent = (string) ($formData['acknowledgeNoAssent'] ?? '0') === '1';
+            $existingAssentId = empty($formData['pediatricAssentId']) ? null : (int) $formData['pediatricAssentId'];
+            if (in_array($assentResponse, ['yes', 'unable'], true)) {
+                $result = $pediatricAssentService->submitMeasurementAssent($participant->id, $assentResponse, $existingAssentId);
+                if (!$result['success']) {
+                    $this->addFlash('error', $result['errorMessage']);
+                    $formData['pediatricAssentId'] = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
+                    $assentForm = $this->createForm(PediatricAssentType::class, $formData, $formOptions);
+                }
+                if ($result['success']) {
+                    /** @var PediatricAssent|null $assent */
+                    $assent = $result['assent'] ?? null;
+                    $measurement = $this->createDraftPediatricMeasurement($participant, $requestedMeasurementType);
+                    $pediatricAssentService->linkMeasurementAssent($assent?->getId(), $measurement);
+
+                    $redirectParams = [
+                        'participantId' => $participant->id,
+                        'measurementId' => $measurement->getId(),
+                    ];
+                    if (!empty($requestedMeasurementType)) {
+                        $redirectParams['type'] = $requestedMeasurementType;
+                    }
+
+                    return $this->redirectToRoute('measurement', $redirectParams);
+                }
+            } else {
+                if (!$acknowledgeNoAssent) {
+                    $assentForm->get('pediatricAssent')->addError(new FormError('Please acknowledge the warning before proceeding.'));
+                } else {
+                    $result = $pediatricAssentService->submitMeasurementAssent($participant->id, $assentResponse, $existingAssentId);
+                    if ($result['success']) {
+                        return $this->redirectToRoute('participant', [
+                            'id' => $participant->id
+                        ]);
+                    }
+                    $this->addFlash('error', $result['errorMessage']);
+                    $formData['pediatricAssentId'] = isset($result['assent']) ? $result['assent']->getId() : $existingAssentId;
+                    $formData['acknowledgeNoAssent'] = '0';
+                    $assentForm = $this->createForm(PediatricAssentType::class, $formData, $formOptions);
+                    $showNoAssentModalOnLoad = true;
+                }
+            }
+        }
+        return $this->render('measurement/pediatric-assent-check.html.twig', [
+            'participant' => $participant,
+            'assentForm' => $assentForm->createView(),
+            'showNoAssentModalOnLoad' => $showNoAssentModalOnLoad,
+        ]);
+    }
+
     #[Route(path: '/ppsc/participant/{participantId}/measurements/{measurementId}/fhir', name: 'measurement_fhir')]
     public function measurementFhirAction(string $participantId, int $measurementId, Request $request, EnvironmentService $env): JsonResponse
     {
@@ -517,5 +601,34 @@ class MeasurementsController extends BaseController
         $response = new JsonResponse($rdrMeasurement);
         $response->setEncodingOptions(JsonResponse::DEFAULT_ENCODING_OPTIONS | JSON_PRETTY_PRINT);
         return $response;
+    }
+
+    private function createDraftPediatricMeasurement(object $participant, ?string $requestedType = null): Measurement
+    {
+        $type = $requestedType ?: ($participant->pediatricMeasurementsVersionType ?? null);
+        $measurement = new Measurement();
+        $this->measurementService->load($measurement, $participant, $type);
+        if ($measurement->isPediatricForm()) {
+            $measurement->setAgeInMonths($participant->ageInMonths);
+        }
+
+        $userRepository = $this->em->getRepository(User::class);
+        $currentUser = $userRepository->find($this->getSecurityUser()->getId());
+        $now = new \DateTime();
+        $measurement->setUser($currentUser);
+        $measurement->setSite($this->siteService->getSiteId());
+        $measurement->setParticipantId($participant->id);
+        $measurement->setCreatedTs($now);
+        $measurement->setUpdatedTs($now);
+        $measurement->setVersion($this->measurementService->getCurrentVersion($type));
+        $measurement->setData(json_encode($measurement->getFieldData()));
+        if (isset($participant->sexAtBirth)) {
+            $measurement->setSexAtBirth($participant->sexAtBirth);
+        }
+
+        $this->em->persist($measurement);
+        $this->em->flush();
+
+        return $measurement;
     }
 }
