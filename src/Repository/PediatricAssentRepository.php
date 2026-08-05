@@ -10,9 +10,9 @@ use Doctrine\Persistence\ManagerRegistry;
  * @extends ServiceEntityRepository<PediatricAssent>
  *
  * @method PediatricAssent|null find($id, $lockMode = null, $lockVersion = null)
- * @method PediatricAssent|null findOneBy(array $criteria, array $orderBy = null)
+ * @method PediatricAssent|null findOneBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null)
  * @method PediatricAssent[]    findAll()
- * @method PediatricAssent[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method PediatricAssent[]    findBy(array<string, mixed> $criteria, array<string, string>|null $orderBy = null, $limit = null, $offset = null)
  */
 class PediatricAssentRepository extends ServiceEntityRepository
 {
