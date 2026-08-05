@@ -29,7 +29,9 @@ class PpscParticipant
 
     /** @var list<float> */
     private static array $pediatricWeightBreakpoints = [
-        9999,
+        1000,
+        50,
+        25,
         16.4,
         5,
         2.5
@@ -41,6 +43,7 @@ class PpscParticipant
         'peds-2' => [24, 35],
         'peds-3' => [36, 59],
         'peds-4' => [60, 83],
+        'peds-5' => [84, 143],
     ];
 
     public function __construct(?\stdClass $ppscParticipant = null)
@@ -137,6 +140,11 @@ class PpscParticipant
             }
         }
         return $breakpoint;
+    }
+
+    public function requirePediatricAssentCheck(): bool
+    {
+        return $this->isPediatric && $this->ageInMonths >= 84 && $this->ageInMonths < 144;
     }
 
     private function parsePPscParticipant(\stdClass $participant): void

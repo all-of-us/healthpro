@@ -11,7 +11,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class PpscApiServiceTest extends ServiceTestCase
 {
@@ -20,13 +19,13 @@ class PpscApiServiceTest extends ServiceTestCase
         $mockParamsService = $this->getPpscParams();
         $mockEnvService = $this->createStub(EnvironmentService::class);
         $mockLoggerService = $this->createStub(LoggerInterface::class);
-        $mockClient = $this->createStub(HttpClient::class);
+        $mockClient = $this->createMock(HttpClient::class);
         $mockEnvService->method('getPpscEnv')->willReturn('qa');
         $data = $this->getMockPpscAccessTokenData();
-        $mockClient->method('request')->willReturn($this->getGuzzleResponse($data));
+        $mockClient->expects($this->once())->method('request')->willReturn($this->getGuzzleResponse($data));
         $ppscApiService = new PpscApiService($mockParamsService, $this->requestStack, $mockEnvService, $mockLoggerService);
         $ppscApiService->client = $mockClient;
-        $result = $ppscApiService->getAccessToken();
+        $result = $ppscApiService->getAccessToken(true);
         $this->assertEquals('123456789', $result);
     }
 
@@ -100,7 +99,7 @@ class PpscApiServiceTest extends ServiceTestCase
 
     private function getMockPpscAccessTokenData(): string
     {
-        return '{"access_token": "123456789"}';
+        return '{"access_token": "123456789", "expires_in": 3600}';
     }
 
     private function getMockPpscRequestIdData(): string

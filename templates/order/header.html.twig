@@ -72,7 +72,7 @@
         finalize: ['finalize', 'finalized'],
         print_requisition: ['print requisition', 'finalized']
     } %}
-    {% if order.type == 'saliva' or isPediatricOrder %}
+    {% if order.type == 'saliva' or (isPediatricOrder and not order.hasProcessingSamples) %}
         {% set steps = steps|filter((label,step) => step != 'process') %}
     {% endif %}
 {% endif %}
@@ -126,6 +126,9 @@
 <ul class="nav nav-tabs">
     <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Safety Check</a></li>
     <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Create</a></li>
+    {% if order.ageInMonths is not empty and order.ageInMonths >= 84 and order.ageInMonths < 144 %}
+        <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#"><i class="fa fa-check-circle" aria-hidden="true"></i> Assent</a></li>
+    {% endif %}
     {% set nextEnabled = true %}
     {% set previousStep = false %}
     {% for step, column in steps %}

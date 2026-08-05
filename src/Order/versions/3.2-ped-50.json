@@ -1,0 +1,63 @@
+{
+  "version": "5",
+  "notes": "Pediatric Updated Saliva Tubes, 25 < 50 Kg",
+  "samplesInformation": {
+    "1SS08": {
+      "number": 1,
+      "label": "8 mL SST",
+      "color": "Red and gray",
+      "temperature": "Refrigerated",
+      "specimen": "PMI SST",
+      "code": "1SSTP",
+      "prompt": "SST Centrifuge Type",
+      "icodeSwingingBucket": "1SST8",
+      "icodeFixedAngle": "2SST8"
+    },
+    "1ED04": {
+      "number": 2,
+      "label": "4 ml EDTA",
+      "temperature": "Refrigerated",
+      "specimen": "4 ml EDTA",
+      "color": "Lavender"
+    },
+    "1ED10": {
+      "number": 3,
+      "label": "10 ml EDTA",
+      "temperature": "Refrigerated",
+      "specimen": "10 ml EDTA",
+      "color": "Lavender"
+    },
+    "1PXR2": {
+      "number": 4,
+      "label": "2.5 ml PAXgene",
+      "temperature": "Refrigerated",
+      "specimen": "Paxgene",
+      "color": "Clear-Red"
+    },
+    "1UR10": {
+      "number": 1,
+      "label": "Urine 10 mL",
+      "color": "Yellow",
+      "temperature": "Refrigerated",
+      "specimen": "PMI Urine Cup",
+      "labelCount": 2
+    }
+  },
+  "salivaSamplesInformation": {
+    "1SAL2": {
+      "label": "Saliva [1SAL2]",
+      "temperature": "Refrigerated",
+      "specimen": "PMI Saliva, FDA Kit",
+      "color": "Clear",
+      "identifier": "OGD-500"
+    },
+    "2SAL0": {
+      "label": "Saliva [2SAL0]",
+      "temperature": "Refrigerated",
+      "specimen": "PMI Saliva, FDA Kit",
+      "color": "Clear",
+      "identifier": "OCD-100 Sponge Assisted Device"
+    }
+  },
+  "salivaInstructions": "Order a saliva biospecimen only if the participant is unable to provide both the 4 mL EDTA tube and the 10 mL EDTA tube."
+}
