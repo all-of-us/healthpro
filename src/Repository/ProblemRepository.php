@@ -7,10 +7,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Problem|null find($id, $lockMode = null, $lockVersion = null)
- * @method Problem|null findOneBy(array $criteria, array $orderBy = null)
- * @method Problem[]    findAll()
- * @method Problem[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @extends ServiceEntityRepository<Problem>
  */
 class ProblemRepository extends ServiceEntityRepository
@@ -21,7 +17,7 @@ class ProblemRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return list<array<int|string, mixed>>
      */
     public function getProblemsWithCommentsCount(?string $participantId = null): array
     {

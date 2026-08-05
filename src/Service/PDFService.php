@@ -69,7 +69,7 @@ class PDFService
                                 $sample['identifier'] = 'ST-KIT';
                                 $sampleId = $sample['orderId'];
                                 $stoolPrinted = true;
-                            } elseif (($sampleType === NphOrder::TYPE_STOOL || $sampleType === NphOrder::TYPE_STOOL_2) && $stoolPrinted === true) {
+                            } elseif (($sampleType === NphOrder::TYPE_STOOL || $sampleType === NphOrder::TYPE_STOOL_2)) {
                                 continue;
                             }
                             $visit = $sample['visitDisplayName'];

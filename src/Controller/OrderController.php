@@ -806,6 +806,8 @@ class OrderController extends BaseController
 
     /**
      * @param array<string, mixed> $formData
+     *
+     * @return FormInterface<mixed>
      */
     private function createOrderCollectForm(Order $order, array $formData, Request $request, Session $session, ParameterBagInterface $params, string $step): FormInterface
     {

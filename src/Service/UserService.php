@@ -12,7 +12,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 
 class UserService
@@ -85,9 +84,6 @@ class UserService
             $this->em->flush();
         }
 
-        if (empty($user)) {
-            throw new AuthenticationException('Failed to retrieve user information');
-        }
         // Return user info in array format
         $userInfo = [
             'id' => $user->getId(),

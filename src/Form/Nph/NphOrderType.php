@@ -12,6 +12,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class NphOrderType extends AbstractType
 {
     private const STOOL_ST1 = 'ST1';
@@ -197,6 +200,9 @@ class NphOrderType extends AbstractType
         return false;
     }
 
+    /**
+     * @param FormBuilderInterface<mixed> $builder
+     */
     private function addStoolKitField(FormBuilderInterface $builder, bool $isStoolKitDisabled, ?string $stoolKitData, string $fieldName): void
     {
         $stoolKitAttributes = [

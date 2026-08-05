@@ -256,6 +256,9 @@ class OrderService
         return $id;
     }
 
+    /**
+     * @param FormInterface<mixed> $form
+     */
     public function setOrderUpdateFromForm(string $step, FormInterface $form): void
     {
         $formData = $form->getData();
@@ -802,6 +805,9 @@ class OrderService
         return $this->order;
     }
 
+    /**
+     * @param FormInterface<mixed> $orderCollectForm
+     */
     public function updateOrderVersion(Order $order, string $orderVersion, FormInterface $orderCollectForm): Order
     {
         $processedSamples = json_decode($order->getProcessedSamples(), true);

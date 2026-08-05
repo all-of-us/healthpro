@@ -7,6 +7,9 @@ use Symfony\Component\Form\Extension\Core\Type as Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints as Constraints;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class ParticipantLookupEmailType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

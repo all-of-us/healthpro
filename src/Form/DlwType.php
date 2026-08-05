@@ -16,6 +16,9 @@ use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Type;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DlwType extends AbstractType
 {
     private const DOSE_BATCH_ID_DIGITS = 8;

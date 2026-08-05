@@ -8,11 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<ZScores>
- *
- * @method ZScores|null find($id, $lockMode = null, $lockVersion = null)
- * @method ZScores|null findOneBy(array $criteria, array $orderBy = null)
- * @method ZScores[]    findAll()
- * @method ZScores[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class ZScoresRepository extends ServiceEntityRepository
 {
