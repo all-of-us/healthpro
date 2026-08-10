@@ -78,6 +78,11 @@ class RequestListener
 
         if ($siteSelectResponse = $this->checkSiteSelect()) {
             $event->setResponse($siteSelectResponse);
+            return;
+        }
+
+        if ($nphTimezoneResponse = $this->checkNphTimezone()) {
+            $event->setResponse($nphTimezoneResponse);
         }
     }
 
@@ -184,6 +189,27 @@ class RequestListener
         }
 
         return null;
+    }
+
+    /**
+     * NPH users must have a time zone set in their profile before they can proceed
+     * beyond the home page. When it is missing, redirect them to a dedicated
+     * "time zone required" page (allow the settings page) until they save one.
+     */
+    private function checkNphTimezone(): ?RedirectResponse
+    {
+        if ($this->requestStack->getSession()->get('program') !== User::PROGRAM_NPH) {
+            return null;
+        }
+        $user = $this->userService->getUser();
+        if ($user === null || $user->getTimezone(false) !== null) {
+            return null;
+        }
+        $path = $this->request->getPathInfo();
+        if ($this->ignoreRoutes() || preg_match('#^/(nph/timezone-required)($|/)#', $path)) {
+            return null;
+        }
+        return new RedirectResponse('/nph/timezone-required');
     }
 
     private function ignoreRoutes(): bool

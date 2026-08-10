@@ -64,6 +64,15 @@ class DefaultController extends BaseController
         throw $this->createAccessDeniedException();
     }
 
+    #[Route(path: '/nph/timezone-required', name: 'nph_timezone_required')]
+    public function nphTimezoneRequired(): Response
+    {
+        if ($this->getSecurityUser()->getTimezone(false) !== null) {
+            return $this->redirectToRoute('nph_home');
+        }
+        return $this->render('program/nph/timezone-required.html.twig');
+    }
+
     #[Route(path: '/admin', name: 'admin_home')]
     public function adminIndex(): Response
     {
