@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="page-header pb-1 mb-4 mt-2 border-bottom">
+        <h2>Time zone required</h2>
+    </div>
+    <div class="alert alert-warning" role="alert">
+        <p>Your time zone is not set in your profile. To continue using HealthPro, please update your time zone in your profile settings.</p>
+        <p class="mb-0"><strong>Action:</strong> Go to <strong>Profile Settings</strong>, select your time zone, and save your changes. You can return to HealthPro after your time zone has been updated.</p>
+    </div>
+    <a href="{{ path('settings', { return: path('nph_home') }) }}" class="btn btn-primary">
+        Go to Profile Settings
+        <i class="fas fa-arrow-alt-circle-right"></i>
+    </a>
+{% endblock %}
