@@ -206,7 +206,7 @@ class RequestListener
             return null;
         }
         $path = $this->request->getPathInfo();
-        if ($this->ignoreRoutes() || preg_match('#^/(nph/timezone-required)($|/)#', $path)) {
+        if ($this->isUpkeepRoute() || preg_match('#^/(nph/timezone-required|settings|site|program)($|/)#', $path)) {
             return null;
         }
         return new RedirectResponse('/nph/timezone-required');
