@@ -84,6 +84,9 @@ class MeasurementsController extends BaseController
             $measurement->canRestore = $measurement->canRestore();
             $measurement->reasonDisplayText = $measurement->getReasonDisplayText();
         } else {
+            if ($participant->requirePediatricAssentCheck()) {
+                return $this->redirectToRoute('measurement_pediatric_assent_check', ['participantId' => $participantId]);
+            }
             $measurement = new Measurement();
             $this->measurementService->load($measurement, $participant, $type);
             if ($measurement->isPediatricForm()) {
