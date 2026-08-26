@@ -139,7 +139,7 @@
                         {{ today.displayDate(order, 'collected_ts') }}
                     </td>
                     <td>
-                        {{ order and order.order_type != 'saliva' and not isPediatricParticipant ? today.displayDate(order, 'processed_ts') : '--'}}
+                        {{ order and order.order_type != 'saliva' and (not isPediatricParticipant or order.processed_ts) ? today.displayDate(order, 'processed_ts') : '--'}}
                     </td>
                     <td>
                         {% if order %}
