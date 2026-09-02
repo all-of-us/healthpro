@@ -46,7 +46,11 @@
         </div>
         <div class="col-md-12">
             <p>
-                <a href="{{ path('measurement', {'participantId': participant.id}) }}" class="btn btn-primary">Start New Physical Measurements</a>
+                {% if participant.requirePediatricAssentCheck %}
+                    <a href="{{ path('measurement_pediatric_assent_check', {'participantId': participant.id}) }}" class="btn btn-primary">Start New Physical Measurements</a>
+                {% else %}
+                    <a href="{{ path('measurement', {'participantId': participant.id}) }}" class="btn btn-primary">Start New Physical Measurements</a>
+                {% endif %}
             </p>
         </div>
     {%  elseif weightMeasurement.finalizedTs|date('Y-m-d') != "now"|date('Y-m-d') %}
