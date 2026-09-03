@@ -9,7 +9,7 @@
                         <th colspan="4">Check all</th>
                         {% if app.request.get('_route') == 'order_finalize' %}
                             <th><span class="header-collected">Collected</span></th>
-                            {% if not order.isPediatricOrder %}
+                            {% if not order.isPediatricOrder or order.hasProcessingSamples %}
                             <th>Processed</th>
                             {% endif %}
                         {% endif %}
