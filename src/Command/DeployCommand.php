@@ -461,8 +461,8 @@ class DeployCommand extends Command
     /**
      * Runs a shell command, displaying output as it is generated.
      *
-     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
-     * ($type parameter in run callback is required but not used)
+     * The $type parameter in the run callback is required by Symfony's Process
+     * signature but is not used here.
      */
     private function exec(string $cmd, bool $mustRun = true, bool $raw = false): Process
     {

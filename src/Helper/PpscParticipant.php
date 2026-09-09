@@ -149,9 +149,6 @@ class PpscParticipant
 
     private function parsePPscParticipant(\stdClass $participant): void
     {
-        if (!is_object($participant)) {
-            return;
-        }
         $this->id = $participant->participantId ?? '';
         // Set dob to DateTime object
         if (isset($participant->dob)) {

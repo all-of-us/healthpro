@@ -7,10 +7,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method PatientStatusImportRow|null find($id, $lockMode = null, $lockVersion = null)
- * @method PatientStatusImportRow|null findOneBy(array $criteria, array $orderBy = null)
- * @method PatientStatusImportRow[]    findAll()
- * @method PatientStatusImportRow[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @extends ServiceEntityRepository<PatientStatusImportRow>
  */
 class PatientStatusImportRowRepository extends ServiceEntityRepository

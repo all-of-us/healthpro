@@ -12,10 +12,6 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method NphOrder|null find($id, $lockMode = null, $lockVersion = null)
- * @method NphOrder|null findOneBy(array $criteria, array $orderBy = null)
- * @method NphOrder[]    findAll()
- * @method NphOrder[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @extends ServiceEntityRepository<NphOrder>
  */
 class NphOrderRepository extends ServiceEntityRepository

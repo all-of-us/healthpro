@@ -8,10 +8,6 @@ use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Site|null find($id, $lockMode = null, $lockVersion = null)
- * @method Site|null findOneBy(array $criteria, array $orderBy = null)
- * @method Site[]    findAll()
- * @method Site[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @extends ServiceEntityRepository<Site>
  */
 class SiteRepository extends ServiceEntityRepository

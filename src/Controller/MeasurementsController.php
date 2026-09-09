@@ -123,7 +123,7 @@ class MeasurementsController extends BaseController
                 if ($measurementsForm->isValid()) {
                     if ($measurement->isBloodDonorForm()) {
                         $measurement->addBloodDonorProtocolModificationForRemovedFields();
-                        if ($request->request->has('finalize') && (!$measurement || empty($measurement->getRdrId()))) {
+                        if ($request->request->has('finalize') && empty($measurement->getRdrId())) {
                             $measurement->addBloodDonorProtocolModificationForBloodPressure();
                         }
                     }
@@ -134,7 +134,7 @@ class MeasurementsController extends BaseController
                     $measurement->setData(json_encode($measurement->getFieldData()));
                     $now = new \DateTime();
                     $measurement->setUpdatedTs($now);
-                    if ($request->request->has('finalize') && (!$measurement || empty($measurement->getRdrId()))) {
+                    if ($request->request->has('finalize') && empty($measurement->getRdrId())) {
                         $errors = $measurement->getFinalizeErrors();
                         if (count($errors) === 0) {
                             $measurement->setFinalizedTs($now);

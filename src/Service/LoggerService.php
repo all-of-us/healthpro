@@ -53,7 +53,7 @@ class LoggerService
         $user = $site = $ip = null;
 
         try {
-            if (($userObj = $this->userService->getUser()) && is_object($userObj)) {
+            if ($userObj = $this->userService->getUser()) {
                 $user = $userObj->getUsername();
             } elseif ($userObj = $this->userService->getGoogleUser()) {
                 $user = $userObj->getEmail();

@@ -184,7 +184,7 @@ class SiteSyncService
         return [
             'created' => $created,
             'modified' => $modified,
-            'deleted' => array_values($deleted)
+            'deleted' => $deleted
         ];
     }
 
