@@ -15,16 +15,17 @@ use App\Form\Nph\NphSampleLookupType;
 use App\Form\Nph\NphSampleModifyBulkType;
 use App\Form\Nph\NphSampleModifyType;
 use App\Form\Nph\NphSampleRevertType;
-use App\HttpClient;
 use App\Nph\Order\Nomenclature;
 use App\Nph\Order\Samples;
 use App\Service\EnvironmentService;
+use App\Service\GcsBucketService;
 use App\Service\HelpService;
 use App\Service\LoggerService;
 use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -629,18 +630,16 @@ class NphOrderController extends BaseController
     }
 
     #[Route(path: '/aliquot/instructions/file/{id}', name: 'aliquot_instructions_file')]
-    public function aliquotInstructions(string $id, HelpService $helpService): Response
+    public function aliquotInstructions(string $id, GcsBucketService $gcsBucketService, ParameterBagInterface $params): Response
     {
         $document = Samples::$aliquotDocuments[$id] ?? null;
         if (!$document) {
             throw $this->createNotFoundException('Page Not Found!');
         }
         $documentFile = $document['filename'];
-        $url = $helpService->getStoragePath() . '/' . rawurlencode($documentFile);
         try {
-            $client = new HttpClient();
-            $response = $client->get($url, ['stream' => true]);
-            $responseBody = $response->getBody();
+            $object = $gcsBucketService->getObjectFromPath($params->get('nph_sop_bucket_name'), $documentFile);
+            $responseBody = $object->downloadAsStream();
             $streamedResponse = new StreamedResponse(function () use ($responseBody) {
                 while (!$responseBody->eof()) {
                     echo $responseBody->read(1024); // phpcs:ignore WordPress.XSS.EscapeOutput
@@ -649,7 +648,7 @@ class NphOrderController extends BaseController
             $streamedResponse->headers->set('Content-Type', 'application/pdf');
             return $streamedResponse;
         } catch (\Exception $e) {
-            error_log('Failed to retrieve Confluence file ' . $url . ' (' . $id . ')');
+            error_log('Failed to retrieve aliquot instructions file ' . $documentFile . ' (' . $id . ')');
             return new Response(
                 '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>',
                 Response::HTTP_BAD_GATEWAY,
