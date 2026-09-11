@@ -24,6 +24,9 @@ class UserTimezoneAuditLog
     #[ORM\Column(length: 255)]
     private string $currentTimezone;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $clientTimezone = null;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private \DateTimeInterface $modifiedTs;
 
@@ -64,6 +67,18 @@ class UserTimezoneAuditLog
     public function setCurrentTimezone(string $currentTimezone): static
     {
         $this->currentTimezone = $currentTimezone;
+
+        return $this;
+    }
+
+    public function getClientTimezone(): ?string
+    {
+        return $this->clientTimezone;
+    }
+
+    public function setClientTimezone(?string $clientTimezone): static
+    {
+        $this->clientTimezone = $clientTimezone;
 
         return $this;
     }

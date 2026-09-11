@@ -28,6 +28,7 @@ class UserTimezoneAuditLogRepositoryTest extends KernelTestCase
             ->setUser($user)
             ->setPreviousTimezone('America/New_York')
             ->setCurrentTimezone('America/Chicago')
+            ->setClientTimezone('America/Los_Angeles')
             ->setModifiedTs($modifiedTs);
         $this->em->persist($auditLog);
         $this->em->flush();
@@ -37,6 +38,7 @@ class UserTimezoneAuditLogRepositoryTest extends KernelTestCase
         $this->assertSame($user->getId(), $saved->getUser()->getId());
         $this->assertSame('America/New_York', $saved->getPreviousTimezone());
         $this->assertSame('America/Chicago', $saved->getCurrentTimezone());
+        $this->assertSame('America/Los_Angeles', $saved->getClientTimezone());
         $this->assertEquals($modifiedTs, $saved->getModifiedTs());
     }
 
