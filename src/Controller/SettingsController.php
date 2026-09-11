@@ -32,7 +32,7 @@ class SettingsController extends BaseController
                     ->setUser($user)
                     ->setPreviousTimezone($previousTimezone)
                     ->setCurrentTimezone($user->getTimezone())
-                    ->setClientTimezone($settingsForm->get('clientTimezone')->getData())
+                    ->setClientTimezone($settingsForm->get('clientTimezone')->getData() ?: null)
                     ->setModifiedTs(new \DateTime());
                 $this->em->persist($auditLog);
             }
