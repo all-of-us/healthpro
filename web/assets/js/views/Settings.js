@@ -26,4 +26,7 @@ $(document).ready(function () {
         $("#settings_timezone").val(PMI.browserTimeZone);
         $("form[name=settings]").submit();
     });
+    $("form[name=settings]").on("submit", function () {
+        $("#settings_clientTimezone").val(PMI.browserTimeZone);
+    });
 });

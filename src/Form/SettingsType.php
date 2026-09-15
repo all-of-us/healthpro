@@ -24,6 +24,9 @@ class SettingsType extends AbstractType
                 'placeholder' => '-- Select your time zone --',
                 'constraints' => new Constraints\NotBlank()
             ])
+            ->add('clientTimezone', Type\HiddenType::class, [
+                'mapped' => false
+            ])
         ;
     }
 
