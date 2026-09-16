@@ -367,7 +367,7 @@ $(document).ready(function () {
         let modelContent = $("#notificationsModal .modal-content");
         modelContent.html("");
         modelContent.load($(this).data("href"));
-        $(notificationsModal).modal("show");
+        bootstrap.Modal.getOrCreateInstance(notificationsModal[0]).show();
     });
 
     $("#notifications_mark_all_read").on("click", function () {

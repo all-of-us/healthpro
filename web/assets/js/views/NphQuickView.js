@@ -22,7 +22,7 @@ $(document).ready(function () {
         });
 
         // Show modal
-        $(quickViewModal).modal("show");
+        bootstrap.Modal.getOrCreateInstance($(quickViewModal)[0]).show();
     });
 
     const initializeDataTable = () => {
