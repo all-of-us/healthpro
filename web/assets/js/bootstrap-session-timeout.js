@@ -71,33 +71,33 @@
               <div class="modal-dialog"> \
                 <div class="modal-content"> \
                   <div class="modal-header"> \
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> \
                     <h4 class="modal-title">' +
                     opt.title +
                     '</h4> \
-                  </div> \
-                  <div class="modal-body"> \
-                    <p>' +
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> \
+              </div> \
+              <div class="modal-body"> \
+                <p>' +
                     opt.message +
                     "</p> \
-                    " +
+                " +
                     countdownMessage +
                     " \
-                    " +
+                " +
                     coundownBarHtml +
                     ' \
-                  </div> \
-                  <div class="modal-footer"> \
-                    <button id="session-timeout-dialog-logout" type="button" class="btn btn-default">' +
+              </div> \
+              <div class="modal-footer"> \
+                <button id="session-timeout-dialog-logout" type="button" class="btn btn-secondary">' +
                     opt.logoutButton +
                     '</button> \
-                    <button id="session-timeout-dialog-keepalive" type="button" class="btn btn-primary" data-dismiss="modal">' +
+                <button id="session-timeout-dialog-keepalive" type="button" class="btn btn-primary" data-bs-dismiss="modal">' +
                     opt.keepAliveButton +
                     "</button> \
-                  </div> \
-                </div> \
               </div> \
-             </div>"
+            </div> \
+          </div> \
+         </div>"
             );
 
             // "Logout" button click

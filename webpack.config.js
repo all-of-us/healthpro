@@ -32,7 +32,6 @@ Encore
     .addEntry("pediatric-assent", "./web/assets/js/views/PediatricAssent.js")
     .addEntry("order-create", "./web/assets/js/views/CreateOrder.js")
     .addEntry("order-sub", "./web/assets/js/views/OrderSubPage.js")
-    .addEntry("order-sub-bs5", "./web/assets/js/views/OrderSubPage-bs5.js")
     .addEntry("order-finalize", "./web/assets/js/views/FinalizeOrder.js")
     .addEntry("patient-status-import", "./web/assets/js/views/PatientStatusImport.js")
     .addEntry("physical-measurements-0.1", "./web/assets/js/views/PhysicalEvaluation-0.1.js")
