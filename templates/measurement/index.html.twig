@@ -32,13 +32,13 @@
                     {% if not measurement or not measurement.finalizedTs %}
                         <button type="submit" class="btn btn-primary btn-sm" name="save">
                             Save
-                            <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                            <span class="spinner-border spinner-border-loading" style="display: none;"></span>
                         </button>
                     {% endif %}
                     <button type="submit" class="btn btn-success btn-sm" name="finalize"
                             onclick="return confirm('Are you sure you want to finalize these physical measurements?');">
                         Save and Finalize
-                        <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                        <span class="spinner-border spinner-border-loading" style="display: none;"></span>
                     </button>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                     {% if measurement.rdrId and (measurement.history is empty or measurement.history.type != 'cancel') %}
                         <button type="submit" class="btn btn-warning btn-sm" name="copy" onclick="return confirm('Are you sure you want to amend these physical measurements?');">
                             Amend
-                            <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                            <span class="spinner-border spinner-border-loading" style="display: none;"></span>
                         </button>
                     {% endif %}
                     {% if measurement.canCancel %}
@@ -137,13 +137,13 @@
                                 <div class="col-6">
                                     <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-secondary w-100" data-reason="refusal" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">
                                         Refusal
-                                        <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                                        <span class="spinner-border spinner-border-loading" style="display: none;"></span>
                                     </button>
                                 </div>
                                 <div class="col-6">
                                     <button type="submit" name="finalize" class="autofill-protocol-modification btn btn-secondary w-100" data-reason="emergency" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">
                                         Urgent/Emergent Event
-                                        <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                                        <span class="spinner-border spinner-border-loading" style="display: none;"></span>
                                     </button>
                                 </div>
                             </div>
@@ -172,12 +172,12 @@
                     {% if not measurement or not measurement.finalizedTs %}
                         <button type="submit" class="btn btn-primary" name="save">
                             Save
-                            <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                            <span class="spinner-border spinner-border-loading" style="display: none;"></span>
                         </button>
                     {% endif %}
                     <button type="submit" class="btn btn-success float-end" name="finalize" onclick="return confirm('Are you sure you want to finalize these physical measurements?');">
                         Save and Finalize
-                        <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                        <span class="spinner-border spinner-border-loading" style="display: none;"></span>
                     </button>
                 {% endif %}
             </div>

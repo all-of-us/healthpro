@@ -44,7 +44,7 @@
                     <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary" id="cancelBtn">Cancel</a>
                     <button type="submit" class="btn btn-primary d-none" id="continueBtn" disabled>
                         Continue
-                        <span id="spinner" class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                        <span id="spinner" class="spinner-border spinner-border-loading" style="display: none;"></span>
                     </button>
                 </div>
             {{ form_end(assentForm, { render_rest: false }) }}

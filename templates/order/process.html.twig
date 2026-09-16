@@ -49,7 +49,7 @@
                 {% else %}
                     Save and mark as processed
                 {% endif %}
-                <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                <span class="spinner-border spinner-border-loading" style="display: none;"></span>
             </button>
             <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
         </p>

@@ -1006,7 +1006,7 @@ table.table-samples td {
     border-width: .2em;
 }
 
-.spinner-border-sm-bs5 {
+.spinner-border-loading {
     width: 1.5rem !important;
     height: 1.5rem !important;
     border-width: .2em;

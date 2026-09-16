@@ -95,7 +95,7 @@
             <p>
                 <button type="submit" name="reportable" class="btn {% if type == 'cancel' %} btn-danger {% elseif type == 'restore' %} btn-success {% else %} btn-primary {% endif %}">
                     {{ type|capitalize }} Order
-                    <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                    <span class="spinner-border spinner-border-loading" style="display: none;"></span>
                 </button>
                 <a href="{{ path('participant', { id: participant.id }) }}" class="btn btn-secondary">Exit</a>
             </p>
