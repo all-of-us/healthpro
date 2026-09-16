@@ -92,7 +92,7 @@ $(document).ready(function () {
     /*************************************************************************
      * Auto-enable bootstrap tooltips
      ************************************************************************/
-    $('[data-toggle="tooltip"]').tooltip();
+    window.initTooltips();
 
     /*************************************************************************
      * Handle session timeout
@@ -328,7 +328,7 @@ $(document).ready(function () {
         !PMI.hideTZWarning
     ) {
         var html = '<div class="alert alert-warning">';
-        html += '<a href="#" class="close" id="tz_close" data-dismiss="alert" aria-label="close">&times;</a>';
+        html += '<a href="#" class="close" id="tz_close" data-bs-dismiss="alert" aria-label="close">&times;</a>';
         html += "Your computer's time zone does not appear to match your HealthPro time zone preference. ";
         html += '<a href="' + PMI.path.settings + '">Update preference</a>';
         html += "</div>";
