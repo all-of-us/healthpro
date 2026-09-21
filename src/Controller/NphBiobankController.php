@@ -488,7 +488,7 @@ class NphBiobankController extends BaseController
     }
 
     /**
-     * @return array{0: ?\DateTime, 1: ?\DateTime, 2: ?string, 3: \Symfony\Component\Form\FormInterface}
+     * @return array{0: ?\DateTime, 1: ?\DateTime, 2: ?string, 3: \Symfony\Component\Form\FormInterface<mixed>}
      */
     private function getDateRangeFilterForm(Request $request): array
     {

@@ -8,11 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<WeightForAge24MonthsAndUp>
- *
- * @method WeightForAge24MonthsAndUp|null find($id, $lockMode = null, $lockVersion = null)
- * @method WeightForAge24MonthsAndUp|null findOneBy(array $criteria, array $orderBy = null)
- * @method WeightForAge24MonthsAndUp[]    findAll()
- * @method WeightForAge24MonthsAndUp[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class WeightForAge24MonthsAndUpRepository extends ServiceEntityRepository
 {

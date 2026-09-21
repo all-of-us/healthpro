@@ -7,6 +7,9 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class IdVerificationType extends AbstractType
 {
     /** @var array<string, array<string, string>> */

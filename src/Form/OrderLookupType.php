@@ -7,6 +7,9 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class OrderLookupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

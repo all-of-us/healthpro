@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class SettingsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -20,6 +23,9 @@ class SettingsType extends AbstractType
                 'choices' => array_flip(TimezoneService::$timezoneOptions),
                 'placeholder' => '-- Select your time zone --',
                 'constraints' => new Constraints\NotBlank()
+            ])
+            ->add('clientTimezone', Type\HiddenType::class, [
+                'mapped' => false
             ])
         ;
     }

@@ -8,11 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<NphSampleProcessingStatus>
- *
- * @method NphSampleProcessingStatus|null find($id, $lockMode = null, $lockVersion = null)
- * @method NphSampleProcessingStatus|null findOneBy(array $criteria, array $orderBy = null)
- * @method NphSampleProcessingStatus[]    findAll()
- * @method NphSampleProcessingStatus[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class NphSampleProcessingStatusRepository extends ServiceEntityRepository
 {

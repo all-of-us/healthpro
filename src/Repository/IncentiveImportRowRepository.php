@@ -8,10 +8,6 @@ use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method IncentiveImportRow|null find($id, $lockMode = null, $lockVersion = null)
- * @method IncentiveImportRow|null findOneBy(array $criteria, array $orderBy = null)
- * @method IncentiveImportRow[]    findAll()
- * @method IncentiveImportRow[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @extends ServiceEntityRepository<IncentiveImportRow>
  */
 class IncentiveImportRowRepository extends ServiceEntityRepository

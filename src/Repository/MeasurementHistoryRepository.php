@@ -7,10 +7,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method MeasurementHistory|null find($id, $lockMode = null, $lockVersion = null)
- * @method MeasurementHistory|null findOneBy(array $criteria, array $orderBy = null)
- * @method MeasurementHistory[]    findAll()
- * @method MeasurementHistory[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @extends ServiceEntityRepository<MeasurementHistory>
  */
 class MeasurementHistoryRepository extends ServiceEntityRepository

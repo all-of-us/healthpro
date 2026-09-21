@@ -128,9 +128,6 @@ class NphParticipant
 
     private function parseRdrParticipant(\stdClass $participant): void
     {
-        if (!is_object($participant)) {
-            return;
-        }
         // Use nph participant id as id
         if (isset($participant->participantNphId)) {
             $this->id = $participant->participantNphId;

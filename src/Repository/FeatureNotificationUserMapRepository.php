@@ -8,10 +8,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method FeatureNotificationUserMap|null find($id, $lockMode = null, $lockVersion = null)
- * @method FeatureNotificationUserMap|null findOneBy(array $criteria, array $orderBy = null)
- * @method FeatureNotificationUserMap[]    findAll()
- * @method FeatureNotificationUserMap[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @extends ServiceEntityRepository<FeatureNotificationUserMap>
  */
 class FeatureNotificationUserMapRepository extends ServiceEntityRepository

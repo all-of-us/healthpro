@@ -7,10 +7,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method Notice|null find($id, $lockMode = null, $lockVersion = null)
- * @method Notice|null findOneBy(array $criteria, array $orderBy = null)
- * @method Notice[]    findAll()
- * @method Notice[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @extends ServiceEntityRepository<Notice>
  */
 class NoticeRepository extends ServiceEntityRepository

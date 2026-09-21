@@ -13,6 +13,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class DeceasedReportType extends AbstractType
 {
     private const AOU_START_DATE = '2018-05-06';

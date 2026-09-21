@@ -10,6 +10,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class NphSiteType extends AbstractType
 {
     /** @var array<string, array<string, int>> */

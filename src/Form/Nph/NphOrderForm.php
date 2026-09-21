@@ -8,6 +8,9 @@ use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class NphOrderForm extends AbstractType
 {
     public const FORM_FINALIZE_TYPE = 'finalize';
@@ -49,6 +52,9 @@ class NphOrderForm extends AbstractType
         'I tend to have normal formed stool - Type 3 and 4' => 'normal'
     ];
 
+    /**
+     * @param FormBuilderInterface<mixed> $builder
+     */
     protected function addUrineMetadataFields(
         FormBuilderInterface $builder,
         bool $disabled = false,
@@ -78,6 +84,9 @@ class NphOrderForm extends AbstractType
         $builder->add('urineClarity', Type\ChoiceType::class, $urineClarityOptions);
     }
 
+    /**
+     * @param FormBuilderInterface<mixed> $builder
+     */
     protected function addStoolMetadataFields(
         FormBuilderInterface $builder,
         string $timeZone,
@@ -144,6 +153,9 @@ class NphOrderForm extends AbstractType
         }
     }
 
+    /**
+     * @param FormBuilderInterface<mixed> $builder
+     */
     protected function addUrineTotalCollectionVolume(
         FormBuilderInterface $builder,
         bool $disabled = false
@@ -171,6 +183,7 @@ class NphOrderForm extends AbstractType
     }
 
     /**
+     * @param FormBuilderInterface<mixed> $builder
      * @param array<string, mixed> $options
      */
     protected function addCollectedTimeAndNoteFields(

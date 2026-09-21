@@ -12,11 +12,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<NphAdminOrderEditLog>
- *
- * @method NphAdminOrderEditLog|null find($id, $lockMode = null, $lockVersion = null)
- * @method NphAdminOrderEditLog|null findOneBy(array $criteria, array $orderBy = null)
- * @method NphAdminOrderEditLog[]    findAll()
- * @method NphAdminOrderEditLog[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class NphAdminOrderEditLogRepository extends ServiceEntityRepository
 {

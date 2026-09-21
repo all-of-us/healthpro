@@ -903,12 +903,10 @@ class PediatricsReportService
         }
         $weights = $measurementData['weight'];
         $weightChart = [];
-        if ($growthChartsByAge !== null) {
-            foreach ($growthChartsByAge as $growthChart) {
-                if (floor($growthChart['month']) === $ageInMonths) {
-                    if ($sex === 0 || ($sex === $growthChart['sex'])) {
-                        $weightChart[] = $growthChart;
-                    }
+        foreach ($growthChartsByAge as $growthChart) {
+            if (floor($growthChart['month']) === $ageInMonths) {
+                if ($sex === 0 || ($sex === $growthChart['sex'])) {
+                    $weightChart[] = $growthChart;
                 }
             }
         }
@@ -968,12 +966,10 @@ class PediatricsReportService
         }
         $averageLength = round(array_sum($heights) / count($heights));
         $weightForLengthChart = [];
-        if ($growthChartsByAge !== null) {
-            foreach ($growthChartsByAge as $growthChart) {
-                if (round($growthChart['length']) === $averageLength) {
-                    if ($sex === 0 || ($sex === $growthChart['sex'])) {
-                        $weightForLengthChart[] = $growthChart;
-                    }
+        foreach ($growthChartsByAge as $growthChart) {
+            if (round($growthChart['length']) === $averageLength) {
+                if ($sex === 0 || ($sex === $growthChart['sex'])) {
+                    $weightForLengthChart[] = $growthChart;
                 }
             }
         }
@@ -1016,12 +1012,10 @@ class PediatricsReportService
                 }
             }
         }
-        if ($growthChartsByAge !== null) {
-            foreach ($growthChartsByAge as $growthChart) {
-                if (round($growthChart['month']) === $ageInMonths) {
-                    if ($sex === 0 || ($sex === $growthChart['sex'])) {
-                        $bmiChart[] = $growthChart;
-                    }
+        foreach ($growthChartsByAge as $growthChart) {
+            if (round($growthChart['month']) === $ageInMonths) {
+                if ($sex === 0 || ($sex === $growthChart['sex'])) {
+                    $bmiChart[] = $growthChart;
                 }
             }
         }

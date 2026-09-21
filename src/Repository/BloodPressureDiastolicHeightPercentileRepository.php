@@ -8,11 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<BloodPressureDiastolicHeightPercentile>
- *
- * @method BloodPressureDiastolicHeightPercentile|null find($id, $lockMode = null, $lockVersion = null)
- * @method BloodPressureDiastolicHeightPercentile|null findOneBy(array $criteria, array $orderBy = null)
- * @method BloodPressureDiastolicHeightPercentile[]    findAll()
- * @method BloodPressureDiastolicHeightPercentile[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class BloodPressureDiastolicHeightPercentileRepository extends ServiceEntityRepository
 {

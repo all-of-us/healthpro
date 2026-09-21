@@ -8,11 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<BmiForAge5YearsAndUp>
- *
- * @method BmiForAge5YearsAndUp|null find($id, $lockMode = null, $lockVersion = null)
- * @method BmiForAge5YearsAndUp|null findOneBy(array $criteria, array $orderBy = null)
- * @method BmiForAge5YearsAndUp[]    findAll()
- * @method BmiForAge5YearsAndUp[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class BmiForAge5YearsAndUpRepository extends ServiceEntityRepository
 {

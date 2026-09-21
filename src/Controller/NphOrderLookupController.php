@@ -69,6 +69,9 @@ class NphOrderLookupController extends AbstractController
         );
     }
 
+    /**
+     * @return FormInterface<mixed>|RedirectResponse
+     */
     private function getIdForm(
         Request $request,
         SiteService $siteService,
@@ -106,6 +109,9 @@ class NphOrderLookupController extends AbstractController
         return $idForm;
     }
 
+    /**
+     * @return FormInterface<mixed>|RedirectResponse
+     */
     private function getSampleAliquotIdForm(
         Request $request,
         SiteService $siteService,
@@ -150,6 +156,9 @@ class NphOrderLookupController extends AbstractController
     }
 
     /**
+     * @param FormInterface<mixed> $idForm
+     * @param FormInterface<mixed> $sampleIdForm
+     * @param FormInterface<mixed> $aliquotIdForm
      * @param array<int, NphOrder>|null $recentOrders
      */
     private function generateOrderLookupView(

@@ -7,10 +7,6 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @method DeceasedLog|null find($id, $lockMode = null, $lockVersion = null)
- * @method DeceasedLog|null findOneBy(array $criteria, array $orderBy = null)
- * @method DeceasedLog[]    findAll()
- * @method DeceasedLog[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  * @extends ServiceEntityRepository<DeceasedLog>
  */
 class DeceasedLogRepository extends ServiceEntityRepository

@@ -127,8 +127,8 @@ $(document).ready(function () {
                 `<li class="list-group-item radio">
                         <label>
                             <input type="radio" name="site" value="${jsonData[i]["siteId"]}" ${
-                    jsonData[i]["siteId"] === urlParams.get("site") ? "checked" : ""
-                }>
+                                jsonData[i]["siteId"] === urlParams.get("site") ? "checked" : ""
+                            }>
                             ${jsonData[i]["siteName"]}
                         </label>
                     </li>`

@@ -44,8 +44,8 @@ class Samples
             'filename' => 'HPRO Nail Aliquoting Instructions.pdf'
         ],
         'stool' => [
-            'title' => 'HPRO Stool Instructions',
-            'filename' => 'HPRO Stool Instructions.pdf'
+            'title' => 'HPRO Stool Aliquoting Instructions',
+            'filename' => 'HPRO Stool Aliquoting Instructions.pdf'
         ],
         'saliva' => [
             'title' => 'HPRO Module 1&2 Saliva Aliquoting Instructions',

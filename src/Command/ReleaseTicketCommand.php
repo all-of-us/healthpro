@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment as Templating;
 
 /**
- * @phpstan-type ReleaseIssue object{
+ * @phpstan-type ReleaseIssue \stdClass&object{
  *     id: string,
  *     title: string,
  *     type: string,

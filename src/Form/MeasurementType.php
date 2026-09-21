@@ -11,6 +11,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints;
 
+/**
+ * @extends AbstractType<mixed>
+ */
 class MeasurementType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -165,6 +168,8 @@ class MeasurementType extends AbstractType
     }
 
     /**
+     * @param FormInterface<mixed> $form
+     *
      * @return list<Constraints\Collection>
      */
     private function addDiastolicBloodPressureConstraint(FormInterface $form, \stdClass $field): array

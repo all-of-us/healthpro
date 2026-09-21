@@ -161,3 +161,6 @@ nph_biobank_id_prefix: T
 
 # Define Cloud SQl Users
 cloudsql_users:
+
+# Path to NPH SOP aliquot instruction PDFs
+# nph_sop_bucket_name:

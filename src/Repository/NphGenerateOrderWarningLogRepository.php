@@ -8,11 +8,6 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<NphGenerateOrderWarningLog>
- *
- * @method NphGenerateOrderWarningLog|null find($id, $lockMode = null, $lockVersion = null)
- * @method NphGenerateOrderWarningLog|null findOneBy(array $criteria, array $orderBy = null)
- * @method NphGenerateOrderWarningLog[]    findAll()
- * @method NphGenerateOrderWarningLog[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class NphGenerateOrderWarningLogRepository extends ServiceEntityRepository
 {
