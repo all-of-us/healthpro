@@ -17,7 +17,7 @@ require("datatables.net-responsive-bs5/js/responsive.bootstrap5.js");
 require("datatables.net-buttons/js/dataTables.buttons.js");
 require("jsbarcode/dist/barcodes/JsBarcode.code128.min.js");
 require("inputmask/dist/jquery.inputmask.bundle.js");
-require("./bootstrap-session-timeout-bs5.js");
+require("./bootstrap-session-timeout.js");
 require("corejs-typeahead");
 window.Masonry = require("masonry-layout");
 window.Bloodhound = require("corejs-typeahead/dist/bloodhound.js");
@@ -45,7 +45,7 @@ require("datatables.net-bs5/css/dataTables.bootstrap5.css");
 require("datatables.net-responsive-bs5/css/responsive.bootstrap5.css");
 require("../../../node_modules/bootstrap5-toggle/css/bootstrap5-toggle.min.css");
 require("../css/app.css");
-require("../css/bs5.css");
+require("../css/overrides.css");
 
 require("./global.js");
-require("./bs5.js");
+require("./bootstrap-helpers.js");

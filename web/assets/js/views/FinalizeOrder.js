@@ -41,14 +41,14 @@ $(document).ready(function () {
             if (typeof processed !== "undefined") {
                 if (typeof error !== "undefined") {
                     html +=
-                        '<td><span class="text-danger"><i class="fa fa-exclamation-circle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="' +
+                        '<td><span class="text-danger"><i class="fa fa-exclamation-circle" aria-hidden="true" data-bs-toggle="tooltip" data-bs-placement="bottom" title="' +
                         error +
                         '"></i> ' +
                         processed +
                         "</span></td>";
                 } else if (typeof warning !== "undefined") {
                     html +=
-                        '<td><span class="text-warning"><i class="fa fa-exclamation-triangle" aria-hidden="true" data-toggle="tooltip" data-placement="bottom" title="' +
+                        '<td><span class="text-warning"><i class="fa fa-exclamation-triangle" aria-hidden="true" data-bs-toggle="tooltip" data-bs-placement="bottom" title="' +
                         warning +
                         '"></i> ' +
                         processed +
@@ -65,7 +65,7 @@ $(document).ready(function () {
         });
     }
 
-    $('[data-toggle="tooltip"]').tooltip();
+    window.initTooltips();
 
     $("#checkall").on("change", function () {
         $("#order_finalizedSamples input:checkbox:enabled").prop("checked", $(this).prop("checked"));

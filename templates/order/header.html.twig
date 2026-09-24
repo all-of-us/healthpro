@@ -159,7 +159,7 @@
             </li>
         {% else %}
             {% set title = previousStep|capitalize ~ " time must be set to continue" %}
-            <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#" title="{{ title }}" data-toggle="tooltip" data-placement="bottom">{{ column[0]|title }}</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link disabled" href="#" title="{{ title }}" data-bs-toggle="tooltip" data-bs-placement="bottom">{{ column[0]|title }}</a></li>
         {% endif %}
         {% set previousStep = column[1] %}
     {% endfor %}

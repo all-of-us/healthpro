@@ -45,6 +45,6 @@ $(document).ready(function () {
         let modelContent = $("#consentModal .modal-content");
         modelContent.html("");
         modelContent.load($(this).data("href"));
-        $(consentModal).modal("show");
+        bootstrap.Modal.getOrCreateInstance(consentModal[0]).show();
     });
 });

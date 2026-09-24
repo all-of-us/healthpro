@@ -71,33 +71,33 @@
               <div class="modal-dialog"> \
                 <div class="modal-content"> \
                   <div class="modal-header"> \
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button> \
                     <h4 class="modal-title">' +
                     opt.title +
                     '</h4> \
-                  </div> \
-                  <div class="modal-body"> \
-                    <p>' +
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> \
+              </div> \
+              <div class="modal-body"> \
+                <p>' +
                     opt.message +
                     "</p> \
-                    " +
+                " +
                     countdownMessage +
                     " \
-                    " +
+                " +
                     coundownBarHtml +
                     ' \
-                  </div> \
-                  <div class="modal-footer"> \
-                    <button id="session-timeout-dialog-logout" type="button" class="btn btn-default">' +
+              </div> \
+              <div class="modal-footer"> \
+                <button id="session-timeout-dialog-logout" type="button" class="btn btn-secondary">' +
                     opt.logoutButton +
                     '</button> \
-                    <button id="session-timeout-dialog-keepalive" type="button" class="btn btn-primary" data-dismiss="modal">' +
+                <button id="session-timeout-dialog-keepalive" type="button" class="btn btn-primary" data-bs-dismiss="modal">' +
                     opt.keepAliveButton +
                     "</button> \
-                  </div> \
-                </div> \
               </div> \
-             </div>"
+            </div> \
+          </div> \
+         </div>"
             );
 
             // "Logout" button click
@@ -128,14 +128,10 @@
 
                 // If they moved the mouse not only reset the counter
                 // but remove the modal too!
-                if (
-                    opt.warnAutoClose &&
-                    $("#session-timeout-dialog").length > 0 &&
-                    $("#session-timeout-dialog").data("bs.modal") &&
-                    $("#session-timeout-dialog").data("bs.modal").isShown
-                ) {
+                var timeoutDialogEl = document.getElementById("session-timeout-dialog");
+                if (opt.warnAutoClose && timeoutDialogEl && timeoutDialogEl.classList.contains("show")) {
                     // http://stackoverflow.com/questions/11519660/twitter-bootstrap-modal-backdrop-doesnt-disappear
-                    $("#session-timeout-dialog").modal("hide");
+                    bootstrap.Modal.getOrCreateInstance(timeoutDialogEl).hide();
                     $("body").removeClass("modal-open");
                     $("div.modal-backdrop").remove();
                 }
@@ -181,7 +177,7 @@
             timer = setTimeout(function () {
                 // Check for onWarn callback function and if there is none, launch dialog
                 if (typeof opt.onWarn !== "function") {
-                    $("#session-timeout-dialog").modal("show");
+                    bootstrap.Modal.getOrCreateInstance(document.getElementById("session-timeout-dialog")).show();
                 } else {
                     opt.onWarn(opt);
                 }

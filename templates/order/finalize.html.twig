@@ -93,7 +93,7 @@
         <p class="mt-2 mb-4">
             <button type="submit" {% if hasErrors %} class="btn btn-default" disabled="disabled" {% else %} class="btn btn-primary" {% endif %}>
                 Save and mark as finalized
-                <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                <span class="spinner-border spinner-border-loading" style="display: none;"></span>
             </button>
             <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
         </p>
@@ -124,6 +124,6 @@
 {% endblock %}
 
 {% block pagejs %}
-    {{ encore_entry_script_tags('order-sub-bs5') }}
+    {{ encore_entry_script_tags('order-sub') }}
     {{ encore_entry_script_tags('order-finalize') }}
 {% endblock %}

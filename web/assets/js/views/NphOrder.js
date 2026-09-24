@@ -34,7 +34,7 @@ $(document).ready(function () {
             html += caption;
         }
         this.$("#helpModal .modal-body").html(html);
-        this.$("#helpModal").modal();
+        bootstrap.Modal.getOrCreateInstance(this.$("#helpModal")[0]).show();
     };
 
     $("#scan_barcode").keyup(function () {
@@ -121,7 +121,7 @@ $(document).ready(function () {
     });
 
     $("#collection_notes_help").on("click", function () {
-        $("#collection_notes_modal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("collection_notes_modal")).show();
     });
 
     $(".toggle-chart-image").on("click", function (e) {
