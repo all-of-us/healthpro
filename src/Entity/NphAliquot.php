@@ -40,9 +40,9 @@ class NphAliquot
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $aliquotTimezoneId = null;
 
-    /** @var array<string, mixed> */
+    /** @var array<string, mixed>|null */
     #[ORM\Column(type: 'json', nullable: true)]
-    private array $aliquotMetadata = [];
+    private ?array $aliquotMetadata = [];
 
     public function getId(): ?int
     {
@@ -150,7 +150,7 @@ class NphAliquot
      */
     public function getAliquotMetadata(): array
     {
-        return $this->aliquotMetadata;
+        return $this->aliquotMetadata ?? [];
     }
 
     /**
