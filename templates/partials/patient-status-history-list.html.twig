@@ -1,6 +1,6 @@
 <div class="panel-group view-details" id="accordion_patient_status_history" role="tablist" aria-multiselectable="true">
     <div class="panel-heading bg-secondary text-white view-history-dropdown" role="tab">
-        <div role="button" data-bs-toggle="collapse" data-parent="#accordion_patient_status_history"
+        <div role="button" data-bs-toggle="collapse" data-bs-parent="#accordion_patient_status_history"
              data-bs-target="#collapse_patient_status_history" aria-expanded="true" aria-controls="collapseOne">
             View Patient Status History: {{ app.session.get('siteOrganizationDisplayName') }}
             <span class="badge badge-light">{{ orgPatientStatusHistoryData|length }}</span>

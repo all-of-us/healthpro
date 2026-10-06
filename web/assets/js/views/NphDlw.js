@@ -4,7 +4,7 @@ $(document).ready(function () {
     });
 
     $("#enter_pound").on("click", function () {
-        $("#pound_modal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("pound_modal")).show();
     });
 
     $("#confirm_btn").on("click", function () {
@@ -15,7 +15,7 @@ $(document).ready(function () {
         $("input#dlw_participantWeight").val(weight);
         let dosage = weight * 1.5;
         $("input#dlw_calculatedDose").val(dosage.toFixed(1));
-        $("#pound_modal").modal("hide");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("pound_modal")).hide();
     });
 
     $("#form_edit").on("click", function () {

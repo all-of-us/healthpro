@@ -174,7 +174,7 @@ $(document).ready(function () {
 
     $("#nph_order_downtime_generated").on("click", function () {
         if ($(this).prop("checked")) {
-            $("#downtime-warning-modal").modal("show");
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("downtime-warning-modal")).show();
         }
         $(this).prop("checked", false);
         showHideDowntimeCreatedTs();
@@ -183,12 +183,12 @@ $(document).ready(function () {
     $("#downtime-agree").on("click", function () {
         $("#nph_order_downtime_generated").prop("checked", true);
         showHideDowntimeCreatedTs();
-        $("#downtime-warning-modal").modal("hide");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("downtime-warning-modal")).hide();
     });
     $("#downtime-disagree").on("click", function () {
         $("#nph_order_downtime_generated").prop("checked", false);
         showHideDowntimeCreatedTs();
-        $("#downtime-warning-modal").modal("hide");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("downtime-warning-modal")).hide();
     });
 
     function showHideDowntimeCreatedTs() {
@@ -277,7 +277,7 @@ $(document).ready(function () {
     });
 
     if ($(".stoolKit2-checkbox").is(":checked")) {
-        $("#stoolKit2Samples").collapse("show");
+        bootstrap.Collapse.getOrCreateInstance(document.getElementById("stoolKit2Samples")).show();
         samplesMasonry.layout();
     }
 

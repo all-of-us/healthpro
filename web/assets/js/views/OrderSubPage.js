@@ -7,12 +7,14 @@ PMI.views["OrderSubPage"] = Backbone.View.extend({
         "click #unlock-order": "displayUnlockWarningModal"
     },
     displayHelpModal: function (e) {
-        this.$("#orderHelpModal").modal();
+        let helpModal = new bootstrap.Modal(this.$("#orderHelpModal")[0]);
+        helpModal.show();
     },
     displayUnlockWarningModal: function (e) {
-        var url = $(e.currentTarget).data("href");
+        let url = $(e.currentTarget).data("href");
         $("#unlock-continue").attr("href", url);
-        this.$("#unlockWarningModal").modal();
+        let unlockModal = new bootstrap.Modal(this.$("#unlockWarningModal")[0]);
+        unlockModal.show();
     },
     initialize: function () {
         this.render();

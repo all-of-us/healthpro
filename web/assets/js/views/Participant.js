@@ -38,12 +38,12 @@ $(document).ready(function () {
 
         // Switch to default tab if empty
         if (!hasOrgPatientStatusData) {
-            $('[href="#on_site_details"]').tab("show");
+            bootstrap.Tab.getOrCreateInstance($('[href="#on_site_details"]')[0]).show();
         }
 
         // Switch to patient status tab if there is a form error
         if ($(".patient-status-form").find("div").hasClass("alert-danger")) {
-            $('[href="#on_site_details"]').tab("show");
+            bootstrap.Tab.getOrCreateInstance($('[href="#on_site_details"]')[0]).show();
             // Display form
             setTimeout(function () {
                 $(".btn-patient-status-update").trigger("click");
@@ -51,7 +51,7 @@ $(document).ready(function () {
         }
 
         $(".patient-status-block").on("click", function () {
-            $('[href="#on_site_details"]').tab("show");
+            bootstrap.Tab.getOrCreateInstance($('[href="#on_site_details"]')[0]).show();
         });
 
         // Hide form by default if not empty
@@ -75,10 +75,9 @@ $(document).ready(function () {
 
         $(".patient-status-details").on("click", function (e) {
             e.preventDefault();
-            $(psDetailsModal).removeData("bs.modal");
             // Load data from url
             $("#patient-status-details-modal .modal-content").load($(this).attr("data-href"));
-            $(psDetailsModal).modal("show");
+            bootstrap.Modal.getOrCreateInstance(psDetailsModal[0]).show();
         });
 
         $(psDetailsModal).on("hidden.bs.modal", function () {

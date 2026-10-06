@@ -61,7 +61,7 @@
                 {% else %}
                     Save and mark as collected
                 {% endif %}
-                <span class="spinner-border spinner-border-sm-bs5" style="display: none;"></span>
+                <span class="spinner-border spinner-border-loading" style="display: none;"></span>
             </button>
             <a href="{{ path(routePrefix ~ 'participant', { id: participant.id }) }}" class="btn btn-secondary">Cancel</a>
         </p>
@@ -87,7 +87,7 @@
                     <img src="{{ asset('img/aou/order/4ml PST.png') }}" style="height: 80px" alt="4.5mL PST Tube">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -101,7 +101,7 @@
                     <p>Changing the PST tube type will remove the previously collected PST tube(s) and replace them with the other PST tube type option. Ensure the new PST tube type selected is checked off in the list below. Click the “update” button to save your changes.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-dismiss="modal">Go Back</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Go Back</button>
                     <button id="modal_trigger_update" type="button" class="btn btn-primary">Continue</button>
                 </div>
             </div>
@@ -144,6 +144,6 @@
 {% endblock %}
 
 {% block pagejs %}
-    {{ encore_entry_script_tags('order-sub-bs5') }}
+    {{ encore_entry_script_tags('order-sub') }}
     {{ encore_entry_script_tags('order-collect') }}
 {% endblock %}

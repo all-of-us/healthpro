@@ -135,7 +135,7 @@ $(document).ready(function () {
     showHideIncentiveFormFields();
 
     if ($(".incentive-form").find("div").hasClass("alert-danger")) {
-        $('[href="#on_site_details"]').tab("show");
+        bootstrap.Tab.getOrCreateInstance($('[href="#on_site_details"]')[0]).show();
     }
 
     let hasIncentives = $("#incentive_create").data("has-incentives");
@@ -154,25 +154,26 @@ $(document).ready(function () {
     $(".incentive-amend").on("click", function () {
         var url = $(this).data("href");
         $("#incentive_amend_ok").data("href", url);
-        $("#incentive_amend_modal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("incentive_amend_modal")).show();
     });
 
     $(".incentive-remove").on("click", function () {
         var incentiveId = $(this).data("id");
         $("#incentive_remove_id").val(incentiveId);
-        $("#incentive_remove_modal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("incentive_remove_modal")).show();
     });
 
     $("#incentive_amend_ok").on("click", function () {
-        var amendButton = $(this).button("loading");
+        var amendButton = $(this);
+        amendButton.prop("disabled", true);
         var incentiveEditFormModal = $("#incentive_edit_form_modal");
         var modelContent = $("#incentive_edit_form_modal .modal-content");
         modelContent.html("");
         // Load data from url
         modelContent.load($(this).data("href"), function () {
-            $("#incentive_amend_modal").modal("hide");
-            amendButton.button("reset");
-            incentiveEditFormModal.modal("show");
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("incentive_amend_modal")).hide();
+            amendButton.prop("disabled", false);
+            bootstrap.Modal.getOrCreateInstance(incentiveEditFormModal[0]).show();
         });
     });
 

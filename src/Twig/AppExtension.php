@@ -88,12 +88,12 @@ class AppExtension extends AbstractExtension
         switch ($type) {
             case 'alert':
                 if (isset($options['closeButton']) && $options['closeButton']) {
-                    $message .= ' <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                    $message .= ' <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
                 }
                 return '<div class="alert alert-info">' . $message . '</div>';
             case 'tooltip':
                 $tooltipText = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-                return '<span title="' . $tooltipText . '" data-toggle="tooltip" data-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span>';
+                return '<span title="' . $tooltipText . '" data-bs-toggle="tooltip" data-bs-container="body"><i class="fa fa-info-circle" aria-hidden="true"></i></span>';
             default:
                 return $message;
         }

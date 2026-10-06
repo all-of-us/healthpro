@@ -39,7 +39,7 @@ $(document).ready(function () {
     });
 
     $resubmitBtn.on("click", function () {
-        $orderResubmitConfirmationModal.modal("show");
+        bootstrap.Modal.getOrCreateInstance($orderResubmitConfirmationModal[0]).show();
     });
 
     $resubmitFinalizeBtn.on("click", function () {
