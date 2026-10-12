@@ -15,9 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
  *     physicalMeasurements: list<ReviewRow>|null,
  *     physicalMeasurementsCount: int,
  *     incentives: mixed,
- *     incentivesCount: int,
- *     idVerifications: mixed,
- *     idVerificationsCount: int
+ *     incentivesCount: int
  * }
  */
 class ReviewService
@@ -45,9 +43,7 @@ class ReviewService
         'physicalMeasurements' => null,
         'physicalMeasurementsCount' => 0,
         'incentives' => null,
-        'incentivesCount' => 0,
-        'idVerifications' => null,
-        'idVerificationsCount' => 0
+        'incentivesCount' => 0
     ];
 
     public function __construct(
