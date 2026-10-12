@@ -195,12 +195,6 @@ class DefaultController extends BaseController
         return $this->redirect($logoutUrl);
     }
 
-    #[Route(path: '/imports', name: 'imports_home')]
-    public function importsIndex(): Response
-    {
-        return $this->render('imports/index.html.twig');
-    }
-
     private function getHomeRedirectRoute(string $program): string
     {
         return $program === User::PROGRAM_NPH ? 'nph_home' : 'home';
