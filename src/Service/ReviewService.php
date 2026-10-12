@@ -13,9 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
  *     orders: list<ReviewRow>|null,
  *     ordersCount: int,
  *     physicalMeasurements: list<ReviewRow>|null,
- *     physicalMeasurementsCount: int,
- *     incentives: mixed,
- *     incentivesCount: int
+ *     physicalMeasurementsCount: int
  * }
  */
 class ReviewService
@@ -41,9 +39,7 @@ class ReviewService
         'orders' => null,
         'ordersCount' => 0,
         'physicalMeasurements' => null,
-        'physicalMeasurementsCount' => 0,
-        'incentives' => null,
-        'incentivesCount' => 0
+        'physicalMeasurementsCount' => 0
     ];
 
     public function __construct(
@@ -166,7 +162,6 @@ class ReviewService
     protected function getTodayRows(\DateTimeInterface $startDate, \DateTimeInterface $endDate, ?string $site): array
     {
         $startTime = $startDate->format('Y-m-d H:i:s');
-        $incentiveStartTime = $startDate->format('Y-m-d');
         $endTime = $endDate->format('Y-m-d H:i:s');
         $ordersQuery = 'SELECT o.participant_id, \'order\' as type, o.id, null as parent_id, o.order_id, o.rdr_id, o.biobank_id, o.created_ts, o.collected_ts, o.processed_ts, o.finalized_ts, o.finalized_samples, o.biobank_finalized, o.type as order_type, ' .
             'greatest(coalesce(o.created_ts, 0), coalesce(o.collected_ts, 0), coalesce(o.processed_ts, 0), coalesce(o.finalized_ts, 0), coalesce(oh.created_ts, 0)) AS latest_ts, ' .
@@ -201,7 +196,6 @@ class ReviewService
 
         return $this->em->getConnection()->fetchAllAssociative($query, [
             'startTime' => $startTime,
-            'incentiveStartTime' => $incentiveStartTime,
             'endTime' => $endTime,
             'site' => $site
         ]);

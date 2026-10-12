@@ -74,7 +74,7 @@
         </thead>
         <tbody>
         {% for id, participant in participants %}
-            {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount, participant.incentivesCount) %}
+            {% set maxCount = max(participant.ordersCount, participant.physicalMeasurementsCount) %}
             {% set rowSpan = 'rowspan=' ~ maxCount %}
             {% for i in 0..maxCount - 1 %}
                 {% set isPediatricParticipant = participant.participant is defined and participant.participant is not empty and participant.participant.isPediatric ? true : false %}
