@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Entity\Order;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -17,6 +18,16 @@ class BiobankOrderType extends AbstractType
     {
         $disabled = $options['order']->isFormDisabled();
         $samples = $options['order']->getCustomRequestedSamples();
+        if ($options['order']->isPediatricOrder() && $options['order']->getType() === Order::ORDER_TYPE_SALIVA) {
+            $collectedSample = json_decode($options['order']->getCollectedSamples(), true);
+            $removeSample = Order::PEDIATRIC_SALIVA_SAMPLE_HIDE;
+            if (!empty($collectedSample) && $collectedSample[0] === Order::PEDIATRIC_SALIVA_SAMPLE_HIDE) {
+                $removeSample = Order::PEDIATRIC_SALIVA_SAMPLE_DEFAULT;
+            }
+            if (($key = array_search($removeSample, $samples)) !== false) {
+                unset($samples[$key]);
+            }
+        }
         if (!empty($samples)) {
             $samplesDisabled = $disabled;
             $builder->add('finalizedSamples', Type\ChoiceType::class, [

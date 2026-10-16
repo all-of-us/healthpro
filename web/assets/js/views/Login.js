@@ -1,8 +1,10 @@
-require("bootstrap5");
+const bootstrap = require("bootstrap5");
 require("../../css/login.css");
 
 $(document).ready(function () {
-    $(".carousel").carousel({
-        interval: 5000
+    document.querySelectorAll(".carousel").forEach((carouselEl) => {
+        new bootstrap.Carousel(carouselEl, {
+            interval: 5000
+        });
     });
 });

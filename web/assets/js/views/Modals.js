@@ -93,7 +93,7 @@ window.PmiConfirmModal = Backbone.View.extend({
         // if the output is undefined then assume the function isn't being
         // used to control the modal
         if (closeModal || _.isUndefined(closeModal)) {
-            this.$el.modal("hide");
+            bootstrap.Modal.getOrCreateInstance(this.$el[0]).hide();
             this.shutdown();
         }
     },
@@ -103,7 +103,7 @@ window.PmiConfirmModal = Backbone.View.extend({
     },
     cancel: function () {
         this._onFalse(this);
-        this.$el.modal("hide");
+        bootstrap.Modal.getOrCreateInstance(this.$el[0]).hide();
         this.shutdown();
     },
     shutdown: function () {
@@ -144,10 +144,7 @@ window.PmiConfirmModal = Backbone.View.extend({
         // then add any additional classes
         if (this._titleClass.length > 0) this.$(".modal-title").addClass(this._titleClass);
 
-        this.$el.modal({ backdrop: "static" });
-
-        // Handle bootstrap 5 modal
-        let modal = new bootstrap.Modal(this.$el, { backdrop: "static" });
+        let modal = new bootstrap.Modal(this.$el[0], { backdrop: "static" });
         modal.show();
     }
 });

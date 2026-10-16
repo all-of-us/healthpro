@@ -34,7 +34,7 @@
                 html += caption;
             }
             this.$("#helpModal .modal-body").html(html);
-            this.$("#helpModal").modal();
+            bootstrap.Modal.getOrCreateInstance(this.$("#helpModal")[0]).show();
         },
         initialize: function () {
             this.render();

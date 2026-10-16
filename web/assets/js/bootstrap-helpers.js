@@ -1,8 +1,13 @@
-$(document).ready(function () {
-    let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+window.initTooltips = (root = document) => {
+    [].slice.call(root.querySelectorAll('[data-bs-toggle="tooltip"]')).forEach((tooltipTriggerEl) => {
+        if (!bootstrap.Tooltip.getInstance(tooltipTriggerEl)) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        }
     });
+};
+
+$(document).ready(function () {
+    window.initTooltips();
 
     let popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
     popoverTriggerList.map(function (popoverTriggerEl) {

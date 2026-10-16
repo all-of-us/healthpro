@@ -51,7 +51,7 @@ $(document).ready(function () {
                             var statusTitle = status === 2 ? "Invalid Participant Id" : "Invalid User";
                             return (
                                 html +
-                                ' <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true" data-toggle="tooltip" data-container="body" data-placement="bottom" title="' +
+                                ' <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true" data-bs-toggle="tooltip" data-bs-container="body" data-bs-placement="bottom" title="' +
                                 statusTitle +
                                 '"></i>'
                             );
@@ -67,7 +67,7 @@ $(document).ready(function () {
         ]
     });
 
-    importDetailsSelector.tooltip({
-        selector: '[data-toggle="tooltip"]'
+    new bootstrap.Tooltip(importDetailsSelector[0], {
+        selector: '[data-bs-toggle="tooltip"]'
     });
 });

@@ -44,12 +44,12 @@
                             {% if participant.awardee != siteInfo.siteAwardee %}
                                 <i class="fa fa-info-circle text-warning"
                                    title="Participant paired awardee is different from your awardee"
-                                   data-toggle="tooltip"></i>
+                                   data-bs-toggle="tooltip"></i>
                             {% endif %}
                             {{ siteInfo.awardeeDisplayName(participant.awardee) }}
                         {% else %}
                             <i class="fa fa-info-circle text-warning" title="Participant is unpaired"
-                               data-toggle="tooltip"></i>
+                               data-bs-toggle="tooltip"></i>
                             <span class="text-muted">Unpaired</span>
                         {% endif %}
                     </td>
@@ -59,14 +59,14 @@
                                 {% if participant.searchField == 'loginPhone' %}
                                     Login Phone
                                     <span title="This is the verified SMS number used during registration"
-                                          data-toggle="tooltip">
+                                          data-bs-toggle="tooltip">
                                         <span class="sr-only">What is Login Phone?</span>
                                         <i class="fa fa-question-circle text-info"></i>
                                     </span>
                                 {% else %}
                                     Contact Phone
                                     <span title="This is the phone number provided after consent"
-                                          data-toggle="tooltip">
+                                          data-bs-toggle="tooltip">
                                         <span class="sr-only">What is Contact Phone?</span>
                                         <i class="fa fa-question-circle text-info"></i>
                                     </span>

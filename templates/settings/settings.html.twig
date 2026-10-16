@@ -13,7 +13,7 @@
                     <button type="submit" class="btn btn-primary btn-small">
                         Update Settings
                         {% if app.session.get('ppscRequestId') is not empty %}
-                            <span class="spinner-border spinner-border-sm-bs5 ms-2" style="display: none;"></span>
+                            <span class="spinner-border spinner-border-loading ms-2" style="display: none;"></span>
                         {% endif %}
                     </button>
                 </div>

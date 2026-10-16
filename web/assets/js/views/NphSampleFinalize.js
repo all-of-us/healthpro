@@ -7,21 +7,21 @@ $(document).ready(function () {
             return;
         }
         if ($(".sample-finalize-form").parsley().validate()) {
-            $("#confirmation_modal").modal("show");
+            bootstrap.Modal.getOrCreateInstance(document.getElementById("confirmation_modal")).show();
         }
     });
 
     $("#sample_refinalize_btn").on("click", function (e) {
-        $("#confirmation_resubmit_modal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("confirmation_resubmit_modal")).show();
     });
 
     $("#confirm_finalize_btn").on("click", function () {
-        $("#confirmation_modal").modal("hide");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("confirmation_modal")).hide();
         $("form[name='nph_sample_finalize']").submit();
     });
 
     $("#confirm_resubmit_btn").on("click", function () {
-        $("#confirmation_resubmit_modal").modal("hide");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("confirmation_resubmit_modal")).hide();
         $("form[name='nph_sample_resubmit']").submit();
     });
 
@@ -445,10 +445,10 @@ $(document).ready(function () {
     });
 
     $("#aliquot_collection_notes_help").on("click", function () {
-        $("#aliquot_collection_notes_modal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("aliquot_collection_notes_modal")).show();
     });
 
     $("#aliquot_mop_expand").on("click", function () {
-        $("#aliquot_mop_modal").modal("show");
+        bootstrap.Modal.getOrCreateInstance(document.getElementById("aliquot_mop_modal")).show();
     });
 });
