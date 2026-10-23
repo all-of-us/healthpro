@@ -8,5 +8,6 @@ session.use_only_cookies = 1
 session.cookie_httponly = 1
 session.cookie_secure = 1
 session.cookie_samesite= "Lax"
+session.upload_progress.enabled = 0
 extension=grpc.so
 session.gc_probability = 0
