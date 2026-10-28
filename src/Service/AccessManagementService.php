@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Audit\Log;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
 
@@ -21,7 +22,8 @@ class AccessManagementService
         ParameterBagInterface $params,
         Environment $twig,
         UserService $userService,
-        ContextTemplateService $contextTemplateService
+        ContextTemplateService $contextTemplateService,
+        private LoggerInterface $logger
     ) {
         $this->loggerService = $loggerService;
         $this->env = $env;
@@ -38,7 +40,7 @@ class AccessManagementService
         \DateTime $currentTime,
         string $attestation = null
     ): void {
-        $message = new Message($this->env, $this->loggerService, $this->twig, $this->params);
+        $message = new Message($this->env, $this->loggerService, $this->twig, $this->params, $this->logger);
         if ($this->params->has('feature.drcsupportemail') && $this->params->get('feature.drcsupportemail')) {
             $message
                 ->setTo($this->params->get('feature.drcsupportemail'))
