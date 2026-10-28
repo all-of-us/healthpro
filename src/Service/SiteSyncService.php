@@ -7,6 +7,7 @@ use App\Entity\Awardee;
 use App\Entity\Organization;
 use App\Entity\Site;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use stdClass;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -44,7 +45,8 @@ class SiteSyncService
         LoggerService $loggerService,
         ParameterBagInterface $params,
         NormalizerInterface $normalizer,
-        GoogleGroupsService $googleGroupsService
+        GoogleGroupsService $googleGroupsService,
+        private LoggerInterface $logger
     ) {
         $this->rdrApiService = $rdrApiService;
         $this->em = $em;
@@ -283,7 +285,7 @@ class SiteSyncService
             }
             $user = $this->googleGroupsService->getUser($member->email);
             if (is_null($user)) {
-                error_log('Unable to retrieve user details: ' . $member->email);
+                $this->logger->warning('Unable to retrieve user details', ['email' => $member->email]);
                 continue;
             }
             foreach ($user->emails as $email) {
