@@ -7,6 +7,7 @@ use App\Drc\Exception\InvalidDobException;
 use App\Drc\Exception\InvalidResponseException;
 use App\Helper\NphParticipant;
 use App\Service\RdrApiService;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class NphParticipantSummaryService
@@ -16,11 +17,13 @@ class NphParticipantSummaryService
 
     protected RdrApiService $api;
     protected ParameterBagInterface $params;
+    protected LoggerInterface $logger;
 
-    public function __construct(RdrApiService $api, ParameterBagInterface $params)
+    public function __construct(RdrApiService $api, ParameterBagInterface $params, LoggerInterface $logger)
     {
         $this->api = $api;
         $this->params = $params;
+        $this->logger = $logger;
     }
 
     public function getParticipantById(string $participantId, ?string $refresh = null): NphParticipant|false
@@ -41,7 +44,7 @@ class NphParticipantSummaryService
                     $participant = $cacheItem->get();
                 }
             } catch (\Exception $e) {
-                error_log($e->getMessage());
+                $this->logger->error('Failed to read NPH participant cache: ' . $e->getMessage(), ['participantId' => $participantId]);
             }
         }
         if (!$participant) {
@@ -52,7 +55,7 @@ class NphParticipantSummaryService
                 $edges = $result->participant->edges;
                 $participant = !empty($edges) ? $edges[0]->node : null;
             } catch (\Exception $e) {
-                error_log($e->getMessage());
+                $this->logger->error('Failed to fetch NPH participant: ' . $e->getMessage(), ['participantId' => $participantId]);
                 return false;
             }
             if ($participant && $cacheEnabled) {
@@ -83,7 +86,7 @@ class NphParticipantSummaryService
         try {
             $response = $this->api->GQLPost('rdr/v1/nph_participant', $query);
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            $this->logger->error('NPH participant search failed: ' . $e->getMessage());
             throw new FailedRequestException();
         }
 
@@ -117,7 +120,7 @@ class NphParticipantSummaryService
             $edges = $result['participant']['edges'];
             return !empty($edges) ? $edges[0]['node'] : null;
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            $this->logger->error('Failed to fetch NPH participant details: ' . $e->getMessage(), ['participantId' => $participantId]);
             return null;
         }
     }

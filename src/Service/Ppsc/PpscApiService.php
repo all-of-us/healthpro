@@ -90,7 +90,7 @@ class PpscApiService
                     $participant = $cacheItem->get();
                 }
             } catch (\Exception $e) {
-                error_log($e->getMessage());
+                $this->logger->error('Failed to read PPSC participant cache: ' . $e->getMessage(), ['participantId' => $participantId]);
             }
         }
         if (!$participant) {
@@ -194,7 +194,7 @@ class PpscApiService
                     return $this->accessToken;
                 }
             } catch (\Exception $e) {
-                error_log($e->getMessage());
+                $this->logger->error('Failed to read PPSC access token cache: ' . $e->getMessage());
             }
         }
 
@@ -223,7 +223,7 @@ class PpscApiService
                     $cacheItem->set($this->accessToken);
                     $cache->save($cacheItem);
                 } catch (\Exception $e) {
-                    error_log($e->getMessage());
+                    $this->logger->error('Failed to cache PPSC access token: ' . $e->getMessage());
                 }
                 return $this->accessToken;
             }
