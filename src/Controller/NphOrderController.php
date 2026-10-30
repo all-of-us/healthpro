@@ -25,6 +25,7 @@ use App\Service\Nph\NphOrderService;
 use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\SiteService;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\SubmitButton;
@@ -630,7 +631,7 @@ class NphOrderController extends BaseController
     }
 
     #[Route(path: '/aliquot/instructions/file/{id}', name: 'aliquot_instructions_file')]
-    public function aliquotInstructions(string $id, GcsBucketService $gcsBucketService, ParameterBagInterface $params): Response
+    public function aliquotInstructions(string $id, GcsBucketService $gcsBucketService, ParameterBagInterface $params, LoggerInterface $logger): Response
     {
         $document = Samples::$aliquotDocuments[$id] ?? null;
         if (!$document) {
@@ -648,7 +649,7 @@ class NphOrderController extends BaseController
             $streamedResponse->headers->set('Content-Type', 'application/pdf');
             return $streamedResponse;
         } catch (\Exception $e) {
-            error_log('Failed to retrieve aliquot instructions file ' . $documentFile . ' (' . $id . ')');
+            $logger->error('Failed to retrieve aliquot instructions file: ' . $e->getMessage(), ['file' => $documentFile, 'id' => $id]);
             return new Response(
                 '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>',
                 Response::HTTP_BAD_GATEWAY,

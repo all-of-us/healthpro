@@ -6,13 +6,14 @@ use App\Entity\Site;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Exception;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
 
 /**
  * @extends ServiceEntityRepository<Site>
  */
 class SiteRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, private LoggerInterface $logger)
     {
         parent::__construct($registry, Site::class);
     }
@@ -111,7 +112,7 @@ class SiteRepository extends ServiceEntityRepository
             $connection = $this->getEntityManager()->getConnection();
             $connection->executeStatement($sql);
         } catch (Exception $e) {
-            error_log($e->getMessage());
+            $this->logger->error('Failed to set group_concat_max_len: ' . $e->getMessage(), ['maxLength' => $newMaxLength]);
         }
     }
 

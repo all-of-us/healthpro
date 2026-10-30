@@ -126,7 +126,8 @@ class DefaultController extends BaseController
                 'submitted_token' => $request->request->get('csrf_token'),
                 'referrer' => $request->headers->get('referer')
             ]);
-            throw $this->createAccessDeniedException();
+            // Expired sessions invalidate the token, avoid logging an uncaught exception for each ping
+            return new JsonResponse([], Response::HTTP_FORBIDDEN);
         }
         $request->getSession()->set('pmiLastUsed', time());
         return (new JsonResponse())->setData([]);

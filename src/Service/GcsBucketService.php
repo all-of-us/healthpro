@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Google\Cloud\Storage\StorageClient;
 use Google\Cloud\Storage\StorageObject;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -13,7 +14,7 @@ class GcsBucketService
     /** @var array<string, mixed> */
     protected array $config = [];
 
-    public function __construct(EnvironmentService $environment, KernelInterface $appKernel, ParameterBagInterface $params)
+    public function __construct(EnvironmentService $environment, KernelInterface $appKernel, ParameterBagInterface $params, private LoggerInterface $logger)
     {
         $this->storageClient = new StorageClient();
         $basePath = $appKernel->getProjectDir();
@@ -47,7 +48,7 @@ class GcsBucketService
             ]);
             return true;
         } catch (\Exception $e) {
-            error_log($e->getMessage());
+            $this->logger->error('GCS upload failed: ' . $e->getMessage(), ['bucket' => $bucket, 'destination' => $destinationBlobName]);
             return false;
         }
     }

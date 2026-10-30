@@ -90,7 +90,7 @@ class PpscApiService
                     $participant = $cacheItem->get();
                 }
             } catch (\Exception $e) {
-                error_log($e->getMessage());
+                $this->logger->error('Failed to read PPSC participant cache: ' . $e->getMessage(), ['participantId' => $participantId]);
             }
         }
         if (!$participant) {
@@ -194,7 +194,7 @@ class PpscApiService
                     return $this->accessToken;
                 }
             } catch (\Exception $e) {
-                error_log($e->getMessage());
+                $this->logger->error('Failed to read PPSC access token cache: ' . $e->getMessage());
             }
         }
 
@@ -223,7 +223,7 @@ class PpscApiService
                     $cacheItem->set($this->accessToken);
                     $cache->save($cacheItem);
                 } catch (\Exception $e) {
-                    error_log($e->getMessage());
+                    $this->logger->error('Failed to cache PPSC access token: ' . $e->getMessage());
                 }
                 return $this->accessToken;
             }
@@ -280,9 +280,15 @@ class PpscApiService
             }
             $response = $this->post('assents', $payload);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->salesforceId, $result->status)) {
+            $missing = array_filter(
+                ['salesforceId', 'status'],
+                fn (string $field) => !is_object($result) || empty($result->$field)
+            );
+            if (!$missing) {
                 return $result;
             }
+            $this->lastError = 'PPSC API response missing ' . implode(' and ', $missing);
+            $this->logger->error($this->lastError);
         } catch (\Exception $e) {
             $this->logException($e);
             return false;

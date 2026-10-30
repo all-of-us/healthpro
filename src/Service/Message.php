@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Mail\Mandrill;
 use App\Mail\Sendgrid;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Twig\Environment;
 
@@ -26,7 +27,7 @@ class Message
     protected int $method;
     protected ?string $template = null;
 
-    public function __construct(EnvironmentService $env, LoggerService $logger, Environment $twig, ParameterBagInterface $params)
+    public function __construct(EnvironmentService $env, LoggerService $logger, Environment $twig, ParameterBagInterface $params, private LoggerInterface $psrLogger)
     {
         $this->env = $env;
         $this->logger = $logger;
@@ -106,7 +107,7 @@ class Message
                 try {
                     $mandrill->send($this->to, $this->from, $this->subject, $this->content, $tags);
                 } catch (\Exception $e) {
-                    error_log($e->getMessage());
+                    $this->psrLogger->error('Mandrill send failed: ' . $e->getMessage(), ['recipients' => $this->to, 'subject' => $this->subject]);
                 }
                 break;
 
@@ -119,11 +120,11 @@ class Message
                 if ($this->template) {
                     $tags[] = $this->template;
                 }
-                $sendgrid = new Sendgrid((string) $this->params->get('sendgrid_key'));
+                $sendgrid = new Sendgrid((string) $this->params->get('sendgrid_key'), $this->psrLogger);
                 try {
                     $sendgrid->send($this->to, $this->from, $this->subject, $this->content, $tags);
                 } catch (\Exception $e) {
-                    error_log($e->getMessage());
+                    $this->psrLogger->error('Sendgrid send failed: ' . $e->getMessage(), ['recipients' => $this->to, 'subject' => $this->subject]);
                 }
                 break;
 
