@@ -280,9 +280,15 @@ class PpscApiService
             }
             $response = $this->post('assents', $payload);
             $result = json_decode($response->getBody()->getContents());
-            if (is_object($result) && isset($result->salesforceId, $result->status)) {
+            $missing = array_filter(
+                ['salesforceId', 'status'],
+                fn (string $field) => !is_object($result) || empty($result->$field)
+            );
+            if (!$missing) {
                 return $result;
             }
+            $this->lastError = 'PPSC API response missing ' . implode(' and ', $missing);
+            $this->logger->error($this->lastError);
         } catch (\Exception $e) {
             $this->logException($e);
             return false;
