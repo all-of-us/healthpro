@@ -24,7 +24,7 @@ Prerequisites:
         * `gcloud components install cloud_sql_proxy`
         * `gcloud components install app-engine-php`  **NOTE:** This is not available in WSL and may not be required
 * [NodeJS](https://nodejs.org/) (latest LTS should be fine)
-* [MySQL](https://dev.mysql.com/downloads/mysql/) (select version 5.7 which is used by Google Cloud SQL)
+* [MySQL](https://dev.mysql.com/downloads/mysql/) (select version 8.4 which is used by Google Cloud SQL)
 * [Composer](https://getcomposer.org/doc/00-intro.md#globally)
 * [git-secrets](https://github.com/awslabs/git-secrets#installing-git-secrets)
 * [Symfony CLI](https://symfony.com/download)
