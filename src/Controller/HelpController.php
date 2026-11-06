@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\HttpClient;
 use App\Service\HelpService;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -45,7 +46,7 @@ class HelpController extends BaseController
     }
 
     #[Route(path: '/sop/file/{id}/{language}/{documentGroup}', name: 'help_sopFile')]
-    public function sopFileAction(string $id, string $language, HelpService $helpService, string $documentGroup = 'hpo'): Response
+    public function sopFileAction(string $id, string $language, HelpService $helpService, LoggerInterface $logger, string $documentGroup = 'hpo'): Response
     {
         $document = $helpService->getDocumentInfo($id, $documentGroup);
         if (!$document) {
@@ -71,7 +72,7 @@ class HelpController extends BaseController
             $streamedResponse->headers->set('Content-Type', 'application/pdf');
             return $streamedResponse;
         } catch (\Exception $e) {
-            error_log('Failed to retrieve Confluence file ' . $url . ' (' . $id . ')');
+            $logger->error('Failed to retrieve Confluence file: ' . $e->getMessage(), ['url' => $url, 'id' => $id]);
             echo '<html><body style="font-family: Helvetica Neue,Helvetica,Arial,sans-serif"><strong>File could not be loaded</strong></body></html>';
             exit;
         }

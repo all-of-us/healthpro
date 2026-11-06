@@ -4,12 +4,13 @@ namespace App\Mail;
 
 use App\HttpClient;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 class Sendgrid
 {
     private HttpClient $client;
 
-    public function __construct(string $apiKey)
+    public function __construct(string $apiKey, private LoggerInterface $logger)
     {
         $this->client = new HttpClient([
             'base_uri' => 'https://api.sendgrid.com/v3/',
@@ -54,10 +55,15 @@ class Sendgrid
             if ($response->getStatusCode() === 202) {
                 return true;
             }
-            error_log('SendGrid API Error: ' . $response->getStatusCode() . ' ' . $response->getBody()->getContents());
+            $this->logger->error('SendGrid API error', [
+                'status' => $response->getStatusCode(),
+                'body' => $response->getBody()->getContents(),
+                'recipients' => $to,
+                'subject' => $subject
+            ]);
             return false;
         } catch (\Exception $e) {
-            error_log('SendGrid Exception: ' . $e->getMessage());
+            $this->logger->error('SendGrid exception: ' . $e->getMessage(), ['recipients' => $to, 'subject' => $subject]);
             return false;
         }
     }

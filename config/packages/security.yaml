@@ -28,6 +28,7 @@ security:
         - { path: ^/nph/timezone-required($|\/), roles: [ROLE_NPH_USER, ROLE_NPH_BIOBANK, ROLE_NPH_ADMIN] }
         - { path: ^/nph/biobank($|\/), roles: ROLE_NPH_BIOBANK }
         - { path: ^/nph/admin($|\/).*, roles: ROLE_NPH_ADMIN }
+        - { path: ^/nph/aliquot/instructions($|\/), roles: [ROLE_NPH_USER, ROLE_NPH_BIOBANK] }
         - { path: ^/nph($|\/).*, roles: ROLE_NPH_USER }
         - { path: ^/problem($|\/).*, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/settings($|\/), roles: [ROLE_USER, ROLE_NPH_USER, ROLE_ADMIN, ROLE_AWARDEE, ROLE_DV_ADMIN, ROLE_BIOBANK, ROLE_SCRIPPS, ROLE_AWARDEE_SCRIPPS, ROLE_READ_ONLY] }

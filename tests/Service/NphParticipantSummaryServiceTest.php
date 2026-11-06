@@ -6,6 +6,7 @@ use App\Helper\NphParticipant;
 use App\Service\Nph\NphParticipantSummaryService;
 use App\Service\RdrApiService;
 use GuzzleHttp\Psr7\Response;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
@@ -21,7 +22,7 @@ class NphParticipantSummaryServiceTest extends ServiceTestCase
         $mockRdrApiService = $this->createStub(RdrApiService::class);
         $data = $this->getMockRdrResponseData();
         $mockRdrApiService->method('GQLPost')->willReturn($this->getGuzzleResponse($data));
-        $nphParticipantService = new NphParticipantSummaryService($mockRdrApiService, $mockParamsService);
+        $nphParticipantService = new NphParticipantSummaryService($mockRdrApiService, $mockParamsService, $this->createStub(LoggerInterface::class));
 
         // Test the getParticipantById method with a valid participant ID
         $result = $nphParticipantService->getParticipantById('123456');
@@ -41,11 +42,23 @@ class NphParticipantSummaryServiceTest extends ServiceTestCase
         $mockRdrApiService->method('GQLPost')->willReturn($this->getGuzzleResponse($data));
         $nphParticipantService = new NphParticipantSummaryService(
             $mockRdrApiService,
-            static::getContainer()->get(ParameterBagInterface::class)
+            static::getContainer()->get(ParameterBagInterface::class),
+            $this->createStub(LoggerInterface::class)
         );
         $result = $nphParticipantService->getAllParticipantDetailsById('123456');
         $this->assertEquals('123456', $result['participantNphId']);
         $this->assertEquals('John', $result['firstName']);
+    }
+
+    public function testGetAllParticipantDetailsByIdLogsFailure()
+    {
+        $mockRdrApiService = $this->createStub(RdrApiService::class);
+        $mockRdrApiService->method('GQLPost')->willThrowException(new \Exception('rdr down'));
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('error')
+            ->with($this->stringContains('rdr down'), ['participantId' => '123456']);
+        $service = new NphParticipantSummaryService($mockRdrApiService, new ParameterBag(), $logger);
+        $this->assertNull($service->getAllParticipantDetailsById('123456'));
     }
 
     public function testSearch()
@@ -55,7 +68,8 @@ class NphParticipantSummaryServiceTest extends ServiceTestCase
         $mockRdrApiService->method('GQLPost')->willReturn($this->getGuzzleResponse($data));
         $nphParticipantService = new NphParticipantSummaryService(
             $mockRdrApiService,
-            static::getContainer()->get(ParameterBagInterface::class)
+            static::getContainer()->get(ParameterBagInterface::class),
+            $this->createStub(LoggerInterface::class)
         );
         $params = [
             'lastName' => 'John',

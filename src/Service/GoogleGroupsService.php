@@ -9,6 +9,7 @@ use Google\Service\Directory\Group as GoogleGroup;
 use Google\Service\Directory\Member as GoogleMember;
 use Google\Service\Directory\User as GoogleUser;
 use Google\Service\Exception as GoogleException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 /**
@@ -21,7 +22,7 @@ class GoogleGroupsService
     private ?string $domain = null;
     private ?GoogleDirectory $client = null;
 
-    public function __construct(ContainerBagInterface $params, EnvironmentService $env)
+    public function __construct(ContainerBagInterface $params, EnvironmentService $env, private LoggerInterface $logger)
     {
         $gaBypass = $env->isLocal() && $params->has('gaBypass') && $params->get('gaBypass');
         if (!$env->values['isUnitTest'] && !$gaBypass) {
@@ -239,14 +240,18 @@ class GoogleGroupsService
                 $reason = isset($message->error->errors[0]->reason) ? $message->error->errors[0]->reason : 'unknown';
                 if (in_array($e->getCode(), [403, 429]) && in_array($reason, ['userRateLimitExceeded', 'quotaExceeded', 'rateLimitExceeded']) && $retryCount < self::RETRY_LIMIT) {
                     $micros = self::calculateBackoff($retryCount);
-                    error_log("$resourceName.$methodName was rate-limited; " .
-                        'retrying in ' . (round($micros / 1000000, 3)) .
-                        ' seconds...');
+                    $this->logger->warning("$resourceName.$methodName was rate-limited; retrying", [
+                        'retryCount' => $retryCount,
+                        'retryInSeconds' => round($micros / 1000000, 3)
+                    ]);
                     usleep($micros);
                     $doRetry = true;
                     $retryCount++;
                 } else {
-                    error_log($e->getCode() . '-' . $reason);
+                    $this->logger->error("$resourceName.$methodName failed", [
+                        'code' => $e->getCode(),
+                        'reason' => $reason
+                    ]);
                     throw $e;
                 }
             }
